@@ -18,8 +18,11 @@
 #ifndef TRINITYCORE_CHAT_H
 #define TRINITYCORE_CHAT_H
 
+#include "ChatCommand.h"
 #include "ObjectGuid.h"
+#include "SharedDefines.h"
 #include "StringFormat.h"
+#include <vector>
 
 class ChatHandler;
 class Creature;
