@@ -1387,7 +1387,6 @@ void GameObject::Update(uint32 diff)
                 UpdateObjectVisibilityOnDestroy();
             else
                 AddObjectToRemoveList();
-
             break;
         }
     }
