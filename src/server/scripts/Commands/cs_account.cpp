@@ -41,6 +41,7 @@ EndScriptData */
 #include "World.h"
 #include "WorldSession.h"
 #include <unordered_map>
+#include <openssl/rand.h>
 
 using namespace Trinity::ChatCommands;
 

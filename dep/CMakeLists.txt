@@ -31,6 +31,7 @@ if(SERVERS)
   add_subdirectory(gsoap)
   add_subdirectory(rapidjson)
   add_subdirectory(efsw)
+  add_subdirectory(argon2)
   add_subdirectory(protobuf)
 endif()
 

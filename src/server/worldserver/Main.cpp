@@ -47,6 +47,7 @@
 #include "ScriptMgr.h"
 #include "ScriptReloadMgr.h"
 #include "SecretMgr.h"
+#include "SharedDefines.h"
 #include "TCSoap.h"
 #include "TerrainMgr.h"
 #include "ThreadPool.h"
