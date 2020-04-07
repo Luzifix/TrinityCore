@@ -451,6 +451,9 @@ void DBUpdater<T>::ApplyFile(DatabaseWorkerPool<T>& pool, std::string const& hos
     args.emplace_back("-e");
     args.emplace_back(Trinity::StringFormat("BEGIN; SOURCE %s; COMMIT;", path.generic_string().c_str()));
 
+    if (ssl == "ssl")
+        args.push_back("--ssl");
+
     // Database
     if (!database.empty())
         args.emplace_back(database);
