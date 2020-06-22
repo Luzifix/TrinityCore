@@ -13,6 +13,9 @@ CollectSourceFiles(
   PRIVATE_SOURCES)
 
 list(APPEND PRIVATE_SOURCES ${sources_windows})
+if(WIN32)
+  list(APPEND PRIVATE_SOURCES ${sources_windows})
+endif()
 
 add_executable(mmaps_generator ${PRIVATE_SOURCES})
 
