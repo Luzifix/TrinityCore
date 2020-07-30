@@ -217,6 +217,13 @@ class DatabaseWorkerPool
 
         char const* GetDatabaseName() const;
 
+        void WarnAboutSyncQueries([[maybe_unused]] bool warn)
+        {
+#ifdef TRINITY_DEBUG
+            _warnSyncQueries = warn;
+#endif
+        }
+
     private:
         uint32 OpenConnections(InternalIndex type, uint8 numConnections);
 
