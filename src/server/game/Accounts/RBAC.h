@@ -753,7 +753,7 @@ enum RBACPermissions
     // IF YOU ADD NEW PERMISSIONS, ADD THEM IN 3.3.5 BRANCH AS WELL!
     //
     // custom permissions 1000+
-    RBAC_PERM_COMMAND_HOUSING                               = 2000,   
+    RBAC_PERM_COMMAND_HOUSING                               = 2000,
     RBAC_PERM_COMMAND_HOUSING_RELOAD                        = 2001,
     RBAC_PERM_COMMAND_HOUSING_CURD                          = 2002,
     RBAC_PERM_COMMAND_HOUSING_DELETE                        = 2003,
