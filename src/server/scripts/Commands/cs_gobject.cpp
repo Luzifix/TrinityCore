@@ -43,6 +43,7 @@ EndScriptData */
 #include "RBAC.h"
 #include "WorldSession.h"
 #include <sstream>
+#include <typeinfo>
 
 using namespace Trinity::ChatCommands;
 
