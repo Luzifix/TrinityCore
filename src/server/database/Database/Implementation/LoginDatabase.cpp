@@ -122,9 +122,11 @@ void LoginDatabaseConnection::DoPrepareStatements()
 
     PrepareStatement(LOGIN_SEL_BNET_AUTHENTICATION, "SELECT ba.id, ba.sha_pass_hash, ba.failed_logins, ba.LoginTicket, ba.LoginTicketExpiry, bab.unbandate > UNIX_TIMESTAMP() OR bab.unbandate = bab.bandate FROM battlenet_accounts ba LEFT JOIN battlenet_account_bans bab ON ba.id = bab.id WHERE email = ?", CONNECTION_ASYNC);
     PrepareStatement(LOGIN_UPD_BNET_AUTHENTICATION, "UPDATE battlenet_accounts SET LoginTicket = ?, LoginTicketExpiry = ? WHERE id = ?", CONNECTION_ASYNC);
-    PrepareStatement(LOGIN_SEL_BNET_EXISTING_AUTHENTICATION, "SELECT LoginTicketExpiry FROM battlenet_accounts WHERE LoginTicket = ?", CONNECTION_ASYNC);
+    PrepareStatement(LOGIN_UPD_BNET_AUTHENTICATION_WITH_HARDWARE_INFORMATION, "UPDATE battlenet_accounts SET LoginTicket = ?, LoginTicketExpiry = ?, hardwareHash = ?, gatewayMac = ?, cpuId = ?, volumeIds = ? WHERE id = ?", CONNECTION_ASYNC);
+    PrepareStatement(LOGIN_SEL_BNET_EXISTING_AUTHENTICATION, "SELECT LoginTicketExpiry, id FROM battlenet_accounts WHERE LoginTicket = ?", CONNECTION_ASYNC);
     PrepareStatement(LOGIN_SEL_BNET_EXISTING_AUTHENTICATION_BY_ID, "SELECT LoginTicket FROM battlenet_accounts WHERE id = ?", CONNECTION_ASYNC);
     PrepareStatement(LOGIN_UPD_BNET_EXISTING_AUTHENTICATION, "UPDATE battlenet_accounts SET LoginTicketExpiry = ? WHERE LoginTicket = ?", CONNECTION_ASYNC);
+    PrepareStatement(LOGIN_UPD_BNET_EXISTING_AUTHENTICATION_WITH_HARDWARE_INFORMATION, "UPDATE battlenet_accounts SET LoginTicketExpiry = ?, hardwareHash = ?, gatewayMac = ?, cpuId = ?, volumeIds = ? WHERE LoginTicket = ?", CONNECTION_ASYNC);
     PrepareStatement(LOGIN_SEL_BNET_ACCOUNT_INFO, "SELECT " BnetAccountInfo ", " BnetGameAccountInfo ""
         " FROM battlenet_accounts ba LEFT JOIN battlenet_account_bans bab ON ba.id = bab.id LEFT JOIN account a ON ba.id = a.battlenet_account"
         " LEFT JOIN account_banned ab ON a.id = ab.id AND ab.active = 1 LEFT JOIN account_access aa ON a.id = aa.AccountID AND aa.RealmID = -1 WHERE ba.LoginTicket = ? ORDER BY a.id", CONNECTION_ASYNC);
@@ -190,6 +192,26 @@ void LoginDatabaseConnection::DoPrepareStatements()
     PrepareStatement(LOGIN_SEL_BNET_TRANSMOG_ILLUSIONS, "SELECT blobIndex, illusionMask FROM battlenet_account_transmog_illusions WHERE battlenetAccountId = ? ORDER BY blobIndex DESC", CONNECTION_ASYNC);
     PrepareStatement(LOGIN_INS_BNET_TRANSMOG_ILLUSIONS, "INSERT INTO battlenet_account_transmog_illusions (battlenetAccountId, blobIndex, illusionMask) VALUES (?, ?, ?) "
         "ON DUPLICATE KEY UPDATE illusionMask = illusionMask | VALUES(illusionMask)", CONNECTION_ASYNC);
+
+    // Activity
+    PrepareStatement(LOGIN_SEL_BNET_ACTIVITY, "SELECT played, inactivity, inactivity_paused_weeks, inactivity_pause_current_week, inactivity_pause_change_allowed FROM battlenet_account_activity WHERE id = ?", CONNECTION_SYNCH);
+    PrepareStatement(LOGIN_SEL_BNET_ACTIVITY_ALL, "SELECT ba.id, bac.played, bac.played_last_character, bac.inactivity, bac.inactivity_paused_weeks, bac.inactivity_pause_current_week, bac.inactivity_locked, baci.minCoins, baci.disableInactivityPoints, baci.disableSystem FROM battlenet_accounts ba LEFT JOIN battlenet_account_activity bac ON (ba.id = bac.id) LEFT JOIN battlenet_account_activity_info baci ON (ba.id = baci.id)", CONNECTION_SYNCH);
+    PrepareStatement(LOGIN_INS_BNET_ACTIVITY_HISTORY, "INSERT INTO `battlenet_account_activity_history` (`id`, `played`, `played_last_character`, `inactivity`, `inactivity_paused_weeks`, `inactivity_pause_current_week`, `inactivity_pause_change_allowed`, `inactivity_locked`, `minCoins`, `disableInactivityPoints`, `disableSystem`) SELECT baa.`id`, baa.`played`, baa.`played_last_character`, baa.`inactivity`, baa.`inactivity_paused_weeks`, baa.`inactivity_pause_current_week`, baa.`inactivity_pause_change_allowed`, baa.`inactivity_locked`, baai.`minCoins`, baai.`disableInactivityPoints`, baai.`disableSystem` FROM `battlenet_account_activity` baa LEFT JOIN `battlenet_account_activity_info` baai ON (baa.id = baai.id)", CONNECTION_SYNCH);
+    PrepareStatement(LOGIN_DEL_BNET_ACTIVITY_HISTORY, "DELETE FROM `battlenet_account_activity_history` WHERE `date` <= CURRENT_TIMESTAMP - INTERVAL 3 MONTH; ", CONNECTION_SYNCH);
+    PrepareStatement(LOGIN_INS_BNET_ACTIVITY, "INSERT INTO battlenet_account_activity (id, inactivity, inactivity_paused_weeks, inactivity_pause_current_week, inactivity_pause_change_allowed, inactivity_locked) VALUES (?, ?, ?, ?, ?, ?) ON DUPLICATE KEY UPDATE inactivity = VALUES(inactivity), inactivity_paused_weeks = VALUES(inactivity_paused_weeks), inactivity_pause_current_week = VALUES(inactivity_pause_current_week), inactivity_pause_change_allowed = VALUES(inactivity_pause_change_allowed), inactivity_locked = VALUES(inactivity_locked) ", CONNECTION_ASYNC);
+    PrepareStatement(LOGIN_INS_BNET_ACTIVITY_PLAYTIME, "INSERT INTO battlenet_account_activity (id, played, played_last_character) VALUES (?, ?, ?) ON DUPLICATE KEY UPDATE played = played + VALUES(played), played_last_character = VALUES(played_last_character)", CONNECTION_ASYNC);
+    PrepareStatement(LOGIN_UPD_BNET_ACTIVITY_PLAYTIME, "UPDATE battlenet_account_activity SET played = ? WHERE id = ?", CONNECTION_ASYNC);
+
+    // Battle Pay
+    PrepareStatement(LOGIN_INS_BPAY_PURCHASE, "INSERT INTO battlepay_purchases (battlenetAccountId, realm, characterGuid, productID, productName, CurrentPrice, RemoteAddress) VALUES (?, ?, ?, ?, ?, ?, ?)", CONNECTION_ASYNC);
+
+    // Hardware Info
+    PrepareStatement(LOGIN_REP_BNET_HARDWARE_HISTORY, "REPLACE INTO battlenet_accounts_hardware_history (id, hash, gatewayMac, cpuId, volumeIds) VALUES (?, ?, ?, ?, ?)", CONNECTION_ASYNC);
+
+    // Endorsements
+    PrepareStatement(LOGIN_REP_ENDORSEMENT_REQUEST, "REPLACE INTO endorsements_request (senderBnetId, receiverBnetId, receiverCharacterName, createdAt) VALUES (?, ?, ?, ?)", CONNECTION_ASYNC);
+    PrepareStatement(LOGIN_UPD_ENDORSEMENT_REQUEST_SELECTED_TYPE, "UPDATE endorsements_request SET selectedType = ?, submitAt = ? WHERE senderBnetId = ? AND receiverBnetId = ?", CONNECTION_SYNCH);
+    PrepareStatement(LOGIN_INS_ENDORSEMENT, "INSERT INTO endorsements (type, senderBnetId, receiverBnetId, characterName, createdAt) VALUES (?, ?, ?, ?, ?)", CONNECTION_SYNCH);
 }
 
 LoginDatabaseConnection::LoginDatabaseConnection(MySQLConnectionInfo& connInfo) : MySQLConnection(connInfo)

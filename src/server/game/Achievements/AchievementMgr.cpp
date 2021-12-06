@@ -59,6 +59,8 @@ AchievementMgr::~AchievementMgr() { }
 */
 void AchievementMgr::CheckAllAchievementCriteria(Player* referencePlayer)
 {
+    return;
+
     // suppress sending packets
     for (uint32 i = 0; i < uint32(CriteriaType::Count); ++i)
         UpdateCriteria(CriteriaType(i), 0, 0, 0, nullptr, referencePlayer);
@@ -86,6 +88,8 @@ std::vector<uint32> AchievementMgr::GetCompletedAchievementIds() const
 
 bool AchievementMgr::CanUpdateCriteriaTree(Criteria const* criteria, CriteriaTree const* tree, Player* referencePlayer) const
 {
+    return false;
+
     AchievementEntry const* achievement = tree->Achievement;
     if (!achievement)
         return false;

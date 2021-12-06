@@ -902,3 +902,57 @@ float DegToRad(float degrees)
 {
     return degrees * (2.f * float(M_PI) / 360.f);
 }
+
+std::vector<std::string> Split(const std::string& s, const std::string& sperator) {
+    std::vector<std::string> result;
+    int start = 0;
+    int end = 0;
+    while (end != std::string::npos) {
+        end = s.find(sperator, start);
+        result.push_back(s.substr(start, end - start));
+        start = end + sperator.length();
+    }
+    return result;
+}
+
+uint16 crc16(const unsigned char* data_p, unsigned char length)
+{
+    unsigned char x;
+    unsigned short crc = 0xFFFF;
+
+    while (length--) {
+        x = crc >> 8 ^ *data_p++;
+        x ^= x >> 4;
+        crc = (crc << 8) ^ ((unsigned short)(x << 12)) ^ ((unsigned short)(x << 5)) ^ ((unsigned short)x);
+    }
+    return crc;
+}
+
+float roundN(float value, const uint32 to)
+{
+    float places = pow(10.0, to);
+    return round(value * places) / places;
+}
+
+double roundN(double value, const uint32 to)
+{
+    double places = pow(10.0, to);
+    return round(value * places) / places;
+}
+
+std::string ltrim(std::string str, const std::string chars /*= "\t\n\v\f\r "*/)
+{
+    str.erase(0, str.find_first_not_of(chars));
+    return str;
+}
+
+std::string rtrim(std::string str, const std::string chars /*= "\t\n\v\f\r " */)
+{
+    str.erase(str.find_last_not_of(chars) + 1);
+    return str;
+}
+
+std::string trim(std::string str, const std::string chars /*= "\t\n\v\f\r " */)
+{
+    return ltrim(rtrim(str, chars), chars);
+}

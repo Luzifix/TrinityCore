@@ -125,6 +125,26 @@ inline bool isBasicLatinCharacter(wchar_t wchar)
     return false;
 }
 
+inline bool isGermanCharacter(wchar_t wchar)
+{
+    if (isBasicLatinCharacter(wchar))
+        return true;
+
+    if (wchar == 0x00C4 || wchar == 0x00E4)                  // ??
+        return true;
+
+    if (wchar == 0x00D6 || wchar == 0x00F6)                  // ??
+        return true;
+
+    if (wchar == 0x00DC || wchar == 0x00FC)                  // ??
+        return true;
+
+    if (wchar == 0x00DF)                                     // ?
+        return true;
+
+    return false;
+}
+
 inline bool isExtendedLatinCharacter(wchar_t wchar)
 {
     if (isBasicLatinCharacter(wchar))
@@ -212,6 +232,14 @@ inline bool isExtendedLatinString(std::wstring_view wstr, bool numericOrSpace)
 {
     for (wchar_t c : wstr)
         if (!isExtendedLatinCharacter(c) && (!numericOrSpace || !isNumericOrSpace(c)))
+            return false;
+    return true;
+}
+
+inline bool isGermanString(std::wstring_view wstr, bool numericOrSpace)
+{
+    for (size_t i = 0; i < wstr.size(); ++i)
+        if (!isGermanCharacter(wstr[i]) && (!numericOrSpace || !isNumericOrSpace(wstr[i])))
             return false;
     return true;
 }
@@ -391,6 +419,14 @@ struct StringCompareLessI_T
 {
     bool operator()(std::string_view a, std::string_view b) const { return StringCompareLessI(a, b); }
 };
+
+TC_COMMON_API std::vector<std::string> Split(const std::string& s, const std::string& sperator);
+TC_COMMON_API uint16 crc16(const unsigned char* data_p, unsigned char length);
+TC_COMMON_API float roundN(float value, const uint32_t to);
+TC_COMMON_API double roundN(double value, const uint32_t to);
+TC_COMMON_API std::string ltrim(std::string str, const std::string chars = "\t\n\v\f\r ");
+TC_COMMON_API std::string rtrim(std::string str, const std::string chars = "\t\n\v\f\r ");
+TC_COMMON_API std::string trim(std::string str, const std::string chars = "\t\n\v\f\r ");
 
 // simple class for not-modifyable list
 template <typename T>

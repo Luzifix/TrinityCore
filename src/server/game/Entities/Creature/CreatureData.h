@@ -427,7 +427,8 @@ struct TC_GAME_API CreatureTemplate
     std::unordered_map<Difficulty, CreatureLevelScaling> scalingStore;
     int32   HealthScalingExpansion;
     uint32  RequiredExpansion;
-    uint32  VignetteID;                                     /// @todo Read Vignette.db2
+    uint32  VignetteID;
+    uint32  TrackingQuestID;
     uint32  faction;
     uint64  npcflag;
     float   speed_walk;
@@ -610,6 +611,7 @@ struct CreatureData : public SpawnData
     uint32 unit_flags2 = 0;                                 // enum UnitFlags2 mask values
     uint32 unit_flags3 = 0;                                 // enum UnitFlags3 mask values
     uint32 dynamicflags = 0;
+    float size = 0.0f;
 };
 
 struct CreatureModelInfo

@@ -18,6 +18,7 @@
 #include "WorldSession.h"
 #include "AchievementPackets.h"
 #include "Common.h"
+#include "Creature.h"
 #include "GameTime.h"
 #include "Guild.h"
 #include "GuildMgr.h"
@@ -137,6 +138,12 @@ void WorldSession::HandleGuildSetMemberNote(WorldPackets::Guild::GuildSetMemberN
         guild->HandleSetMemberNote(this, packet.Note, packet.NoteeGUID, packet.IsPublic);
 }
 
+void WorldSession::HandleGuildShiftRank(WorldPackets::Guild::GuildShiftRank& packet)
+{
+    if (Guild* guild = GetPlayer()->GetGuild())
+        guild->HandleShiftRank(this, packet.RankOrder, packet.ShiftUp);
+}
+
 void WorldSession::HandleGuildGetRanks(WorldPackets::Guild::GuildGetRanks& packet)
 {
     TC_LOG_DEBUG("guild", "CMSG_GUILD_GET_RANKS [%s]: Guild: %s",
@@ -235,6 +242,12 @@ void WorldSession::HandleGuildBankActivate(WorldPackets::Guild::GuildBankActivat
 {
     TC_LOG_DEBUG("guild", "CMSG_GUILD_BANK_ACTIVATE [%s]: [%s] AllSlots: %u"
         , GetPlayerInfo().c_str(), packet.Banker.ToString().c_str(), packet.FullUpdate);
+
+#ifndef DISABLE_DRESSNPCS_CORESOUNDS
+    if (packet.Banker.IsAnyTypeCreature())
+        if (Creature* creature = _player->GetMap()->GetCreature(packet.Banker))
+            creature->SendMirrorSound(_player, 0);
+#endif
 
     GameObject const* const go = GetPlayer()->GetGameObjectIfCanInteractWith(packet.Banker, GAMEOBJECT_TYPE_GUILD_BANK);
     if (!go)

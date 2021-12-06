@@ -195,6 +195,7 @@ enum WorldBoolConfigs
     CONFIG_REGEN_HP_CANNOT_REACH_TARGET_IN_RAID,
     CONFIG_ALLOW_LOGGING_IP_ADDRESSES_IN_DATABASE,
     CONFIG_CHARACTER_CREATING_DISABLE_ALLIED_RACE_ACHIEVEMENT_REQUIREMENT,
+    CONFIG_VISIBILITY_GOBJECT_LOS,
     BOOL_CONFIG_VALUE_COUNT
 };
 
@@ -429,6 +430,7 @@ enum WorldIntConfigs
     CONFIG_SOCKET_TIMEOUTTIME_ACTIVE,
     CONFIG_BLACKMARKET_MAXAUCTIONS,
     CONFIG_BLACKMARKET_UPDATE_PERIOD,
+    CONFIG_BATTLE_PAY_CURRENCY,
     CONFIG_FACTION_BALANCE_LEVEL_CHECK_DIFF,
     INT_CONFIG_VALUE_COUNT
 };
@@ -858,6 +860,7 @@ class TC_GAME_API World
         time_t mail_timer;
         time_t mail_timer_expires;
         time_t blackmarket_timer;
+        int blackmarket_lastDrop = 0;
 
         SessionMap m_sessions;
         std::unordered_multimap<ObjectGuid, WorldSession*> m_sessionsByBnetGuid;

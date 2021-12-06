@@ -3240,7 +3240,7 @@ class spell_gen_running_wild_aura : public AuraScript
 
     bool Validate(SpellInfo const* /*spell*/) override
     {
-        if (!sCreatureDisplayInfoStore.LookupEntry(DISPLAYID_HIDDEN_MOUNT))
+        if (!sCreatureDisplayInfoStoreRaw.LookupEntry(DISPLAYID_HIDDEN_MOUNT))
             return false;
         return true;
     }

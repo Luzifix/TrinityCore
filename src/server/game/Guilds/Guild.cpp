@@ -43,12 +43,12 @@
 
 size_t const MAX_GUILD_BANK_TAB_TEXT_LEN = 500;
 
-uint32 const EMBLEM_PRICE = 10 * GOLD;
+uint32 const EMBLEM_PRICE = 5 * SILVER;
 
 inline uint64 GetGuildBankTabPrice(uint8 tabId)
 {
     // these prices are in gold units, not copper
-    static uint64 const tabPrices[GUILD_BANK_MAX_TABS] = { 100, 250, 500, 1000, 2500, 5000, 0, 0 };
+    static uint64 const tabPrices[GUILD_BANK_MAX_TABS] = { 5, 10, 15, 20, 25, 30, 0, 0 };
     ASSERT(tabId < GUILD_BANK_MAX_TABS);
 
     return tabPrices[tabId];
@@ -1631,7 +1631,7 @@ void Guild::HandleBuyBankTab(WorldSession* session, uint8 tabId)
     // This is just a speedup check, GetGuildBankTabPrice will return 0.
     if (tabId < GUILD_BANK_MAX_TABS - 2) // 7th tab is actually the 6th
     {
-        int64 tabCost = GetGuildBankTabPrice(tabId) * GOLD;
+        int64 tabCost = GetGuildBankTabPrice(tabId) * SILVER;
         if (!player->HasEnoughMoney(tabCost))                   // Should not happen, this is checked by client
             return;
 
@@ -1903,6 +1903,26 @@ void Guild::HandleSetMemberRank(WorldSession* session, ObjectGuid targetGuid, Ob
     SendGuildRanksUpdate(setterGuid, targetGuid, newRank->GetId());
 }
 
+void Guild::HandleShiftRank(WorldSession* /*session*/, uint32 id, bool up)
+{
+    uint32 nextID = up ? id - 1 : id + 1;
+
+    RankInfo* oldRankInfo = GetRankInfo(id);
+    RankInfo* newRankInfo = GetRankInfo(nextID);
+
+    if (!oldRankInfo || !newRankInfo)
+        return;
+
+    RankInfo tmp = NULL;
+    tmp = *newRankInfo;
+    newRankInfo->SetName(oldRankInfo->GetName());
+    newRankInfo->SetRights(oldRankInfo->GetRights());
+    oldRankInfo->SetName(tmp.GetName());
+    oldRankInfo->SetRights(tmp.GetRights());
+
+    SendGuildEventRanksUpdated();
+}
+
 void Guild::HandleAddNewRank(WorldSession* session, std::string_view name)
 {
     uint8 size = _GetRanksSize();
@@ -2098,6 +2118,25 @@ bool Guild::HandleMemberWithdrawMoney(WorldSession* session, uint64 amount, bool
     return true;
 }
 
+void Guild::HandleDepositMoney(uint64 amount, ObjectGuid::LowType characterGuid /*= 0*/, bool cashFlow /*= false*/)
+{
+    // guild bank cannot have more than MAX_MONEY_AMOUNT
+    amount = std::min(amount, MAX_MONEY_AMOUNT - m_bankMoney);
+    if (!amount)
+        return;
+
+    CharacterDatabaseTransaction trans = CharacterDatabase.BeginTransaction();
+    _ModifyBankMoney(trans, amount, true);
+
+    if (characterGuid)
+        _LogBankEvent(trans, cashFlow ? GUILD_BANK_LOG_CASH_FLOW_DEPOSIT : GUILD_BANK_LOG_DEPOSIT_MONEY, uint8(0), characterGuid, amount);
+
+    CharacterDatabase.CommitTransaction(trans);
+
+    SendEventBankMoneyChanged();
+}
+
+
 void Guild::HandleMemberLogout(WorldSession* session)
 {
     Player* player = session->GetPlayer();
@@ -2292,8 +2331,8 @@ void Guild::SendLoginInfo(WorldSession* session)
         player->GetSession()->SendPacket(renameFlag.Write());
     }
 
-    for (GuildPerkSpellsEntry const* entry : sGuildPerkSpellsStore)
-        player->LearnSpell(entry->SpellID, true);
+    //for (GuildPerkSpellsEntry const* entry : sGuildPerkSpellsStore)
+    //    player->LearnSpell(entry->SpellID, true);
 
     GetAchievementMgr().SendAllData(player);
 
@@ -3560,6 +3599,11 @@ void Guild::SendBankList(WorldSession* session, uint8 tabId, bool fullUpdate) co
     }
 
     session->SendPacket(packet.Write());
+}
+
+void Guild::SendGuildEventRanksUpdated()
+{
+    BroadcastPacket(WorldPackets::Guild::GuildEventRanksUpdated().Write());
 }
 
 void Guild::SendGuildRanksUpdate(ObjectGuid setterGuid, ObjectGuid targetGuid, GuildRankId rank)

@@ -24,6 +24,7 @@
 #include "Timer.h"
 #include "World.h"
 #include <unordered_map>
+#include <boost/algorithm/string.hpp>
 
 namespace
 {
@@ -107,13 +108,13 @@ void CharacterCache::AddCharacterCacheEntry(ObjectGuid const& guid, uint32 accou
     data.IsDeleted = isDeleted;
 
     // Fill Name to Guid Store
-    _characterCacheByNameStore[name] = &data;
+    _characterCacheByNameStore[boost::algorithm::to_lower_copy(name)] = &data;
 }
 
 void CharacterCache::DeleteCharacterCacheEntry(ObjectGuid const& guid, std::string const& name)
 {
     _characterCacheStore.erase(guid);
-    _characterCacheByNameStore.erase(name);
+    _characterCacheByNameStore.erase(boost::algorithm::to_lower_copy(name));
 }
 
 void CharacterCache::UpdateCharacterData(ObjectGuid const& guid, std::string const& name, Optional<uint8> gender /*= {}*/, Optional<uint8> race /*= {}*/)
@@ -136,8 +137,8 @@ void CharacterCache::UpdateCharacterData(ObjectGuid const& guid, std::string con
     sWorld->SendGlobalMessage(invalidatePlayer.Write());
 
     // Correct name -> pointer storage
-    _characterCacheByNameStore.erase(oldName);
-    _characterCacheByNameStore[name] = &itr->second;
+    _characterCacheByNameStore.erase(boost::algorithm::to_lower_copy(oldName));
+    _characterCacheByNameStore[boost::algorithm::to_lower_copy(name)] = &itr->second;
 }
 
 void CharacterCache::UpdateCharacterGender(ObjectGuid const& guid, uint8 gender)
@@ -217,7 +218,7 @@ CharacterCacheEntry const* CharacterCache::GetCharacterCacheByGuid(ObjectGuid co
 
 CharacterCacheEntry const* CharacterCache::GetCharacterCacheByName(std::string const& name) const
 {
-    auto itr = _characterCacheByNameStore.find(name);
+    auto itr = _characterCacheByNameStore.find(boost::algorithm::to_lower_copy(name));
     if (itr != _characterCacheByNameStore.end())
         return itr->second;
 
@@ -226,7 +227,7 @@ CharacterCacheEntry const* CharacterCache::GetCharacterCacheByName(std::string c
 
 ObjectGuid CharacterCache::GetCharacterGuidByName(std::string const& name) const
 {
-    auto itr = _characterCacheByNameStore.find(name);
+    auto itr = _characterCacheByNameStore.find(boost::algorithm::to_lower_copy(name));
     if (itr != _characterCacheByNameStore.end())
         return itr->second->Guid;
 
@@ -263,7 +264,7 @@ uint32 CharacterCache::GetCharacterAccountIdByGuid(ObjectGuid guid) const
 
 uint32 CharacterCache::GetCharacterAccountIdByName(std::string const& name) const
 {
-    auto itr = _characterCacheByNameStore.find(name);
+    auto itr = _characterCacheByNameStore.find(boost::algorithm::to_lower_copy(name));
     if (itr != _characterCacheByNameStore.end())
         return itr->second->AccountId;
 

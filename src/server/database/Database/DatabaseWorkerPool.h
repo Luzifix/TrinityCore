@@ -215,6 +215,8 @@ class DatabaseWorkerPool
 
         size_t QueueSize() const;
 
+        char const* GetDatabaseName() const;
+
     private:
         uint32 OpenConnections(InternalIndex type, uint8 numConnections);
 
@@ -225,8 +227,6 @@ class DatabaseWorkerPool
         //! Gets a free connection in the synchronous connection pool.
         //! Caller MUST call t->Unlock() after touching the MySQL context to prevent deadlocks.
         T* GetFreeConnection();
-
-        char const* GetDatabaseName() const;
 
         //! Queue shared by async worker threads.
         std::unique_ptr<ProducerConsumerQueue<SQLOperation*>> _queue;

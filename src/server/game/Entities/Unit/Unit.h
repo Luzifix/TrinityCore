@@ -1644,6 +1644,7 @@ class TC_GAME_API Unit : public WorldObject
         }
         void UpdateInterruptMask();
 
+        virtual uint32 GetDisplayId() const { return m_unitData->DisplayID; }
         virtual float GetNativeObjectScale() const { return 1.0f; }
         virtual void RecalculateObjectScale();
         uint32 GetDisplayId() const { return m_unitData->DisplayID; }

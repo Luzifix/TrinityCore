@@ -261,7 +261,8 @@ bool StartDB()
     // Load databases
     DatabaseLoader loader("server.bnetserver", DatabaseLoader::DATABASE_NONE);
     loader
-        .AddDatabase(LoginDatabase, "Login");
+        .AddDatabase(LoginDatabase, "Login")
+        .AddDatabase(WebsiteDatabase, "Website");
 
     if (!loader.Load())
         return false;
@@ -275,6 +276,7 @@ bool StartDB()
 void StopDB()
 {
     LoginDatabase.Close();
+    WebsiteDatabase.Close();
     MySQL::Library_End();
 }
 
@@ -293,6 +295,7 @@ void KeepDatabaseAliveHandler(std::weak_ptr<Trinity::Asio::DeadlineTimer> dbPing
         {
             TC_LOG_INFO("server.bnetserver", "Ping MySQL to keep connection alive");
             LoginDatabase.KeepAlive();
+            WebsiteDatabase.KeepAlive();
 
             dbPingTimer->expires_from_now(boost::posix_time::minutes(dbPingInterval));
             dbPingTimer->async_wait(std::bind(&KeepDatabaseAliveHandler, dbPingTimerRef, dbPingInterval, std::placeholders::_1));

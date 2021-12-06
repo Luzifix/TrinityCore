@@ -40,6 +40,8 @@
 #include <memory>
 #include <unordered_map>
 
+class BattlepayManager;
+class BattlePetMgr;
 class BlackMarketEntry;
 class CollectionMgr;
 class Creature;
@@ -64,6 +66,12 @@ enum class AuctionCommand : int8;
 enum class AuctionResult : int8;
 enum InventoryResult : uint8;
 enum class StableResult : uint8;
+
+namespace Battlepay
+{
+    struct Purchase;
+    enum Error : uint32;
+}
 
 namespace BattlePets
 {
@@ -191,6 +199,22 @@ namespace WorldPackets
         class Request;
     }
 
+    namespace BattlePay
+    {
+        class DistributionAssignToTarget;
+        class StartPurchase;
+        class PurchaseProduct;
+        class ConfirmPurchaseResponse;
+        class GetProductList;
+        class GetPurchaseListQuery;
+        class UpdateVasPurchaseStates;
+        class BattlePayAckFailedResponse;
+        class BattlePayQueryClassTrialResult;
+        class BattlePayTrialBoostCharacter;
+        class BattlePayPurchaseDetailsResponse;
+        class BattlePayPurchaseUnkResponse;
+    }
+
     namespace BattlePet
     {
         class BattlePetRequestJournal;
@@ -266,6 +290,7 @@ namespace WorldPackets
         class SetFactionInactive;
         class SetWatchedFaction;
         class SetPlayerDeclinedNames;
+        class SetCurrencyFlags;
 
         enum class LoginFailureReason : uint8;
     }
@@ -367,6 +392,7 @@ namespace WorldPackets
         class GuildEventLogQuery;
         class GuildBankRemainingWithdrawMoneyQuery;
         class GuildPermissionsQuery;
+        class GuildShiftRank;
         class GuildSetRankPermissions;
         class GuildBankActivate;
         class GuildBankQueryTab;
@@ -858,6 +884,16 @@ struct AccountData
     std::string Data;
 };
 
+struct ActivityData
+{
+    int Played = 0;
+    int Inactivity = 0;
+    int InactivityPausedWeeks = 0;
+    bool InactivityPauseCurrentWeek = false;
+    bool InactivityPauseChangeAllowed = true;
+    bool InactivityLocked = false;
+};
+
 enum PartyOperation
 {
     PARTY_OP_INVITE   = 0,
@@ -1066,6 +1102,20 @@ class TC_GAME_API WorldSession
         void SetAccountData(AccountDataType type, time_t time, std::string const& data);
         void SendAccountDataTimes(ObjectGuid playerGuid, uint32 mask);
         void LoadAccountData(PreparedQueryResult result, uint32 mask);
+
+        // Activity Data
+        ActivityData const GetActivityData() const { return _activityData; }
+        void AddActivityPlayed(int additionalPlaytime) { _activityData.Played += additionalPlaytime; };
+        void SetActivityPlayed(int played) { _activityData.Played = played; };
+        void SetActivityInactivity(int inactivity) { _activityData.Inactivity = inactivity; };
+        void SetActivityInactivityPausedWeeks(int inactivityPausedWeeks) { _activityData.InactivityPausedWeeks = inactivityPausedWeeks; };
+        void SetActivityInactivityPauseCurrentWeek(bool inactivityPauseCurrentWeek) { _activityData.InactivityPauseCurrentWeek = inactivityPauseCurrentWeek; };
+        void SetActivityInactivityPauseChangeAllowed(bool inactivityPauseChangeAllowed) { _activityData.InactivityPauseChangeAllowed = inactivityPauseChangeAllowed; };
+        void SetActivityInactivityLocked(bool inactivityLocked) { _activityData.InactivityLocked = inactivityLocked; };
+        bool IsActivityInactivityPauseCurrentWeek() { return _activityData.InactivityPauseCurrentWeek; };
+        bool IsActivityInactivityPauseChangeAllowed() { return _activityData.InactivityPauseChangeAllowed; };
+        void LoadActivityData();
+        void SaveActivityData();
 
         void LoadTutorialsData(PreparedQueryResult result);
         void SendTutorialsData();
@@ -1367,6 +1417,7 @@ class TC_GAME_API WorldSession
         void HandleGuildNewsUpdateSticky(WorldPackets::Guild::GuildNewsUpdateSticky& packet);
         void HandleGuildSetMemberNote(WorldPackets::Guild::GuildSetMemberNote& packet);
         void HandleGuildGetRanks(WorldPackets::Guild::GuildGetRanks& packet);
+        void HandleGuildShiftRank(WorldPackets::Guild::GuildShiftRank& packet);
         void HandleGuildQueryNews(WorldPackets::Guild::GuildQueryNews& newsQuery);
         void HandleGuildSetRankPermissions(WorldPackets::Guild::GuildSetRankPermissions& packet);
         void HandleGuildAddRank(WorldPackets::Guild::GuildAddRank& packet);
@@ -1713,6 +1764,7 @@ class TC_GAME_API WorldSession
         void HandleObjectUpdateFailedOpcode(WorldPackets::Misc::ObjectUpdateFailed& objectUpdateFailed);
         void HandleObjectUpdateRescuedOpcode(WorldPackets::Misc::ObjectUpdateRescued& objectUpdateRescued);
         void HandleRequestCategoryCooldowns(WorldPackets::Spells::RequestCategoryCooldowns& requestCategoryCooldowns);
+        void HandleSetCurrencyFlags(WorldPackets::Character::SetCurrencyFlags& packet);
         void HandleCloseInteraction(WorldPackets::Misc::CloseInteraction& closeInteraction);
         void HandleConversationLineStarted(WorldPackets::Misc::ConversationLineStarted& conversationLineStarted);
 
@@ -1749,6 +1801,20 @@ class TC_GAME_API WorldSession
         void HandleGarrisonCancelConstruction(WorldPackets::Garrison::GarrisonCancelConstruction& garrisonCancelConstruction);
         void HandleGarrisonRequestBlueprintAndSpecializationData(WorldPackets::Garrison::GarrisonRequestBlueprintAndSpecializationData& garrisonRequestBlueprintAndSpecializationData);
         void HandleGarrisonGetMapData(WorldPackets::Garrison::GarrisonGetMapData& garrisonGetMapData);
+
+        // Battle Pay
+        void HandleBattlePayDistributionAssign(WorldPackets::BattlePay::DistributionAssignToTarget& packet);
+        void HandleBattlePayStartPurchase(WorldPackets::BattlePay::StartPurchase& packet);
+        void HandleBattlePayConfirmPurchase(WorldPackets::BattlePay::ConfirmPurchaseResponse& packet);
+        void HandleBattlePayAckFailedResponse(WorldPackets::BattlePay::BattlePayAckFailedResponse& packet);
+        void HandleGetPurchaseListQuery(WorldPackets::BattlePay::GetPurchaseListQuery& packet);
+        void HandleUpdateVasPurchaseStates(WorldPackets::BattlePay::UpdateVasPurchaseStates& packet);
+        void HandleGetProductList(WorldPackets::BattlePay::GetProductList& packet);
+        void SendDisplayPromo(int32 promotionID = 0);
+        void SendPurchaseUpdate(WorldSession* session, Battlepay::Purchase const& purchase, uint32 result);
+        void SendStartPurchaseResponse(WorldSession* session, Battlepay::Purchase const& purchase, Battlepay::Error const& result);
+        void SendMakePurchase(ObjectGuid targetCharacter, uint32 clientToken, uint32 productID, WorldSession* session);
+        void SendSyncWowEntitlements();
 
         // Battle Pets
         void HandleBattlePetRequestJournal(WorldPackets::BattlePet::BattlePetRequestJournal& battlePetRequestJournal);
@@ -1819,6 +1885,8 @@ class TC_GAME_API WorldSession
         QueryCallbackProcessor& GetQueryProcessor() { return _queryProcessor; }
         TransactionCallback& AddTransactionCallback(TransactionCallback&& callback);
         SQLQueryHolderCallback& AddQueryHolderCallback(SQLQueryHolderCallback&& callback);
+
+        BattlepayManager* GetBattlePayMgr() const { return _battlePayMgr.get(); }
 
     private:
         void ProcessQueryCallbacks();
@@ -1898,6 +1966,8 @@ class TC_GAME_API WorldSession
         // Warden
         std::unique_ptr<Warden> _warden;                                    // Remains NULL if Warden system is not enabled by config
 
+        std::shared_ptr<BattlepayManager> _battlePayMgr;
+
         time_t _logoutTime;
         bool m_inQueue;                                     // session wait in auth.queue
         ObjectGuid m_playerLoading;                         // code processed in LoginPlayer
@@ -1908,6 +1978,7 @@ class TC_GAME_API WorldSession
         LocaleConstant m_sessionDbLocaleIndex;
         std::atomic<uint32> m_latency;
         AccountData _accountData[NUM_ACCOUNT_DATA_TYPES];
+        ActivityData _activityData;
         uint32 _tutorials[MAX_ACCOUNT_TUTORIAL_VALUES];
         uint8 _tutorialsChanged;
         std::vector<std::string> _registeredAddonPrefixes;

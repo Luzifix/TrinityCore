@@ -74,18 +74,23 @@ public:
         };
         static ChatCommandTable npcSetCommandTable =
         {
-            { "allowmove",      HandleNpcSetAllowMovementCommand,  rbac::RBAC_PERM_COMMAND_NPC_SET_ALLOWMOVE,  Console::No },
-            { "entry",          HandleNpcSetEntryCommand,          rbac::RBAC_PERM_COMMAND_NPC_SET_ENTRY,      Console::No },
-            { "factionid",      HandleNpcSetFactionIdCommand,      rbac::RBAC_PERM_COMMAND_NPC_SET_FACTIONID,  Console::No },
-            { "flag",           HandleNpcSetFlagCommand,           rbac::RBAC_PERM_COMMAND_NPC_SET_FLAG,       Console::No },
-            { "level",          HandleNpcSetLevelCommand,          rbac::RBAC_PERM_COMMAND_NPC_SET_LEVEL,      Console::No },
-            { "link",           HandleNpcSetLinkCommand,           rbac::RBAC_PERM_COMMAND_NPC_SET_LINK,       Console::No },
-            { "model",          HandleNpcSetModelCommand,          rbac::RBAC_PERM_COMMAND_NPC_SET_MODEL,      Console::No },
-            { "movetype",       HandleNpcSetMoveTypeCommand,       rbac::RBAC_PERM_COMMAND_NPC_SET_MOVETYPE,   Console::No },
-            { "phase",          HandleNpcSetPhaseCommand,          rbac::RBAC_PERM_COMMAND_NPC_SET_PHASE,      Console::No },
-            { "wanderdistance", HandleNpcSetWanderDistanceCommand, rbac::RBAC_PERM_COMMAND_NPC_SET_SPAWNDIST,  Console::No },
-            { "spawntime",      HandleNpcSetSpawnTimeCommand,      rbac::RBAC_PERM_COMMAND_NPC_SET_SPAWNTIME,  Console::No },
-            { "data",           HandleNpcSetDataCommand,           rbac::RBAC_PERM_COMMAND_NPC_SET_DATA,       Console::No },
+            { "allowmove",  rbac::RBAC_PERM_COMMAND_NPC_SET_ALLOWMOVE, false, &HandleNpcSetAllowMovementCommand, "" },
+            { "entry",      rbac::RBAC_PERM_COMMAND_NPC_SET_ENTRY,     false, &HandleNpcSetEntryCommand,         "" },
+            { "factionid",  rbac::RBAC_PERM_COMMAND_NPC_SET_FACTIONID, false, &HandleNpcSetFactionIdCommand,     "" },
+            { "flag",       rbac::RBAC_PERM_COMMAND_NPC_SET_FLAG,      false, &HandleNpcSetFlagCommand,          "" },
+            { "level",      rbac::RBAC_PERM_COMMAND_NPC_SET_LEVEL,     false, &HandleNpcSetLevelCommand,         "" },
+            { "link",       rbac::RBAC_PERM_COMMAND_NPC_SET_LINK,      false, &HandleNpcSetLinkCommand,          "" },
+            { "model",      rbac::RBAC_PERM_COMMAND_NPC_SET_MODEL,     false, &HandleNpcSetModelCommand,         "" },
+            { "movetype",   rbac::RBAC_PERM_COMMAND_NPC_SET_MOVETYPE,  false, &HandleNpcSetMoveTypeCommand,      "" },
+            { "phase",      rbac::RBAC_PERM_COMMAND_NPC_SET_PHASE,     false, &HandleNpcSetPhaseCommand,         "" },
+            { "phasegroup", rbac::RBAC_PERM_COMMAND_NPC_SET_PHASE,     false, &HandleNpcSetPhaseGroup,           "" },
+            { "scale",      rbac::RBAC_PERM_COMMAND_NPC_SET_SCALE,     false, &HandleNpcSetScaleCommand,         "" },
+            { "spawndist",  rbac::RBAC_PERM_COMMAND_NPC_SET_SPAWNDIST, false, &HandleNpcSetSpawnDistCommand,     "" },
+            { "spawntime",  rbac::RBAC_PERM_COMMAND_NPC_SET_SPAWNTIME, false, &HandleNpcSetSpawnTimeCommand,     "" },
+            { "data",       rbac::RBAC_PERM_COMMAND_NPC_SET_DATA,      false, &HandleNpcSetDataCommand,          "" },
+            { "emote",      rbac::RBAC_PERM_COMMAND_NPC_SET,           false, &HandleNpcSetEmoteCommand,         "" },
+            { "event",      rbac::RBAC_PERM_COMMAND_NPC_SET,           false, &HandleNpcSetEventCommand,         "" },
+
         };
         static ChatCommandTable npcCommandTable =
         {
@@ -446,6 +451,94 @@ public:
         return true;
     }
 
+    //save & play npc emote
+    static bool HandleNpcSetEmoteCommand(ChatHandler* handler, char const* args)
+    {
+        uint32 emote = atoi((char*)args);
+
+        Creature* target = handler->getSelectedCreature();
+        if (!target)
+        {
+            handler->SendSysMessage(LANG_SELECT_CREATURE);
+            handler->SetSentErrorMessage(true);
+            return false;
+        }
+
+        target->SetEmoteState(Emote(emote));
+
+        ObjectGuid::LowType guidLow = target->GetSpawnId();
+
+        // Get creature addon
+        WorldDatabasePreparedStatement* stmt = WorldDatabase.GetPreparedStatement(WORLD_SEL_CREATURE_ADDON_BY_GUID);
+        stmt->setUInt64(0, guidLow);
+        PreparedQueryResult result = WorldDatabase.Query(stmt);
+
+        WorldDatabasePreparedStatement* setEmoteStmt;
+
+        if (result)
+        {
+            setEmoteStmt = WorldDatabase.GetPreparedStatement(WORLD_UPD_CREATURE_ADDON_EMOTE);
+
+            setEmoteStmt->setUInt32(0, emote);
+            setEmoteStmt->setUInt64(1, guidLow);
+        }
+        else
+        {
+            setEmoteStmt = WorldDatabase.GetPreparedStatement(WORLD_INS_CREATURE_ADDON_EMOTE);
+
+            setEmoteStmt->setUInt64(0, guidLow);
+            setEmoteStmt->setUInt32(1, emote);
+        }
+
+        WorldDatabase.Execute(setEmoteStmt);
+
+        return true;
+    }
+
+    //set game_event id
+    static bool HandleNpcSetEventCommand(ChatHandler* handler, char const* args)
+    {
+        Creature* target = handler->getSelectedCreature();
+        int16 event = atoi((char*)args);
+
+        if (!target)
+        {
+            handler->SendSysMessage(LANG_SELECT_CREATURE);
+            handler->SetSentErrorMessage(true);
+            return false;
+        }
+
+        if (!event)
+            return false;
+
+        ObjectGuid::LowType guidLow = target->GetSpawnId();
+
+        WorldDatabasePreparedStatement* stmt = WorldDatabase.GetPreparedStatement(WORLD_SEL_GAME_EVENT_CREATURE_BY_GUID);
+        stmt->setUInt64(0, guidLow);
+        PreparedQueryResult result = WorldDatabase.Query(stmt);
+
+        WorldDatabasePreparedStatement* setEventStmt;
+
+        if (result)
+        {
+            setEventStmt = WorldDatabase.GetPreparedStatement(WORLD_UPD_GAME_EVENT_CREATURE);
+
+            setEventStmt->setInt16(0, event);
+            setEventStmt->setUInt64(1, guidLow);
+        }
+        else
+        {
+            setEventStmt = WorldDatabase.GetPreparedStatement(WORLD_INS_GAME_EVENT_CREATURE);
+
+            setEventStmt->setInt16(0, event);
+            setEventStmt->setUInt64(1, guidLow);
+        }
+
+        WorldDatabase.Execute(setEventStmt);
+
+        return true;
+    }
+
     //npc follow handling
     static bool HandleNpcFollowCommand(ChatHandler* handler)
     {
@@ -684,7 +777,7 @@ public:
             return false;
         }
 
-        if (!sCreatureDisplayInfoStore.LookupEntry(displayId))
+        if (!sCreatureDisplayInfoStoreRaw.LookupEntry(displayId))
         {
             handler->PSendSysMessage(LANG_COMMAND_INVALID_PARAM, Trinity::ToString(displayId).c_str());
             handler->SetSentErrorMessage(true);
@@ -860,6 +953,41 @@ public:
 
         return true;
     }
+
+    //npc scale handling
+    //change scale of creature
+    static bool HandleNpcSetScaleCommand(ChatHandler* handler, const char* args)
+    {
+        if (!*args)
+            return false;
+
+        Creature* creature = handler->getSelectedCreature();
+        if (!creature)
+        {
+            handler->SendSysMessage(LANG_SELECT_CREATURE);
+            handler->SetSentErrorMessage(true);
+            return false;
+        }
+
+        float scale = (float)atof((char*)args);
+
+        if (scale <= 0.0f)
+        {
+            scale = creature->GetCreatureTemplate()->scale;
+            const_cast<CreatureData*>(creature->GetCreatureData())->size = -1.0f;
+        }
+        else
+        {
+            const_cast<CreatureData*>(creature->GetCreatureData())->size = scale;
+        }
+
+        creature->SetObjectScale(scale);
+        if (!creature->IsPet())
+            creature->SaveToDB();
+
+        return true;
+    }
+
 
     //set spawn dist of creature
     static bool HandleNpcSetWanderDistanceCommand(ChatHandler* handler, float option)

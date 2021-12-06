@@ -40,6 +40,8 @@
 #    CURRENCIES SETTINGS
 #    PACKET SPOOF PROTECTION SETTINGS
 #    METRIC SETTINGS
+#    BATTLE PAY
+#    SCHATTENHAIN ACTIVITY
 #    PVP SETTINGS
 #
 ###################################################################################################
@@ -92,6 +94,7 @@ LogsDir = ""
 #    WorldDatabaseInfo
 #    CharacterDatabaseInfo
 #    HotfixDatabaseInfo
+#    WebsiteDatabaseInfo
 #        Description: Database connection settings for the world server.
 #        Example:     "hostname;port;username;password;database;ssl"
 #                     ".;some_number;username;password;database" - (Use named pipes on Windows
@@ -103,6 +106,7 @@ LogsDir = ""
 #                     "127.0.0.1;3306;trinity;trinity;world"      - (WorldDatabaseInfo)
 #                     "127.0.0.1;3306;trinity;trinity;characters" - (CharacterDatabaseInfo)
 #                     "127.0.0.1;3306;trinity;trinity;hotfixes"   - (HotfixDatabaseInfo)
+#                     "127.0.0.1;3306;trinity;trinity;website"    - (WebsiteDatabaseInfo)
 #
 #    Don't change hostname unless you are hosting MySQL on a different machine, if you need help
 #    with configuration allowing to connect from different machine than the one running server
@@ -116,12 +120,14 @@ LoginDatabaseInfo     = "127.0.0.1;3306;trinity;trinity;auth"
 WorldDatabaseInfo     = "127.0.0.1;3306;trinity;trinity;world"
 CharacterDatabaseInfo = "127.0.0.1;3306;trinity;trinity;characters"
 HotfixDatabaseInfo    = "127.0.0.1;3306;trinity;trinity;hotfixes"
+WebsiteDatabaseInfo   = "127.0.0.1;3306;trinity;trinity;website"
 
 #
 #    LoginDatabase.WorkerThreads
 #    WorldDatabase.WorkerThreads
 #    CharacterDatabase.WorkerThreads
 #    HotfixDatabase.WorkerThreads
+#    WebsiteDatabase.WorkerThreads
 #        Description: The amount of worker threads spawned to handle asynchronous (delayed) MySQL
 #                     statements. Each worker thread is mirrored with its own connection to the
 #                     MySQL server and their own thread on the MySQL server.
@@ -129,27 +135,32 @@ HotfixDatabaseInfo    = "127.0.0.1;3306;trinity;trinity;hotfixes"
 #                     1 - (WorldDatabase.WorkerThreads)
 #                     1 - (CharacterDatabase.WorkerThreads)
 #                     1 - (HotfixDatabase.WorkerThreads)
+#                     1 - (WebsiteDatabase.WorkerThreads)
 
 LoginDatabase.WorkerThreads     = 1
 WorldDatabase.WorkerThreads     = 1
 CharacterDatabase.WorkerThreads = 1
 HotfixDatabase.WorkerThreads    = 1
+WebsiteDatabase.WorkerThreads   = 1
 
 #
 #    LoginDatabase.SynchThreads
 #    WorldDatabase.SynchThreads
 #    CharacterDatabase.SynchThreads
 #    HotfixDatabase.SynchThreads
+#    WebsiteDatabase.SynchThreads
 #        Description: The amount of MySQL connections spawned to handle.
 #        Default:     1 - (LoginDatabase.SynchThreads)
 #                     1 - (WorldDatabase.SynchThreads)
 #                     2 - (CharacterDatabase.SynchThreads)
 #                     1 - (HotfixDatabase.SynchThreads)
+#                     1 - (WebsiteDatabase.SynchThreads)
 
 LoginDatabase.SynchThreads     = 1
 WorldDatabase.SynchThreads     = 1
 CharacterDatabase.SynchThreads = 2
 HotfixDatabase.SynchThreads    = 1
+WebsiteDatabase.SynchThreads   = 1
 
 #
 #    MaxPingTime
@@ -319,6 +330,14 @@ GridUnload = 1
 #                     1 - (Preload all grids in all base maps upon load)
 
 BaseMapLoadAllGrids = 0
+
+#
+#    LoadAllGridsForMaps
+#        Description: Define a list of comma seperated base maps for BaseMapLoadAllGrids setting
+#        Default:     ""               - Load all non instance maps
+#                     "5000,5001,5002" - Load all Schattenhain maps
+
+LoadAllGridsForMaps = "5000,5001,5002"
 
 #
 #    InstanceMapLoadAllGrids
@@ -639,7 +658,7 @@ RealmZone = 1
 #                         placed in clientdir/Fonts.
 #                     3 - (Enabled, Basic Latin characters + server timezone specific)
 
-StrictPlayerNames = 0
+StrictPlayerNames = 1
 
 #
 #    StrictCharterNames
@@ -653,7 +672,7 @@ StrictPlayerNames = 0
 #                         placed in clientdir/Fonts.
 #                     3 - (Enabled, Basic Latin characters + server timezone specific)
 
-StrictCharterNames = 0
+StrictCharterNames = 1
 
 #
 #    StrictPetNames
@@ -667,7 +686,7 @@ StrictCharterNames = 0
 #                         placed in clientdir/Fonts.
 #                     3 - (Enabled, Basic Latin characters + server timezone specific)
 
-StrictPetNames = 0
+StrictPetNames = 1
 
 #
 #    DBC.Locale
@@ -1424,12 +1443,13 @@ TOTPMasterSecret =
 #        Description: A mask that describes which databases shall be updated.
 #
 #        Following flags are available
-#           DATABASE_LOGIN     = 1, // Auth database
-#           DATABASE_CHARACTER = 2, // Character database
-#           DATABASE_WORLD     = 4, // World database
-#           DATABASE_HOTFIX    = 8, // Hotfixes database
+#           DATABASE_LOGIN     = 1,  // Auth database
+#           DATABASE_CHARACTER = 2,  // Character database
+#           DATABASE_WORLD     = 4,  // World database
+#           DATABASE_HOTFIX    = 8,  // Hotfixes database
+#           DATABASE_WEBSITE   = 16, // Website database
 #
-#        Default:     15 - (All enabled)
+#        Default:     31 - (All enabled)
 #                     4  - (Enable world only)
 #                     0  - (All Disabled)
 
@@ -2335,6 +2355,15 @@ Visibility.Distance.Continents = 100
 Visibility.Distance.Instances  = 170
 Visibility.Distance.BG         = 533
 Visibility.Distance.Arenas     = 533
+
+#
+#    Visibility.GameObject.LoS line of sight
+#        Description: If a GameObject is further than half of the visibility distance and
+#                     is not in the field of view, it is hidden.
+#        Default:     1 - (Enabled)
+#                     0 - (Disabled, somewhat less CPU usage)
+
+Visibility.GameObject.LoS = 1
 
 #
 #    Visibility.Notify.Period.OnContinents
@@ -3255,7 +3284,7 @@ CharDelete.KeepDays = 30
 #        Default:     0 - (Disabled)
 #                     1 - (Enabled)
 
-PlayerStart.AllReputation = 0
+PlayerStart.AllReputation = 1
 
 #
 #    XP.Boost.Daymask
@@ -3290,7 +3319,7 @@ XP.Boost.Rate = 2.0
 #        Default:     0 - (Disabled)
 #                     1 - (Enabled)
 
-PlayerStart.AllSpells = 0
+PlayerStart.AllSpells = 1
 
 #
 #    PlayerStart.MapsExplored
@@ -3298,7 +3327,7 @@ PlayerStart.AllSpells = 0
 #        Default:     0 - (Disabled)
 #                     1 - (Enabled)
 
-PlayerStart.MapsExplored = 0
+PlayerStart.MapsExplored = 1
 
 #
 #    HonorPointsAfterDuel
@@ -4011,10 +4040,18 @@ BlackMarket.MaxAuctions = 12
 #
 #    BlackMarket.UpdatePeriod
 #       Description: How often are the auctions on the black market restored
-#       Default:     24 (hours)
+#       Default:     10 (minutes)
 #
 
-BlackMarket.UpdatePeriod = 24
+BlackMarket.UpdatePeriod = 10
+
+#
+#    BlackMarket.RestoreHours
+#       Description: At what times will the black market be restored?
+#       Default:     7,13,19
+#
+
+BlackMarket.RestoreHours = 7,13,19
 
 #
 #
@@ -4389,3 +4426,137 @@ Pvp.FactionBalance.Pct20 = 0.8
 
 #
 ###################################################################################################
+
+###################################################################################################
+# BATTLE PAY
+#
+#    BattlePay.Currency
+#        Description: Set currency in battle pay
+#        Default:     USD = 1
+#                     GBP = 2
+#                     KRW = 3
+#                     EUR = 4
+#                     RUB = 5
+#                     ARS = 8
+#                     CLP = 9
+#                     MXN = 10
+#                     BRL = 11
+#                     AUD = 12
+#                     CPT = 14
+#                     TPT = 15
+#                     BETA = 16 (OOC-Money)
+#                     JPY = 28
+#                     CAD = 29
+#                     NZD = 30
+
+BattlePay.Currency = 16
+
+#
+###################################################################################################
+
+###################################################################################################
+# SCHATTENHAIN ACTIVITY
+#
+#    Schattenhain.Activity.Enable
+#        Description: Enables the activity system
+#        Default:     1 - (Enabled)
+#                     0 - (Disabled)
+
+Schattenhain.Activity.Enable = 1
+
+#
+#    Schattenhain.Activity.CharacterGuid
+#        Description: Character guid who sends money to players and guilds
+#        Default:     1
+
+Schattenhain.Activity.CharacterGuid = 1
+
+#
+#    Schattenhain.Activity.Interval
+#        Description: Tick interval
+#        Default:     30 second
+
+Schattenhain.Activity.Interval = 30
+
+#
+#    Schattenhain.Activity.AllowedMaps
+#        Description: Comma separated map ids where activity farming is allowed
+#        Default:     "5000,5002"
+#
+
+Schattenhain.Activity.AllowedMaps = "5000,5002"
+
+#
+#    Schattenhain.Activity.CoinCap
+#        Description: The amout of silver per week
+#        Default:     50 silver
+#
+
+Schattenhain.Activity.CoinCap = 50
+
+#
+#    Schattenhain.Activity.CoinPerHour
+#        Description: The amout of coins per hour
+#        Default:     1 silver
+#
+
+Schattenhain.Activity.CoinPerHour = 1
+
+#
+#    Schattenhain.Activity.MaxInactivityPoints
+#        Description: The maximum amout of inactivity points
+#        Default:     4
+#
+
+Schattenhain.Activity.MaxInactivityPoints = 4
+
+#
+#    Schattenhain.Activity.MaxPauseWeeks
+#        Description: The maximum amout of pause weeks
+#        Default:     4 weeks
+#
+
+Schattenhain.Activity.MaxPauseWeeks = 6
+
+#     Schattenhain.Activity.PayRewardInterval
+#        How often should pay reward (days)
+#        Default: 7 (weekly)
+#
+
+Schattenhain.Activity.PayRewardInterval = 7
+
+#
+#    Schattenhain.Activity.PayRewardDay
+#        Week day when pay reward (0..6) 0 == Sunday
+#        Default: 6 (Saturday)
+#
+
+Schattenhain.Activity.PayRewardDay = 6
+
+#
+#    Schattenhain.Activity.PayRewardHour
+#        Hour of a day when pay reward (0..23)
+#        Default: 18
+#
+
+Schattenhain.Activity.PayRewardHour = 18
+#
+#    Schattenhain.Activity.Guild.Enable
+#        Description: Enables the activity system for guilds
+#        Default:     1 - (Enabled)
+#                     0 - (Disabled)
+
+Schattenhain.Activity.Guild.Enable = 1
+
+#
+#    Schattenhain.Activity.Guild.CoinPerHour
+#        Description: The amout of coins per hour for guilds
+#        Default:     0.5 silver
+#
+
+Schattenhain.Activity.Guild.CoinPerHour = 0.5
+
+
+#
+###################################################################################################
+

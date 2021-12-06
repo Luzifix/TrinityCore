@@ -944,6 +944,12 @@ struct CreatureDisplayInfoEntry
     std::array<int32, 3> TextureVariationFileDataID;
 };
 
+struct CreatureDisplayInfoStore
+{
+    bool HasRecord(uint32 id) const;
+    const CreatureDisplayInfoEntry * LookupEntry(uint32 id) const;
+};
+
 struct CreatureDisplayInfoExtraEntry
 {
     uint32 ID;
@@ -2743,6 +2749,15 @@ struct NumTalentsAtLevelEntry
     int32 NumTalentsDemonHunter;
 };
 
+struct NPCSoundsEntry
+{
+    uint32 ID;
+    uint32 hello;
+    uint32 goodbye;
+    uint32 pissed;
+    uint32 ack;
+};
+
 #define MAX_OVERRIDE_SPELL 10
 
 struct OverrideSpellDataEntry
@@ -4066,6 +4081,21 @@ struct VehicleSeatEntry
                 VEHICLE_SEAT_FLAG_B_USABLE_FORCED_3 | VEHICLE_SEAT_FLAG_B_USABLE_FORCED_4));
     }
     inline bool IsEjectable() const { return HasFlag(VEHICLE_SEAT_FLAG_B_EJECTABLE); }
+};
+
+struct VignetteEntry
+{
+    uint32 ID;
+    LocalizedString Name;
+    uint32 PlayerConditionID;
+    uint32 VisibleTrackingQuestID;
+    uint32 QuestFeedbackEffectID;
+    uint32 Flags;
+    float MaxHeight;
+    float MinHeight;
+    int8 VignetteType;
+    int32 RewardQuestID;
+    int32 UiWidgetSetID;
 };
 
 struct WMOAreaTableEntry

@@ -146,7 +146,7 @@ static uint32 copseReclaimDelay[MAX_DEATH_COUNT] = { 30, 60, 120 };
 
 uint64 const MAX_MONEY_AMOUNT = 99999999999ULL;
 
-Player::Player(WorldSession* session) : Unit(true), m_sceneMgr(this)
+Player::Player(WorldSession* session) : Unit(true), _vignetteMgr(this), m_sceneMgr(this)
 {
     m_objectType |= TYPEMASK_PLAYER;
     m_objectTypeId = TYPEID_PLAYER;
@@ -1238,6 +1238,8 @@ void Player::Update(uint32 p_time)
     //because we don't want player's ghost teleported from graveyard
     if (IsHasDelayedTeleport() && IsAlive())
         TeleportTo(m_teleport_dest, m_teleport_options);
+
+    GetVignetteMgr().Update();
 }
 
 void Player::setDeathState(DeathState s)
@@ -2413,6 +2415,8 @@ bool Player::IsMaxLevel() const
 
 void Player::InitTalentForLevel()
 {
+    return;
+
     uint8 level = GetLevel();
     // talents base at level diff (talents = level - 9 but some can be used already)
     if (level < MIN_SPECIALIZATION_LEVEL)
@@ -3352,6 +3356,8 @@ void Player::RemoveSpell(uint32 spell_id, bool disabled /*= false*/, bool learn_
 
     m_overrideSpells.erase(spell_id);
 
+    SetCanTitanGrip(true);
+    /*
     if (m_canTitanGrip)
     {
         if (spellInfo && spellInfo->IsPassive() && spellInfo->HasEffect(SPELL_EFFECT_TITAN_GRIP))
@@ -3360,6 +3366,7 @@ void Player::RemoveSpell(uint32 spell_id, bool disabled /*= false*/, bool learn_
             SetCanTitanGrip(false);
         }
     }
+    */
 
     if (m_canDualWield)
     {
@@ -3500,6 +3507,8 @@ bool Player::ResetTalents(bool noCost)
 
 void Player::ResetPvpTalents()
 {
+    return;
+
     for (uint8 spec = 0; spec < MAX_SPECIALIZATIONS; ++spec)
         for (uint32 talentId : GetPvpTalentMap(spec))
             if (PvpTalentEntry const* talentInfo = sPvpTalentStore.LookupEntry(talentId))
@@ -4523,6 +4532,8 @@ Corpse* Player::CreateCorpse()
 
 void Player::SpawnCorpseBones(bool triggerSave /*= true*/)
 {
+    return;
+
     _corpseLocation.WorldRelocate();
     if (GetMap()->ConvertCorpseToBones(GetGUID()))
         if (triggerSave && !GetSession()->PlayerLogoutWithSave())   // at logout we will already store the player
@@ -5677,6 +5688,8 @@ void Player::ModifySkillBonus(uint32 skillid, int32 val, bool talent)
 
 void Player::UpdateSkillsForLevel()
 {
+    return;
+
     Races race = Races(GetRace());
     uint32 maxSkill = GetMaxSkillValueForLevel();
 
@@ -6310,6 +6323,8 @@ void Player::CheckAreaExploreAndOutdoor()
 
 uint32 Player::TeamForRace(uint8 race)
 {
+    return ALLIANCE;
+
     if (ChrRacesEntry const* rEntry = sChrRacesStore.LookupEntry(race))
     {
         switch (rEntry->Alliance)
@@ -6327,6 +6342,8 @@ uint32 Player::TeamForRace(uint8 race)
 
 TeamId Player::TeamIdForRace(uint8 race)
 {
+    return TEAM_ALLIANCE;
+
     if (ChrRacesEntry const* rEntry = sChrRacesStore.LookupEntry(race))
         return TeamId(rEntry->Alliance);
 
@@ -6934,6 +6951,20 @@ void Player::SendCurrencies() const
     }
 
     SendDirectMessage(packet.Write());
+}
+
+void Player::ModifyCurrencyFlag(uint32 id, uint8 flag)
+{
+    if (!id)
+        return;
+
+    if (_currencyStorage.find(id) == _currencyStorage.end())
+        return;
+
+    _currencyStorage[id].Flags = flag;
+
+    if (_currencyStorage[id].state != PLAYERCURRENCY_NEW)
+        _currencyStorage[id].state = PLAYERCURRENCY_CHANGED;
 }
 
 void Player::SendPvpRewards() const
@@ -8935,12 +8966,16 @@ uint8 Player::FindEquipSlot(Item const* item, uint32 slot, bool swap) const
             break;
         case INVTYPE_BODY:
             slots[0] = EQUIPMENT_SLOT_BODY;
+            slots[1] = EQUIPMENT_SLOT_CHEST;
             break;
         case INVTYPE_CHEST:
             slots[0] = EQUIPMENT_SLOT_CHEST;
+            slots[1] = EQUIPMENT_SLOT_BODY;
             break;
         case INVTYPE_ROBE:
             slots[0] = EQUIPMENT_SLOT_CHEST;
+            slots[1] = EQUIPMENT_SLOT_LEGS;
+            slots[2] = EQUIPMENT_SLOT_BODY;
             break;
         case INVTYPE_WAIST:
             slots[0] = EQUIPMENT_SLOT_WAIST;
@@ -8971,11 +9006,7 @@ uint8 Player::FindEquipSlot(Item const* item, uint32 slot, bool swap) const
         case INVTYPE_WEAPON:
         {
             slots[0] = EQUIPMENT_SLOT_MAINHAND;
-
-            // suggest offhand slot only if know dual wielding
-            // (this will be replace mainhand weapon at auto equip instead unwonted "you don't known dual wielding" ...
-            if (CanDualWield())
-                slots[1] = EQUIPMENT_SLOT_OFFHAND;
+            slots[1] = EQUIPMENT_SLOT_OFFHAND;
             break;
         }
         case INVTYPE_SHIELD:
@@ -8983,26 +9014,30 @@ uint8 Player::FindEquipSlot(Item const* item, uint32 slot, bool swap) const
             break;
         case INVTYPE_RANGED:
             slots[0] = EQUIPMENT_SLOT_MAINHAND;
+            slots[1] = EQUIPMENT_SLOT_OFFHAND;
             break;
         case INVTYPE_2HWEAPON:
             slots[0] = EQUIPMENT_SLOT_MAINHAND;
-            if (CanDualWield() && CanTitanGrip())
-                slots[1] = EQUIPMENT_SLOT_OFFHAND;
+            slots[1] = EQUIPMENT_SLOT_OFFHAND;
             break;
         case INVTYPE_TABARD:
             slots[0] = EQUIPMENT_SLOT_TABARD;
             break;
         case INVTYPE_WEAPONMAINHAND:
             slots[0] = EQUIPMENT_SLOT_MAINHAND;
+            slots[1] = EQUIPMENT_SLOT_OFFHAND;
             break;
         case INVTYPE_WEAPONOFFHAND:
             slots[0] = EQUIPMENT_SLOT_OFFHAND;
+            slots[1] = EQUIPMENT_SLOT_MAINHAND;
             break;
         case INVTYPE_HOLDABLE:
             slots[0] = EQUIPMENT_SLOT_OFFHAND;
+            slots[1] = EQUIPMENT_SLOT_MAINHAND;
             break;
         case INVTYPE_RANGEDRIGHT:
             slots[0] = EQUIPMENT_SLOT_MAINHAND;
+            slots[1] = EQUIPMENT_SLOT_MAINHAND;
             break;
         case INVTYPE_BAG:
             slots[0] = INVENTORY_SLOT_BAG_START + 0;
@@ -9026,33 +9061,12 @@ uint8 Player::FindEquipSlot(Item const* item, uint32 slot, bool swap) const
         // search free slot at first
         for (uint8 i = 0; i < 4; ++i)
             if (slots[i] != NULL_SLOT && !GetItemByPos(INVENTORY_SLOT_BAG_0, slots[i]))
-                // in case 2hand equipped weapon (without titan grip) offhand slot empty but not free
-                if (slots[i] != EQUIPMENT_SLOT_OFFHAND || !IsTwoHandUsed())
-                    return slots[i];
+                return slots[i];
 
-        // if not found free and can swap return slot with lower item level equipped
-        if (swap)
-        {
-            uint32 minItemLevel = std::numeric_limits<uint32>::max();
-            uint8 minItemLevelIndex = 0;
-            for (uint8 i = 0; i < 4; ++i)
-            {
-                if (slots[i] != NULL_SLOT)
-                {
-                    if (Item const* equipped = GetItemByPos(INVENTORY_SLOT_BAG_0, slots[i]))
-                    {
-                        uint32 itemLevel = equipped->GetItemLevel(this);
-                        if (itemLevel < minItemLevel)
-                        {
-                            minItemLevel = itemLevel;
-                            minItemLevelIndex = i;
-                        }
-                    }
-                }
-            }
-
-            return slots[minItemLevelIndex];
-        }
+        // if not found free and can swap return first appropriate from used
+        for (uint8 i = 0; i < 4; ++i)
+            if (slots[i] != NULL_SLOT && swap)
+                return slots[i];
     }
 
     // no free position
@@ -10558,6 +10572,7 @@ InventoryResult Player::CanEquipItem(uint8 slot, uint16 &dest, Item* pItem, bool
                         return EQUIP_ERR_CLIENT_LOCKED_OUT;
             }
 
+            /*
             Optional<ContentTuningLevels> requiredLevels;
             // check allowed level (extend range to upper values if MaxLevel more or equal max player level, this let GM set high level with 1...max range items)
             if (pItem->GetQuality() == ITEM_QUALITY_HEIRLOOM)
@@ -10565,6 +10580,7 @@ InventoryResult Player::CanEquipItem(uint8 slot, uint16 &dest, Item* pItem, bool
 
             if (requiredLevels && requiredLevels->MaxLevel < DEFAULT_MAX_LEVEL && requiredLevels->MaxLevel < GetLevel() && !sDB2Manager.GetHeirloomByItemId(pProto->GetId()))
                 return EQUIP_ERR_NOT_EQUIPPABLE;
+            */
 
             uint8 eslot = FindEquipSlot(pItem, slot, swap);
             if (eslot == NULL_SLOT)
@@ -10611,6 +10627,7 @@ InventoryResult Player::CanEquipItem(uint8 slot, uint16 &dest, Item* pItem, bool
             if (res2 != EQUIP_ERR_OK)
                 return res2;
 
+            /*
             // check unique-equipped special item classes
             if (pProto->GetClass() == ITEM_CLASS_QUIVER)
                 for (uint8 i = INVENTORY_SLOT_BAG_START; i < INVENTORY_SLOT_BAG_END; ++i)
@@ -10621,6 +10638,7 @@ InventoryResult Player::CanEquipItem(uint8 slot, uint16 &dest, Item* pItem, bool
                                     return (pBagProto->GetSubClass() == ITEM_SUBCLASS_AMMO_POUCH)
                                         ? EQUIP_ERR_ONLY_ONE_AMMO
                                         : EQUIP_ERR_ONLY_ONE_QUIVER;
+            */
 
             uint32 type = pProto->GetInventoryType();
 
@@ -10992,13 +11010,16 @@ InventoryResult Player::CanUseItem(Item* pItem, bool not_loading) const
             if (pItem->IsBindedNotWith(this))
                 return EQUIP_ERR_NOT_OWNER;
 
+            /*
             if (GetLevel() < pItem->GetRequiredLevel())
                 return EQUIP_ERR_CANT_EQUIP_LEVEL_I;
+            */
 
             InventoryResult res = CanUseItem(pProto, true);
             if (res != EQUIP_ERR_OK)
                 return res;
 
+            /*
             if (pItem->GetSkill() != 0)
             {
                 bool allowEquip = false;
@@ -11025,6 +11046,7 @@ InventoryResult Player::CanUseItem(Item* pItem, bool not_loading) const
                 if (!allowEquip && GetSkillValue(itemSkill) == 0)
                     return EQUIP_ERR_PROFICIENCY_NEEDED;
             }
+            */
 
             return EQUIP_ERR_OK;
         }
@@ -11039,6 +11061,7 @@ InventoryResult Player::CanUseItem(ItemTemplate const* proto, bool skipRequiredL
     if (!proto)
         return EQUIP_ERR_ITEM_NOT_FOUND;
 
+    /*
     if (proto->HasFlag(ITEM_FLAG2_INTERNAL_ITEM))
         return EQUIP_ERR_CANT_EQUIP_EVER;
 
@@ -11071,6 +11094,7 @@ InventoryResult Player::CanUseItem(ItemTemplate const* proto, bool skipRequiredL
 
     if (proto->GetRequiredReputationFaction() && uint32(GetReputationRank(proto->GetRequiredReputationFaction())) < proto->GetRequiredReputationRank())
         return EQUIP_ERR_CANT_EQUIP_REPUTATION;
+    */
 
     // learning (recipes, mounts, pets, etc.)
     if (proto->Effects.size() >= 2)
@@ -11078,10 +11102,11 @@ InventoryResult Player::CanUseItem(ItemTemplate const* proto, bool skipRequiredL
             if (HasSpell(proto->Effects[1]->SpellID))
                 return EQUIP_ERR_INTERNAL_BAG_ERROR;
 
+    /*
     if (ArtifactEntry const* artifact = sArtifactStore.LookupEntry(proto->GetArtifactID()))
         if (artifact->ChrSpecializationID != GetPrimarySpecialization())
             return EQUIP_ERR_CANT_USE_ITEM;
-
+    */
     return EQUIP_ERR_OK;
 }
 
@@ -15982,6 +16007,14 @@ void Player::SetQuestSlotObjectiveFlag(uint16 slot, int8 objectiveIndex)
         .ModifyValue(&UF::QuestLog::ObjectiveFlags), 1 << objectiveIndex);
 }
 
+bool Player::IsQuestBitFlaged(uint32 questBit) const
+{
+    if (!questBit)
+        return false;
+    else
+        return true;
+}
+
 void Player::RemoveQuestSlotObjectiveFlag(uint16 slot, int8 objectiveIndex)
 {
     RemoveUpdateFieldFlagValue(m_values.ModifyValue(&Player::m_playerData)
@@ -17781,6 +17814,7 @@ bool Player::LoadFromDB(ObjectGuid guid, CharacterDatabaseQueryHolder const& hol
 
     m_achievementMgr->CheckAllAchievementCriteria(this);
     m_questObjectiveCriteriaMgr->CheckAllQuestObjectiveCriteria(this);
+    m_session->LoadActivityData();
 
     PushQuests();
 
@@ -17804,6 +17838,8 @@ bool Player::LoadFromDB(ObjectGuid guid, CharacterDatabaseQueryHolder const& hol
 
 void Player::PushQuests()
 {
+    return;
+
     for (Quest const* quest : sObjectMgr->GetQuestTemplatesAutoPush())
     {
         if (quest->GetQuestTag() && quest->GetQuestTag() != QuestTagType::Tag)
@@ -19588,6 +19624,9 @@ void Player::SaveToDB(LoginDatabaseTransaction loginTransaction, CharacterDataba
     // save stats can be out of transaction
     if (m_session->isLogingOut() || !sWorld->getBoolConfig(CONFIG_STATS_SAVE_ONLY_ON_LOGOUT))
         _SaveStats(trans);
+
+    // Save activity data
+    GetSession()->SaveActivityData();
 
     // TODO: Move this out
     GetSession()->GetCollectionMgr()->SaveAccountToys(loginTransaction);
@@ -23062,6 +23101,7 @@ void Player::UpdateVisibilityOf(WorldObject* target)
                 target->DestroyForPlayer(this);
 
             m_clientGUIDs.erase(target->GetGUID());
+            GetVignetteMgr().OnWorldObjectDisappear(target);
 
             #ifdef TRINITY_DEBUG
                 TC_LOG_DEBUG("maps", "Object %s out of range for player %s. Distance = %f", target->GetGUID().ToString().c_str(), GetGUID().ToString().c_str(), GetDistance(target));
@@ -23074,6 +23114,7 @@ void Player::UpdateVisibilityOf(WorldObject* target)
         {
             target->SendUpdateToPlayer(this);
             m_clientGUIDs.insert(target->GetGUID());
+            GetVignetteMgr().OnWorldObjectDisappear(target);
 
             #ifdef TRINITY_DEBUG
                 TC_LOG_DEBUG("maps", "Object %s is visible now for player %s. Distance = %f", target->GetGUID().ToString().c_str(), GetGUID().ToString().c_str(), GetDistance(target));
@@ -23153,6 +23194,7 @@ void Player::UpdateVisibilityOf(T* target, UpdateData& data, std::set<Unit*>& vi
                 target->BuildDestroyUpdateBlock(&data);
 
             m_clientGUIDs.erase(target->GetGUID());
+            GetVignetteMgr().OnWorldObjectAppear(target);
 
             #ifdef TRINITY_DEBUG
                 TC_LOG_DEBUG("maps", "Object %s is out of range for player %s. Distance = %f", target->GetGUID().ToString().c_str(), GetGUID().ToString().c_str(), GetDistance(target));
@@ -23165,6 +23207,7 @@ void Player::UpdateVisibilityOf(T* target, UpdateData& data, std::set<Unit*>& vi
         {
             target->BuildCreateUpdateBlockForPlayer(&data, this);
             UpdateVisibilityOf_helper(m_clientGUIDs, target, visibleNow);
+            GetVignetteMgr().OnWorldObjectAppear(target);
 
             #ifdef TRINITY_DEBUG
                 TC_LOG_DEBUG("maps", "Object %s is visible now for player %s. Distance = %f", target->GetGUID().ToString().c_str(), GetGUID().ToString().c_str(), GetDistance(target));
@@ -23359,6 +23402,9 @@ void Player::SendInitialPacketsBeforeAddToMap()
 
     m_achievementMgr->SendAllData(this);
     m_questObjectiveCriteriaMgr->SendAllData(this);
+
+    // Reset Vignette data
+    SendDirectMessage(WorldPackets::Misc::VignetteUpdate(true).Write());
 
     /// SMSG_LOGIN_SETTIMESPEED
     static float const TimeSpeed = 0.01666667f;
@@ -23642,6 +23688,8 @@ void Player::LearnCustomSpells()
 
 void Player::LearnDefaultSkills()
 {
+    return;
+
     // learn default race/class skills
     PlayerInfo const* info = sObjectMgr->GetPlayerInfo(GetRace(), GetClass());
     ASSERT(info);
@@ -25567,6 +25615,8 @@ void Player::_LoadSkills(PreparedQueryResult result)
 
 InventoryResult Player::CanEquipUniqueItem(Item* pItem, uint8 eslot, uint32 limit_count) const
 {
+    return EQUIP_ERR_OK;
+
     ItemTemplate const* pProto = pItem->GetTemplate();
 
     // proto based limitations
@@ -25593,6 +25643,8 @@ InventoryResult Player::CanEquipUniqueItem(Item* pItem, uint8 eslot, uint32 limi
 
 InventoryResult Player::CanEquipUniqueItem(ItemTemplate const* itemProto, uint8 except_slot, uint32 limit_count) const
 {
+    return EQUIP_ERR_OK;
+
     // check unique-equipped on item
     if (itemProto->HasFlag(ITEM_FLAG_UNIQUE_EQUIPPABLE))
     {
@@ -27734,6 +27786,8 @@ void Player::RemoveOverrideSpell(uint32 overridenSpellId, uint32 newSpellId)
 
 void Player::LearnSpecializationSpells()
 {
+    return;
+
     if (std::vector<SpecializationSpellsEntry const*> const* specSpells = sDB2Manager.GetSpecializationSpells(GetPrimarySpecialization()))
     {
         for (size_t j = 0; j < specSpells->size(); ++j)

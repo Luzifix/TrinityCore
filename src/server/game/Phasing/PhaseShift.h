@@ -114,6 +114,7 @@ public:
     void ClearPhases();
 
     bool CanSee(PhaseShift const& other) const;
+    bool HasPhaseShiftFlag(PhaseShiftFlags const& flag) const;
 
     bool HasPersonalPhase() const;
 

@@ -1801,7 +1801,7 @@ void Pet::SynchronizeLevelWithOwner()
         // always same level
         case SUMMON_PET:
         case HUNTER_PET:
-            GivePetLevel(owner->GetLevel());
+            GivePetLevel(35);
             break;
         default:
             break;

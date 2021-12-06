@@ -289,6 +289,9 @@ public:
             cell.GridX(), cell.GridY(), cell.CellX(), cell.CellY(), object->GetInstanceId(),
             zoneX, zoneY, groundZ, floorZ, map->GetMinHeight(object->GetPhaseShift(), object->GetPositionX(), object->GetPositionY()), haveMap, haveVMap, haveMMap);
 
+        handler->PSendSysMessage(LANG_HOUSING_ID, object->GetHouseId());
+        handler->PSendSysMessage(LANG_HOUSING_PHASE_ID, object->GetHousePhaseId());
+
         LiquidData liquidStatus;
         ZLiquidStatus status = map->GetLiquidStatus(object->GetPhaseShift(), object->GetPositionX(), object->GetPositionY(), object->GetPositionZ(), map_liquidHeaderTypeFlags::AllLiquids, &liquidStatus);
         if (status)
@@ -441,6 +444,7 @@ public:
 
             _player->TeleportTo(target->GetMapId(), x, y, z, _player->GetAbsoluteAngle(target), TELE_TO_GM_MODE, target->GetInstanceId());
             PhasingHandler::InheritPhaseShift(_player, target);
+            _player->SetHousePhaseId(target->GetHousePhaseId(), false);
             _player->UpdateObjectVisibility();
         }
         else
@@ -565,6 +569,7 @@ public:
             _player->GetClosePoint(x, y, z, target->GetCombatReach());
             target->TeleportTo(_player->GetMapId(), x, y, z, target->GetOrientation(), 0, map->GetInstanceId());
             PhasingHandler::InheritPhaseShift(target, _player);
+            target->SetHousePhaseId(_player->GetHousePhaseId(), false);
             target->UpdateObjectVisibility();
         }
         else
@@ -1173,6 +1178,7 @@ public:
             return false;
 
         uint32 itemId = 0;
+        std::vector<int32> bonusListIDs;
 
         if (args[0] == '[')                                        // [name] manual form
         {
@@ -1203,7 +1209,7 @@ public:
         }
         else                                                    // item_id or [name] Shift-click form |color|Hitem:item_id:0:0:0|h[name]|h|r
         {
-            char const* id = handler->extractKeyFromLink((char*)args, "Hitem");
+            char const* id = handler->extractItemFromLink((char*)args, &bonusListIDs);
             if (!id)
                 return false;
             itemId = atoul(id);
@@ -1219,14 +1225,12 @@ public:
         if (count == 0)
             count = 1;
 
-        std::vector<int32> bonusListIDs;
         char const* bonuses = strtok(nullptr, " ");
-
         char const* context = strtok(nullptr, " ");
 
-        // semicolon separated bonuslist ids (parse them after all arguments are extracted by strtok!)
+        // doppledot separated bonuslist ids (parse them after all arguments are extracted by strtok!)
         if (bonuses)
-            for (std::string_view token : Trinity::Tokenize(bonuses, ';', false))
+            for (std::string_view token : Trinity::Tokenize(bonuses, ':', false))
                 if (Optional<int32> bonusListId = Trinity::StringTo<int32>(token))
                     bonusListIDs.push_back(*bonusListId);
 
@@ -1491,7 +1495,7 @@ public:
 
         // semicolon separated bonuslist ids (parse them after all arguments are extracted by strtok!)
         if (bonuses)
-            for (std::string_view token : Trinity::Tokenize(*bonuses, ';', false))
+            for (std::string_view token : Trinity::Tokenize(*bonuses, ':', false))
                 if (Optional<int32> bonusListId = Trinity::StringTo<int32>(token))
                     bonusListIDs.push_back(*bonusListId);
 
@@ -1577,7 +1581,13 @@ public:
             return false;
         }
 
-        weather->SetWeather(type, intensity);
+        WorldPackets::Misc::Weather weatherPkg(WeatherState(type), grade, true);
+
+        //- Returns false if there were no players found to update
+        if (!sWorld->SendZoneMessage(weather->GetZone(), weatherPkg.Write()))
+            return false;
+
+        //weather->SetWeather(type, intensity);
 
         return true;
     }

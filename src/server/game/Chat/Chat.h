@@ -96,6 +96,7 @@ class TC_GAME_API ChatHandler
 
         char* extractKeyFromLink(char* text, char const* linkType, char** something1 = nullptr);
         char* extractKeyFromLink(char* text, char const* const* linkTypes, int* found_idx, char** something1 = nullptr);
+        char* extractItemFromLink(char* text, std::vector<int32>*baseItemBonusListIds = nullptr);
         char* extractQuotedArg(char* args);
         uint32 extractSpellIdFromLink(char* text);
         ObjectGuid::LowType extractLowGuidFromLink(char* text, HighGuid& guidHigh);

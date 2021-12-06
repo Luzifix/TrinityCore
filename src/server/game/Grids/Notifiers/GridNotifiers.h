@@ -789,6 +789,29 @@ namespace Trinity
             NearestGameObjectCheck(NearestGameObjectCheck const&) = delete;
     };
 
+    class NearestGameObjectInSameHouseAndNotAlwaysVisibleCheck
+    {
+        public:
+            NearestGameObjectInSameHouseAndNotAlwaysVisibleCheck(WorldObject const& obj) : i_obj(obj), i_range(10.f) { }
+
+            bool operator()(GameObject* go)
+            {
+                if (i_obj.GetHouseId() == go->GetHouseId() && !go->GetPhaseShift().HasPhaseShiftFlag(PhaseShiftFlags::AlwaysVisible) && i_obj.IsWithinDistInMap(go, i_range))
+                {
+                    i_range = i_obj.GetDistance(go);        // use found GO range as new range limit for next check
+                    return true;
+                }
+                return false;
+            }
+
+        private:
+            WorldObject const& i_obj;
+            float i_range;
+
+            // prevent clone this object
+            NearestGameObjectInSameHouseAndNotAlwaysVisibleCheck(NearestGameObjectInSameHouseAndNotAlwaysVisibleCheck const&) = delete;
+    };
+
     // Success at unit in range, range update for next check (this can be use with GameobjectLastSearcher to find nearest GO)
     class NearestGameObjectEntryInObjectRangeCheck
     {
@@ -1632,6 +1655,25 @@ namespace Trinity
 
         private:
             float x, y, z, range;
+            uint32 entry;
+    };
+
+    class GameObjectInRangeSameHouseAndNotAlwaysVisibleCheck
+    {
+        public:
+            GameObjectInRangeSameHouseAndNotAlwaysVisibleCheck(float _x, float _y, float _z, float _range, uint32 _houseId, uint32 _entry = 0) :
+                x(_x), y(_y), z(_z), range(_range), houseId(_houseId), entry(_entry) { }
+
+            bool operator()(GameObject* go) const
+            {
+                if (!entry || (go->GetGOInfo() && go->GetGOInfo()->entry == entry))
+                    return !go->GetPhaseShift().HasPhaseShiftFlag(PhaseShiftFlags::AlwaysVisible) && go->InSameHouse(houseId) && go->IsWithinDist3d(x, y, z, range);
+                else return false;
+            }
+
+        private:
+            float x, y, z, range;
+            uint32 houseId;
             uint32 entry;
     };
 

@@ -30,7 +30,9 @@ char const* GitRevision::GetDate()
 
 char const* GitRevision::GetBranch()
 {
-    return _BRANCH;
+    std::string branchName = std::string(_BRANCH);
+    std::replace(branchName.begin(), branchName.end(), '/', '-');
+    return branchName.c_str();
 }
 
 char const* GitRevision::GetCMakeCommand()

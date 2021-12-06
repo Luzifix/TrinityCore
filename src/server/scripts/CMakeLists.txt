@@ -32,7 +32,7 @@ endif()
 if(SCRIPTS MATCHES "minimal")
   set(SCRIPTS_USE_WHITELIST ON)
   # Whitelist which is used when minimal is selected
-  list(APPEND SCRIPTS_WHITELIST Commands Spells)
+  list(APPEND SCRIPTS_WHITELIST Commands Spells Events Pet World Schattenhain)
 endif()
 
 # Set the SCRIPTS_${SCRIPT_MODULE} variables from the
@@ -212,7 +212,8 @@ target_link_libraries(scripts
   PRIVATE
     trinity-core-interface
   PUBLIC
-    game-interface)
+    game-interface
+    zlib)
 
 target_include_directories(scripts
   PUBLIC

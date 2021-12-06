@@ -22,6 +22,7 @@
 #include "World.h"
 #include "AccountMgr.h"
 #include "AchievementMgr.h"
+#include "ActivityMgr.h"
 #include "AreaTriggerDataStore.h"
 #include "ArenaTeamMgr.h"
 #include "AuctionHouseBot.h"
@@ -30,6 +31,7 @@
 #include "BattlefieldMgr.h"
 #include "BattlegroundMgr.h"
 #include "BattlenetRpcErrorCodes.h"
+#include "BattlePayData.h"
 #include "BattlePetMgr.h"
 #include "BlackMarketMgr.h"
 #include "CalendarMgr.h"
@@ -49,6 +51,8 @@
 #include "DB2Stores.h"
 #include "DetourMemoryFunctions.h"
 #include "DisableMgr.h"
+#include "EndorsementsMgr.h"
+#include "FurnitureMgr.h"
 #include "GameEventMgr.h"
 #include "GameObjectModel.h"
 #include "GameTables.h"
@@ -58,8 +62,10 @@
 #include "GridNotifiersImpl.h"
 #include "GroupMgr.h"
 #include "GuildMgr.h"
+#include "HousingMgr.h"
 #include "InstanceLockMgr.h"
 #include "IPLocation.h"
+#include "ItemPriceMgr.h"
 #include "Language.h"
 #include "LanguageMgr.h"
 #include "LFGMgr.h"
@@ -72,6 +78,7 @@
 #include "Metric.h"
 #include "MiscPackets.h"
 #include "MMapFactory.h"
+#include "MountMgr.h"
 #include "ObjectAccessor.h"
 #include "ObjectMgr.h"
 #include "OutdoorPvPMgr.h"
@@ -1679,6 +1686,9 @@ void World::LoadConfigSettings(bool reload)
     m_int_configs[CONFIG_BLACKMARKET_MAXAUCTIONS] = sConfigMgr->GetIntDefault("BlackMarket.MaxAuctions", 12);
     m_int_configs[CONFIG_BLACKMARKET_UPDATE_PERIOD] = sConfigMgr->GetIntDefault("BlackMarket.UpdatePeriod", 24);
 
+    // BattlePay
+    m_int_configs[CONFIG_BATTLE_PAY_CURRENCY] = sConfigMgr->GetIntDefault("BattlePay.Currency", 1);
+
     // HotSwap
     m_bool_configs[CONFIG_HOTSWAP_ENABLED] = sConfigMgr->GetBoolDefault("HotSwap.Enabled", true);
     m_bool_configs[CONFIG_HOTSWAP_RECOMPILER_ENABLED] = sConfigMgr->GetBoolDefault("HotSwap.EnableReCompiler", true);
@@ -1702,6 +1712,9 @@ void World::LoadConfigSettings(bool reload)
 
     // Whether to use LoS from game objects
     m_bool_configs[CONFIG_CHECK_GOBJECT_LOS] = sConfigMgr->GetBoolDefault("CheckGameObjectLoS", true);
+
+    // Use LoS for game object visibility
+    m_bool_configs[CONFIG_VISIBILITY_GOBJECT_LOS] = sConfigMgr->GetBoolDefault("Visibility.GameObject.LoS", true);
 
     // FactionBalance
     m_int_configs[CONFIG_FACTION_BALANCE_LEVEL_CHECK_DIFF] = sConfigMgr->GetIntDefault("Pvp.FactionBalance.LevelCheckDiff", 0);
@@ -1745,6 +1758,7 @@ void World::SetInitialWorldSettings()
     ///- Init highest guids before any table loading to prevent using not initialized guids in some code.
     sObjectMgr->SetHighestGuids();
 
+    /*
     ///- Check the existence of the map files for all races' startup areas.
     if (!TerrainMgr::ExistMapAndVMap(0, -6240.32f, 331.033f)
         || !TerrainMgr::ExistMapAndVMap(0, -8949.95f, -132.493f)
@@ -1759,6 +1773,7 @@ void World::SetInitialWorldSettings()
         TC_LOG_FATAL("server.loading", "Unable to load critical files - server shutting down !!!");
         exit(1);
     }
+    */
 
     ///- Initialize pool manager
     sPoolMgr->Initialize();
@@ -1836,6 +1851,21 @@ void World::SetInitialWorldSettings()
 
     TC_LOG_INFO("server.loading", "Initializing PlayerDump tables...");
     PlayerDump::InitializeTables();
+
+    TC_LOG_INFO("server.loading", "Loading battlepay data...");
+    sBattlePayDataStore->Initialize();
+
+    TC_LOG_INFO("server.loading", "Loading Endorsements...");
+    sEndorsementsMgr->LoadFromDB();
+
+    TC_LOG_INFO("server.loading", "Loading Activity...");
+    sActivityMgr->LoadFromDB();
+
+    TC_LOG_INFO("server.loading", "Loading Housing data...");
+    sHousingMgr->LoadFromDB();
+
+    TC_LOG_INFO("server.loading", "Loading Furniture data...");
+    sFurnitureMgr->LoadFromDB();
 
     TC_LOG_INFO("server.loading", "Loading SpellInfo store...");
     sSpellMgr->LoadSpellInfoStore();
@@ -1965,8 +1995,14 @@ void World::SetInitialWorldSettings()
     TC_LOG_INFO("misc", "Loading Item Scripts...");                 // must be after LoadItemPrototypes
     sObjectMgr->LoadItemScriptNames();
 
+    TC_LOG_INFO("server.loading", "Loading item price data...");
+    sItemPriceMgr->LoadFromDB();
+
     TC_LOG_INFO("server.loading", "Loading Creature Model Based Info Data...");
     sObjectMgr->LoadCreatureModelInfo();
+
+    TC_LOG_INFO("server.loading", "Loading Creature template outfits...");     // must be before LoadCreatureTemplates
+    sObjectMgr->LoadCreatureOutfits();
 
     TC_LOG_INFO("server.loading", "Loading Creature templates...");
     sObjectMgr->LoadCreatureTemplates();
@@ -2420,6 +2456,9 @@ void World::SetInitialWorldSettings()
     TC_LOG_INFO("server.loading", "Starting Map System");
     sMapMgr->Initialize();
 
+    TC_LOG_INFO("server.loading", "Loading Mount data...");
+    sMountMgr->LoadFromDB();
+
     TC_LOG_INFO("server.loading", "Starting Game Event system...");
     uint32 nextGameEvent = sGameEventMgr->StartSystem();
     m_timers[WUPDATE_EVENTS].SetInterval(nextGameEvent);    //depend on next event
@@ -2502,6 +2541,26 @@ void World::SetInitialWorldSettings()
 
     TC_LOG_INFO("server.loading", "Loading phase names...");
     sObjectMgr->LoadPhaseNames();
+
+    // Preload all cells from LoadAllGridsForMaps config
+    std::vector<std::string> loadMapListString = Split(sConfigMgr->GetStringDefault("LoadAllGridsForMaps", ""), ",");
+
+    if (!sWorld->getBoolConfig(CONFIG_GRID_UNLOAD))
+    {
+        std::vector<uint32> loadMapList;
+        std::transform(loadMapListString.begin(), loadMapListString.end(), std::back_inserter(loadMapList), [](const std::string& str) { return std::stoi(str); });
+
+        for (uint32 mapId : loadMapList)
+        {
+            TC_LOG_INFO("server.loading", "Pre-loading map data for map %u", mapId);
+            Map* map = sMapMgr->CreateBaseMap(mapId);
+            map->LoadAllCells();
+        }
+    }
+    else if (!loadMapListString.empty())
+    {
+        TC_LOG_ERROR("server.loading", "LoadAllGridsForMaps set, but GridUnload also enabled. GridUnload must be disabled to enable map pre-loading. Maps pre-loading disabled");
+    }
 
     uint32 startupDuration = GetMSTimeDiffToNow(startupBegin);
 
@@ -2652,11 +2711,25 @@ void World::Update(uint32 diff)
         m_timers[WUPDATE_BLACKMARKET].Reset();
 
         ///- Update blackmarket, refresh auctions if necessary
-        if ((blackmarket_timer *  m_timers[WUPDATE_BLACKMARKET].GetInterval() >=
-            getIntConfig(CONFIG_BLACKMARKET_UPDATE_PERIOD) * HOUR * IN_MILLISECONDS)
-            || !blackmarket_timer)
+        if ((blackmarket_timer * m_timers[WUPDATE_BLACKMARKET].GetInterval() >= getIntConfig(CONFIG_BLACKMARKET_UPDATE_PERIOD) * MINUTE * IN_MILLISECONDS) || !blackmarket_timer)
         {
-            sBlackMarketMgr->RefreshAuctions();
+            time_t curTime = time(NULL);
+            tm localTm;
+            localtime_r(&curTime, &localTm);
+
+            if (blackmarket_lastDrop != localTm.tm_hour)
+            {
+                Tokenizer restoreHoursTok(sConfigMgr->GetStringDefault("BlackMarket.RestoreHours", "7,13,19"), ',');
+                std::vector<int> restoreHours;
+                for (char const* token : restoreHoursTok)
+                    restoreHours.push_back(int32(atol(token)));
+
+                if (std::find(restoreHours.begin(), restoreHours.end(), localTm.tm_hour) != restoreHours.end())
+                    sBlackMarketMgr->RefreshAuctions();
+
+                blackmarket_lastDrop = localTm.tm_hour;
+            }
+
             blackmarket_timer = 1; // timer is 0 on startup
         }
         else

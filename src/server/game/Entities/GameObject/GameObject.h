@@ -23,6 +23,7 @@
 #include "GameObjectData.h"
 #include "MapObject.h"
 #include "SharedDefines.h"
+#include <G3D/Quat.h>
 
 class GameObject;
 class GameObjectAI;
@@ -152,9 +153,9 @@ class TC_GAME_API GameObject : public WorldObject, public GridObject<GameObject>
         void CleanupsBeforeDelete(bool finalCleanup = true) override;
 
     private:
-        bool Create(uint32 entry, Map* map, Position const& pos, QuaternionData const& rotation, uint32 animProgress, GOState goState, uint32 artKit, bool dynamic, ObjectGuid::LowType spawnid);
+        bool Create(uint32 entry, Map* map, Position const& pos, QuaternionData const& rotation, uint32 animProgress, GOState goState, uint32 artKit, bool dynamic, ObjectGuid::LowType spawnid, float size = -1.0f, int32 houseId = -1);
     public:
-        static GameObject* CreateGameObject(uint32 entry, Map* map, Position const& pos, QuaternionData const& rotation, uint32 animProgress, GOState goState, uint32 artKit = 0);
+        static GameObject* CreateGameObject(uint32 entry, Map* map, Position const& pos, QuaternionData const& rotation, uint32 animProgress, GOState goState, uint32 artKit = 0, float size = -1.0f, int32 houseId = -1);
         static GameObject* CreateGameObjectFromDB(ObjectGuid::LowType spawnId, Map* map, bool addToMap = true);
 
         void Update(uint32 p_time) override;
@@ -172,7 +173,9 @@ class TC_GAME_API GameObject : public WorldObject, public GridObject<GameObject>
 
          // z_rot, y_rot, x_rot - rotation angles around z, y and x axes
         void SetLocalRotationAngles(float z_rot, float y_rot, float x_rot);
+        void GetLocalRotationAngles(float& z_rot, float& y_rot, float& x_rot);
         void SetLocalRotation(float qx, float qy, float qz, float qw);
+        G3D::Quat GetLocalRotation();
         void SetParentRotation(QuaternionData const& rotation);      // transforms(rotates) transport's path
         QuaternionData const& GetLocalRotation() const { return m_localRotation; }
         int64 GetPackedLocalRotation() const { return m_packedRotation; }
@@ -198,6 +201,7 @@ class TC_GAME_API GameObject : public WorldObject, public GridObject<GameObject>
             SetUpdateFieldValue(m_values.ModifyValue(&GameObject::m_gameObjectData).ModifyValue(&UF::GameObjectData::CreatedBy), owner);
         }
         ObjectGuid GetOwnerGUID() const override { return m_gameObjectData->CreatedBy; }
+        Unit* GetOwner() const;
 
         void SetSpellId(uint32 id)
         {
@@ -248,6 +252,9 @@ class TC_GAME_API GameObject : public WorldObject, public GridObject<GameObject>
 
         std::vector<uint32> const* GetPauseTimes() const;
         void SetPathProgressForClient(float progress);
+
+        void SetHousePhaseId(uint32 housePhaseId, bool update);
+        void SetHouseId(uint32 houseId, bool setPhase = true, bool update = false);
 
         void EnableCollision(bool enable);
 
@@ -370,6 +377,8 @@ class TC_GAME_API GameObject : public WorldObject, public GridObject<GameObject>
         using WorldObject::IsWithinDistInMap;
 
         SpellInfo const* GetSpellForLock(Player const* player) const;
+
+        uint32 GetVignetteId() const { return m_goInfo ? m_goInfo->GetVignetteId() : 0; }
 
         uint16 GetAIAnimKitId() const override { return _animKitId; }
         void SetAnimKitId(uint16 animKitId, bool oneshot);

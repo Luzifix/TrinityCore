@@ -127,9 +127,7 @@ void WorldSession::HandleSendMail(WorldPackets::Mail::SendMail& sendMail)
         return;
     }
 
-    uint32 cost = !sendMail.Info.Attachments.empty() ? 30 * sendMail.Info.Attachments.size() : 30;  // price hardcoded in client
-
-    int64 reqmoney = cost + sendMail.Info.SendMoney;
+    int64 reqmoney = packet.Info.SendMoney;
 
     // Check for overflow
     if (reqmoney < sendMail.Info.SendMoney)
@@ -138,7 +136,7 @@ void WorldSession::HandleSendMail(WorldPackets::Mail::SendMail& sendMail)
         return;
     }
 
-    if (!player->HasEnoughMoney(reqmoney) && !player->IsGameMaster())
+    if (!player->HasEnoughMoney(reqmoney))
     {
         player->SendMailResult(0, MAIL_SEND, MAIL_ERR_NOT_ENOUGH_MONEY);
         return;
@@ -241,7 +239,7 @@ void WorldSession::HandleSendMail(WorldPackets::Mail::SendMail& sendMail)
         player->SendMailResult(0, MAIL_SEND, MAIL_OK);
 
         player->ModifyMoney(-reqmoney);
-        player->UpdateCriteria(CriteriaType::MoneySpentOnPostage, cost);
+        //player->UpdateCriteria(CriteriaType::MoneySpentOnPostage, cost);
 
         bool needItemDelay = false;
 

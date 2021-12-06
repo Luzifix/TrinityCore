@@ -765,6 +765,35 @@ void CharacterDatabaseConnection::DoPrepareStatements()
     PrepareStatement(CHAR_UPD_CHARACTER_INSTANCE_LOCK_FORCE_EXPIRE, "UPDATE character_instance_lock SET expiryTime = ?, extended = 0 WHERE guid = ? AND mapId = ? AND lockId = ?", CONNECTION_ASYNC);
     PrepareStatement(CHAR_DEL_INSTANCE, "DELETE FROM instance WHERE instanceId = ?", CONNECTION_ASYNC);
     PrepareStatement(CHAR_INS_INSTANCE, "INSERT INTO instance (instanceId, data, completedEncountersMask, entranceWorldSafeLocId) VALUES (?, ?, ?, ?)", CONNECTION_ASYNC);
+
+    // Housing
+    PrepareStatement(CHAR_REP_HOUSING, "REPLACE housing (id, type, owner, guild_id, map, height_min, height_max, name, facility_limit, motd) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", CONNECTION_ASYNC);
+    PrepareStatement(CHAR_DEL_HOUSING, "DELETE FROM housing WHERE id = ?", CONNECTION_ASYNC);
+    PrepareStatement(CHAR_INS_HOUSING_TRIGGER, "INSERT INTO housing_trigger (housing_id, id, position_x, position_y) VALUES (?, ?, ?, ?)", CONNECTION_ASYNC);
+    PrepareStatement(CHAR_DEL_HOUSING_TRIGGER, "DELETE FROM housing_trigger WHERE housing_id = ?", CONNECTION_ASYNC);
+    PrepareStatement(CHAR_INS_HOUSING_PERMISSION, "INSERT INTO housing_permission (housing_id, character_guid, type) VALUES (?, ?, ?)", CONNECTION_ASYNC);
+    PrepareStatement(CHAR_DEL_HOUSING_PERMISSION, "DELETE FROM housing_permission WHERE housing_id = ?", CONNECTION_ASYNC);
+    PrepareStatement(CHAR_SEL_HOUSING_BASEMENT, "SELECT houseId, mapId, posX, posY, posZ FROM housing_basement WHERE guid = ?;", CONNECTION_SYNCH);
+    PrepareStatement(CHAR_REP_HOUSING_BASEMENT, "REPLACE INTO housing_basement (guid, houseId, mapId, posX, posY, posZ) VALUES (?, ?, ?, ?, ?, ?) ", CONNECTION_ASYNC);
+    PrepareStatement(CHAR_DEL_HOUSING_BASEMENT, "DELETE FROM housing_basement WHERE guid = ?", CONNECTION_ASYNC);
+
+    // Character Modify
+    PrepareStatement(CHAR_SEL_CHARACTER_MODIFY, "SELECT scale, speed, morph FROM character_modify WHERE guid = ?", CONNECTION_SYNCH);
+    PrepareStatement(CHAR_INS_CHARACTER_MODIFY_SCALE, "INSERT INTO character_modify (guid, scale) VALUES (?, ?) ON DUPLICATE KEY UPDATE scale = ?", CONNECTION_ASYNC);
+    PrepareStatement(CHAR_INS_CHARACTER_MODIFY_SPEED, "INSERT INTO character_modify (guid, speed) VALUES (?, ?) ON DUPLICATE KEY UPDATE speed = ?", CONNECTION_ASYNC);
+    PrepareStatement(CHAR_INS_CHARACTER_MODIFY_MORPH, "INSERT INTO character_modify (guid, morph) VALUES (?, ?) ON DUPLICATE KEY UPDATE morph = ?", CONNECTION_ASYNC);
+
+    // Activity
+    PrepareStatement(CHAR_SEL_GUILD_ACTIVITY_ALL, "SELECT g.guildid, CAST(IFNULL(gai.minCoins, 10) AS INT), CAST(IFNULL(gai.maxCoins, 40) AS INT), CAST(IFNULL(ga.played, 0) AS INT), gai.disableSystem FROM guild g LEFT JOIN guild_activity_info gai ON (g.guildid = gai.guildId) LEFT JOIN guild_activity ga ON (g.guildid = ga.guildId)", CONNECTION_SYNCH);
+    PrepareStatement(CHAR_INS_GUILD_ACTIVITY_HISTORY, "INSERT INTO `guild_activity_history` (`guildId`, `played`, `minCoins`, `maxCoins`, `disableSystem`) SELECT ga.`guildId`, ga.`played`, gai.minCoins, gai.maxCoins, gai.disableSystem FROM `guild_activity` ga LEFT JOIN `guild_activity_info` gai ON (ga.guildId = gai.guildId)", CONNECTION_SYNCH);
+    PrepareStatement(CHAR_DEL_GUILD_ACTIVITY_HISTORY, "DELETE FROM `guild_activity_history` WHERE `date` <= CURRENT_TIMESTAMP - INTERVAL 3 MONTH; ", CONNECTION_SYNCH);
+    PrepareStatement(CHAR_INS_GUILD_ACTIVITY_PLAYTIME, "INSERT INTO guild_activity (guildId, played) VALUES (?, ?) ON DUPLICATE KEY UPDATE played = played + VALUES(played)", CONNECTION_ASYNC);
+    PrepareStatement(CHAR_UPD_GUILD_ACTIVITY_PLAYTIME, "UPDATE guild_activity SET played = ? WHERE guildId = ?", CONNECTION_ASYNC);
+
+    // Character Mount
+    PrepareStatement(CHAR_REP_CHARACTER_MOUNT, "REPLACE INTO `character_mount` (`id`, `guid`, `mountTemplateId`, `name`, `fuel`, `condition`, `positionX`, `positionY`, `positionZ`, `orientation`, `map`, `homePositionX`, `homePositionY`, `homePositionZ`, `homeOrientation`, `homeMap`, `dirtiness`, `lastCleanupTimestamp`, `lastMoveTimestamp`, `parkingTicket`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);", CONNECTION_ASYNC);
+    PrepareStatement(CHAR_REP_CHARACTER_MOUNT_PERMISSION, "REPLACE INTO `character_mount_permission` (`characterMountId`, `characterGuid`) VALUES (?, ?);", CONNECTION_ASYNC);
+    PrepareStatement(CHAR_UPD_CHARACTER_MOUNT_POSITION_BY_GUID_AND_TEMPLATE_ID, "UPDATE `character_mount` SET `positionX` = ?, `positionY` = ?, `positionZ` = ?, `orientation` = ?, `map` = ? WHERE `guid` = ? AND `mountTemplateId` = ?;", CONNECTION_BOTH);
 }
 
 CharacterDatabaseConnection::CharacterDatabaseConnection(MySQLConnectionInfo& connInfo) : MySQLConnection(connInfo)

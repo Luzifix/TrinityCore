@@ -1658,6 +1658,8 @@ Item* Item::CloneItem(uint32 count, Player const* player /*= nullptr*/) const
 
 bool Item::IsBindedNotWith(Player const* player) const
 {
+    return false;
+
     // not binded item
     if (!IsSoulBound())
         return false;

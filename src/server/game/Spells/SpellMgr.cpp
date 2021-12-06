@@ -3989,7 +3989,8 @@ void SpellMgr::LoadSpellInfoCorrections()
     ApplySpellFix({
         64386, // Terrifying Screech (Auriaya)
         64389, // Sentinel Blast (Auriaya)
-        64678  // Sentinel Blast (Auriaya)
+        64678, // Sentinel Blast (Auriaya)
+        211565 // Speech Bubble (Luzifix)
     }, [](SpellInfo* spellInfo)
     {
         spellInfo->DurationEntry = sSpellDurationStore.LookupEntry(28); // 5 seconds, wrong DBC data?

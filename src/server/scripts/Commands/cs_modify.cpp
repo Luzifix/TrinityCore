@@ -27,6 +27,7 @@ EndScriptData */
 #include "Chat.h"
 #include "ChatCommand.h"
 #include "Creature.h"
+#include "DatabaseEnv.h"
 #include "DB2Stores.h"
 #include "Log.h"
 #include "ObjectMgr.h"
@@ -503,7 +504,19 @@ public:
             if (Creature* creatureTarget = target->ToCreature())
                 creatureTarget->SetDisplayId(creatureTarget->GetDisplayId(), Scale);
             else
+            {
                 target->SetObjectScale(Scale);
+                if (target->GetNativeDisplayId() != target->GetDisplayId())
+                {
+                    CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_CHARACTER_MODIFY_SCALE);
+                    stmt->setUInt64(0, target->GetGUID().GetCounter());
+                    stmt->setFloat(1, Scale);
+                    stmt->setFloat(2, Scale);
+                    CharacterDatabase.Execute(stmt);
+                    target->SetDisplayId(target->GetDisplayId(), Scale);
+                }
+            }
+
             return true;
         }
         return false;
@@ -522,7 +535,7 @@ public:
             return false;
 
         uint32 mount = atoul(mount_cstr);
-        if (!sCreatureDisplayInfoStore.HasRecord(mount))
+        if (!sCreatureDisplayInfoStoreRaw.HasRecord(mount))
         {
             handler->SendSysMessage(LANG_NO_MOUNT);
             handler->SetSentErrorMessage(true);
@@ -795,6 +808,12 @@ public:
 
         target->SetDisplayId(display_id);
 
+        CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_CHARACTER_MODIFY_MORPH);
+        stmt->setUInt64(0, target->GetGUID().GetCounter());
+        stmt->setUInt32(1, display_id);
+        stmt->setUInt32(2, display_id);
+        CharacterDatabase.Execute(stmt);
+
         return true;
     }
 
@@ -815,12 +834,14 @@ public:
         if (visibleMapIdText)
             visibleMapId = uint32(strtoul(visibleMapIdText, nullptr, 10));
 
+        /*
         if (phaseId && !sPhaseStore.LookupEntry(phaseId))
         {
             handler->SendSysMessage(LANG_PHASE_NOTFOUND);
             handler->SetSentErrorMessage(true);
             return false;
         }
+        */
 
         Unit* target = handler->getSelectedUnit();
 
@@ -840,13 +861,10 @@ public:
                 PhasingHandler::RemoveVisibleMapId(target, visibleMapId);
         }
 
+        PhasingHandler::ResetPhaseShift(target);
+
         if (phaseId)
-        {
-            if (!target->GetPhaseShift().HasPhase(phaseId))
-                PhasingHandler::AddPhase(target, phaseId, true);
-            else
-                PhasingHandler::RemovePhase(target, phaseId, true);
-        }
+            PhasingHandler::AddPhase(target, phaseId, true);
 
         return true;
     }
@@ -969,6 +987,12 @@ public:
             return false;
 
         target->DeMorph();
+
+        CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_CHARACTER_MODIFY_MORPH);
+        stmt->setUInt64(0, target->GetGUID().GetCounter());
+        stmt->setUInt32(1, 0);
+        stmt->setUInt32(2, 0);
+        CharacterDatabase.Execute(stmt);
 
         return true;
     }

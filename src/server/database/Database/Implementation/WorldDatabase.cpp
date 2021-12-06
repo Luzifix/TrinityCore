@@ -82,10 +82,10 @@ void WorldDatabaseConnection::DoPrepareStatements()
     PrepareStatement(WORLD_SEL_CREATURE_BY_ID, "SELECT guid FROM creature WHERE id = ?", CONNECTION_SYNCH);
     PrepareStatement(WORLD_SEL_GAMEOBJECT_NEAREST, "SELECT guid, id, position_x, position_y, position_z, map, (POW(position_x - ?, 2) + POW(position_y - ?, 2) + POW(position_z - ?, 2)) AS order_ FROM gameobject WHERE map = ? AND (POW(position_x - ?, 2) + POW(position_y - ?, 2) + POW(position_z - ?, 2)) <= ? ORDER BY order_", CONNECTION_SYNCH);
     PrepareStatement(WORLD_SEL_CREATURE_NEAREST, "SELECT guid, id, position_x, position_y, position_z, map, (POW(position_x - ?, 2) + POW(position_y - ?, 2) + POW(position_z - ?, 2)) AS order_ FROM creature WHERE map = ? AND (POW(position_x - ?, 2) + POW(position_y - ?, 2) + POW(position_z - ?, 2)) <= ? ORDER BY order_", CONNECTION_SYNCH);
-    PrepareStatement(WORLD_INS_CREATURE, "INSERT INTO creature (guid, id , map, spawnDifficulties, PhaseId, PhaseGroup, modelid, equipment_id, position_x, position_y, position_z, orientation, spawntimesecs, wander_distance, currentwaypoint, curhealth, curmana, MovementType, npcflag, unit_flags, unit_flags2, unit_flags3, dynamicflags) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", CONNECTION_ASYNC);
+    PrepareStatement(WORLD_INS_CREATURE, "INSERT INTO creature (guid, id , map, spawnDifficulties, PhaseId, PhaseGroup, modelid, equipment_id, position_x, position_y, position_z, orientation, spawntimesecs, wander_distance, currentwaypoint, curhealth, curmana, MovementType, npcflag, unit_flags, unit_flags2, unit_flags3, dynamicflags, size) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", CONNECTION_ASYNC);
     PrepareStatement(WORLD_DEL_GAME_EVENT_CREATURE, "DELETE FROM game_event_creature WHERE guid = ?", CONNECTION_ASYNC);
     PrepareStatement(WORLD_DEL_GAME_EVENT_MODEL_EQUIP, "DELETE FROM game_event_model_equip WHERE guid = ?", CONNECTION_ASYNC);
-    PrepareStatement(WORLD_INS_GAMEOBJECT, "INSERT INTO gameobject (guid, id, map, spawnDifficulties, PhaseId, PhaseGroup, position_x, position_y, position_z, orientation, rotation0, rotation1, rotation2, rotation3, spawntimesecs, animprogress, state) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", CONNECTION_ASYNC);
+    PrepareStatement(WORLD_INS_GAMEOBJECT, "INSERT INTO gameobject (guid, id, map, spawnDifficulties, PhaseId, PhaseGroup, position_x, position_y, position_z, orientation, rotation0, rotation1, rotation2, rotation3, spawntimesecs, animprogress, state, house_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", CONNECTION_ASYNC);
     PrepareStatement(WORLD_INS_DISABLES, "INSERT INTO disables (entry, sourceType, flags, comment) VALUES (?, ?, ?, ?)", CONNECTION_ASYNC);
     PrepareStatement(WORLD_SEL_DISABLES, "SELECT entry FROM disables WHERE entry = ? AND sourceType = ?", CONNECTION_SYNCH);
     PrepareStatement(WORLD_DEL_DISABLES, "DELETE FROM disables WHERE entry = ? AND sourceType = ?", CONNECTION_ASYNC);
@@ -94,6 +94,48 @@ void WorldDatabaseConnection::DoPrepareStatements()
     PrepareStatement(WORLD_DEL_SPAWNGROUP_MEMBER, "DELETE FROM spawn_group WHERE spawnType = ? AND spawnId = ?", CONNECTION_ASYNC);
     PrepareStatement(WORLD_DEL_GAMEOBJECT_ADDON, "DELETE FROM gameobject_addon WHERE guid = ?", CONNECTION_ASYNC);
     PrepareStatement(WORLD_SEL_GUILD_REWARDS_REQ_ACHIEVEMENTS, "SELECT AchievementRequired FROM guild_rewards_req_achievements WHERE ItemID = ?", CONNECTION_SYNCH);
+
+    // Outfit customization
+    PrepareStatement(WORLD_SEL_OUTFIT_CUSTOMIZATIONS, "SELECT chrCustomizationOptionID, chrCustomizationChoiceID from creature_template_outfits_customizations WHERE outfitID = ?", CONNECTION_SYNCH);
+
+    // Furniture
+    PrepareStatement(WORLD_INS_FURNITURE_CATALOG_ENTRY, "INSERT INTO `furniture_catalog` (`id`, `categorization_date`, `categorized_by`, `authorised_by`, `price`, `updated`) VALUES (?, ?, ?, ?, ?, ?) ON DUPLICATE KEY UPDATE `categorization_date` = VALUES(`categorization_date`), `categorized_by` = VALUES(`categorized_by`), `authorised_by` = VALUES(`authorised_by`), `price` = VALUES(`price`), `updated` = VALUES(`updated`);", CONNECTION_ASYNC);
+    PrepareStatement(WORLD_DEL_FURNITURE_CATALOG_CATEGORY_BY_FURNITURE_ID, "DELETE FROM `furniture_catalog_category` WHERE `furniture_id` = ?;", CONNECTION_ASYNC);
+    PrepareStatement(WORLD_INS_FURNITURE_CATALOG_CATEGORY, "INSERT INTO `furniture_catalog_category` (`furniture_id`, `category_id`) VALUES (?, ?);", CONNECTION_ASYNC);
+
+    // Furniture inventory
+    PrepareStatement(WORLD_INS_FURNITURE_INVENTORY, "INSERT INTO `furniture_inventory` (`furniture_id`, `owner`, `count`, `favorit`) VALUES (?, ?, ?, ?) ON DUPLICATE KEY UPDATE `count` = VALUES (`count`), `favorit` = VALUES (`favorit`)", CONNECTION_ASYNC);
+
+    // Furniture categorization
+    PrepareStatement(WORLD_SEL_FURNITURE_CATALOG_CATEGORIZATION_BY_ID, "SELECT `id`, `furniture_id`, `owner`, `categorized_by`, `price`, `category_ids`, `status` FROM `furniture_catalog_categorization` WHERE `id` = ?;", CONNECTION_SYNCH);
+    PrepareStatement(WORLD_SEL_FURNITURE_CATALOG_CATEGORIZATION_BY_STATUS, "SELECT `id`, `furniture_id`, `owner`, `categorized_by`, `price`, `category_ids`, `status` FROM `furniture_catalog_categorization` WHERE `status` = ?;", CONNECTION_SYNCH);
+    PrepareStatement(WORLD_REP_FURNITURE_CATALOG_CATEGORIZATION, "REPLACE INTO `furniture_catalog_categorization` (`furniture_id`, `owner`, `categorized_by`, `price`, `category_ids`) VALUES (?, ?, ?, ?, ?);", CONNECTION_ASYNC);
+    PrepareStatement(WORLD_UPD_FURNITURE_CATALOG_CATEGORIZATION_STATUS, "UPDATE `furniture_catalog_categorization` SET `status` = ? WHERE `id` = ?;", CONNECTION_ASYNC);
+    PrepareStatement(WORLD_UPD_FURNITURE_CATALOG_CATEGORIZATION_REJECT_PENDING_REQUESTS_BY_FURNITURE_ID, "UPDATE `furniture_catalog_categorization` SET `status` = 'REJECTED' WHERE `furniture_id` = ? AND `status` = 'PENDING';", CONNECTION_ASYNC);
+    PrepareStatement(WORLD_DEL_FURNITURE_CATALOG_CATEGORIZATION_BY_ID, "DELETE FROM `furniture_catalog_categorization` WHERE `id` = ?;", CONNECTION_ASYNC);
+
+    // Morph service
+    PrepareStatement(WORLD_SEL_MORPH_BY_CATEGORY_ID, "SELECT id, category_id , name, display_id, size FROM `npc_morph` WHERE category_id = ? ORDER BY `order`;", CONNECTION_SYNCH);
+    PrepareStatement(WORLD_SEL_MORPH_CATEGORY, "SELECT id, icon, name, text_id FROM `npc_morph_category` ORDER BY `order`;", CONNECTION_SYNCH);
+
+    // Item price
+    PrepareStatement(WORLD_INS_ITEM_PRICE, "INSERT INTO `item_price` (`display_info_id`, `price_category_id`, `price_multiplier`, `base_item_id`, `base_item_bonus_list_ids`, `categorized_by`, `categorization_date`) VALUES (?, ?, ?, ?, ?, ?, ?) ON DUPLICATE KEY UPDATE`display_info_id` = VALUES(`display_info_id`), `price_category_id` = VALUES(`price_category_id`), `price_multiplier` = VALUES(`price_multiplier`), `base_item_id` = VALUES(`base_item_id`), `base_item_bonus_list_ids` = VALUES(`base_item_bonus_list_ids`), `categorized_by` = VALUES(`categorized_by`), `categorization_date` = VALUES(`categorization_date`);", CONNECTION_ASYNC);
+    PrepareStatement(WORLD_INS_ITEM_PRICE_CATEGORIZE_REQUEST, "INSERT INTO `item_price_categorize_request` (`display_info_id`, `base_item_id`, `base_item_bonus_list_ids`, `requested_at`) VALUES (?, ?, ?, ?) ON DUPLICATE KEY UPDATE `base_item_id` = VALUES(`base_item_id`), `base_item_bonus_list_ids` = VALUES(`base_item_bonus_list_ids`), `requested_at` = VALUES(`requested_at`);", CONNECTION_ASYNC);
+    PrepareStatement(WORLD_DEL_ITEM_PRICE_CATEGORIZE_REQUEST_BY_DISPLAY_INFO_ID, "DELETE FROM `item_price_categorize_request` WHERE `display_info_id` = ?;", CONNECTION_ASYNC);
+    PrepareStatement(WORLD_REP_ITEM_PRICE_CATEGORIZE_REQUEST_NOTIFIY, "REPLACE `item_price_categorize_request_notify` (`display_info_id`, `battlenet_account_id`) VALUES (?, ?);", CONNECTION_ASYNC);
+    PrepareStatement(WORLD_DEL_ITEM_PRICE_CATEGORIZE_REQUEST_NOTIFIY_BY_DISPLAY_INFO_ID, "DELETE FROM `item_price_categorize_request_notify` WHERE `display_info_id` = ?;", CONNECTION_ASYNC);
+    PrepareStatement(WORLD_UPD_ITEM_PRICE_CATEGORIZE_REQUEST_SET_CATEGORIZED_BY_DISPLAY_INFO_ID, "UPDATE `item_price_categorize_request` SET `categorized` = ? WHERE `display_info_id` = ?;", CONNECTION_ASYNC);
+
+    // Housing
+    PrepareStatement(WORLD_SEL_GAMEOBJECT_COUNT_BY_HOUSEID, "SELECT CAST(COUNT(*) AS INT) FROM gameobject WHERE house_id = ?;", CONNECTION_SYNCH);
+    PrepareStatement(WORLD_SEL_GAMEOBJECT_VALUE_BY_HOUSEID, "SELECT CAST(SUM(fc.price) AS INT) FROM gameobject g LEFT JOIN furniture_catalog fc ON (g.id = fc.id) WHERE g.house_id = ?;", CONNECTION_SYNCH);
+
+    // NPC Commands
+    PrepareStatement(WORLD_INS_CREATURE_ADDON_EMOTE, "INSERT INTO creature_addon(guid, bytes2, emote) VALUES (?, 1, ?)", CONNECTION_ASYNC);
+    PrepareStatement(WORLD_UPD_CREATURE_ADDON_EMOTE, "UPDATE creature_addon SET emote = ?, bytes2 = 1 WHERE guid = ?", CONNECTION_ASYNC);
+    PrepareStatement(WORLD_SEL_GAME_EVENT_CREATURE_BY_GUID, "SELECT guid FROM game_event_creature WHERE guid = ?", CONNECTION_SYNCH);
+    PrepareStatement(WORLD_INS_GAME_EVENT_CREATURE, "INSERT INTO game_event_creature (eventEntry, guid) VALUES (?, ?)", CONNECTION_ASYNC);
+    PrepareStatement(WORLD_UPD_GAME_EVENT_CREATURE, "UPDATE game_event_creature SET eventEntry = ? WHERE guid = ?", CONNECTION_ASYNC);
 }
 
 WorldDatabaseConnection::WorldDatabaseConnection(MySQLConnectionInfo& connInfo) : MySQLConnection(connInfo)

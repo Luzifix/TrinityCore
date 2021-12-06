@@ -753,6 +753,21 @@ enum RBACPermissions
     // IF YOU ADD NEW PERMISSIONS, ADD THEM IN 3.3.5 BRANCH AS WELL!
     //
     // custom permissions 1000+
+    RBAC_PERM_COMMAND_HOUSING                               = 2000,   
+    RBAC_PERM_COMMAND_HOUSING_RELOAD                        = 2001,
+    RBAC_PERM_COMMAND_HOUSING_CURD                          = 2002,
+    RBAC_PERM_COMMAND_HOUSING_DELETE                        = 2003,
+    RBAC_PERM_COMMAND_HOUSING_INFO                          = 2004,
+    RBAC_PERM_COMMAND_RELOAD_BATTLE_PAY                     = 2005,
+    RBAC_PERM_COMMAND_GOBJECT_SET_SCALE                     = 2006,
+    RBAC_PERM_COMMAND_NPC_SET_SCALE                         = 2007,
+    RBAC_PERM_COMMAND_PRICE_CURD                            = 2008,
+    RBAC_PERM_COMMAND_ACTIVITY                              = 2009,
+    RBAC_PERM_COMMAND_MOUNTSYSTEM                           = 2100,
+    RBAC_PERM_COMMAND_MOUNTSYSTEM_RELOAD                    = 2101,
+    RBAC_PERM_COMMAND_MOUNTSYSTEM_CREATE                    = 2102,
+    RBAC_PERM_COMMAND_MOUNTSYSTEM_INFO                      = 2103,
+
     RBAC_PERM_MAX
 };
 

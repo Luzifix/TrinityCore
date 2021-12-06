@@ -324,6 +324,18 @@ uint32 Battlenet::Session::VerifyWebCredentials(std::string const& webCredential
             } while (characterCountsResult->NextRow());
         }
 
+        WebsiteDatabasePreparedStatement* stmt = WebsiteDatabase.GetPreparedStatement(WEBSITE_SEL_WP_USERS_DISCORD_ID);
+        stmt->setUInt32(0, accountInfo->Id);
+        callback.SetNextQuery(WebsiteDatabase.AsyncQuery(stmt));
+    })
+        .WithChainingPreparedCallback([accountInfo](QueryCallback& callback, PreparedQueryResult wpUserDiscordResult)
+    {
+        if (wpUserDiscordResult)
+        {
+            Field* fields = wpUserDiscordResult->Fetch();
+            accountInfo->IsInDiscord = (fields[0].GetString() != "");
+        }
+
         LoginDatabasePreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_SEL_BNET_LAST_PLAYER_CHARACTERS);
         stmt->setUInt32(0, accountInfo->Id);
         callback.SetNextQuery(LoginDatabase.AsyncQuery(stmt));
@@ -401,6 +413,14 @@ uint32 Battlenet::Session::VerifyWebCredentials(std::string const& webCredential
                 asyncContinuation(&asyncContinuationService, ERROR_GAME_ACCOUNT_SUSPENDED, &response);
                 return;
             }
+        }
+
+        // Check if user Account connected to discord
+        if (!_accountInfo->IsInDiscord)
+        {
+            TC_LOG_DEBUG("session", "%s [Session::HandleVerifyWebCredentials] Account %s without discord connection tried to login!", GetClientInfo().c_str(), _accountInfo->Login.c_str());
+            asyncContinuation(&asyncContinuationService, ERROR_GAME_ACCOUNT_NO_TIME, &response);
+            return;
         }
 
         authentication::v1::LogonResult logonResult;

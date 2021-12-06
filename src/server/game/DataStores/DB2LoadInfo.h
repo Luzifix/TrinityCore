@@ -4268,6 +4268,23 @@ struct NumTalentsAtLevelLoadInfo
     }
 };
 
+struct NPCSoundsLoadInfo
+{
+    static DB2LoadInfo const* Instance()
+    {
+        static DB2FieldMeta const fields[] =
+        {
+            { false, FT_INT, "ID" },
+            { false, FT_INT, "hello" },
+            { false, FT_INT, "goodbye" },
+            { false, FT_INT, "pissed" },
+            { false, FT_INT, "ack" },
+        };
+        static DB2LoadInfo const loadInfo(&fields[0], std::extent<decltype(fields)>::value, NPCSoundsMeta::Instance(), HOTFIX_SEL_NPC_SOUNDS);
+        return &loadInfo;
+    }
+};
+
 struct OverrideSpellDataLoadInfo
 {
     static DB2LoadInfo const* Instance()
@@ -6642,6 +6659,29 @@ struct VehicleSeatLoadInfo
             { true, FT_SHORT, "CameraModeID" },
         };
         static DB2LoadInfo const loadInfo(&fields[0], std::size(fields), VehicleSeatMeta::Instance(), HOTFIX_SEL_VEHICLE_SEAT);
+        return &loadInfo;
+    }
+};
+
+struct VignetteLoadInfo
+{
+    static DB2LoadInfo const* Instance()
+    {
+        static DB2FieldMeta const fields[] =
+        {
+            { false, FT_INT, "ID" },
+            { false, FT_STRING, "Name" },
+            { false, FT_INT, "PlayerConditionID" },
+            { false, FT_INT, "VisibleTrackingQuestID" },
+            { false, FT_INT, "QuestFeedbackEffectID" },
+            { false, FT_INT, "Flags" },
+            { false, FT_FLOAT, "MaxHeight" },
+            { false, FT_FLOAT, "MinHeight" },
+            { true, FT_BYTE, "VignetteType" },
+            { true, FT_INT, "RewardQuestID" },
+            { true, FT_INT, "UiWidgetSetID" },
+        };
+        static DB2LoadInfo const loadInfo(&fields[0], std::extent<decltype(fields)>::value, VignetteMeta::Instance(), HOTFIX_SEL_VIGNETTE);
         return &loadInfo;
     }
 };

@@ -98,14 +98,15 @@ enum class GossipOptionRewardType : uint8
 
 struct GossipMenuItem
 {
-    GossipOptionNpc  OptionNpc;
-    bool             IsCoded;
-    std::string      Message;
-    uint32           Sender;
-    uint32           Action;
-    std::string      BoxMessage;
-    uint32           BoxMoney;
-    uint32           Language;
+    GossipOptionNpc    OptionNpc;
+    bool               IsCoded;
+    std::string        Message;
+    uint32             Sender;
+    uint32             Action;
+    std::string        BoxMessage;
+    uint32             BoxMoney;
+    GossipOptionStatus Status;
+    uint32             Language;
 };
 
 // need an ordered container
@@ -134,8 +135,8 @@ class TC_GAME_API GossipMenu
         GossipMenu();
         ~GossipMenu();
 
-        uint32 AddMenuItem(int32 menuItemId, GossipOptionNpc optionNpc, std::string const& message, uint32 sender, uint32 action, std::string const& boxMessage, uint32 boxMoney, bool coded = false);
-        void AddMenuItem(uint32 menuId, uint32 menuItemId, uint32 sender, uint32 action);
+        uint32 AddMenuItem(int32 menuItemId, GossipOptionNpc optionNpc, std::string const& message, uint32 sender, uint32 action, std::string const& boxMessage, uint32 boxMoney, bool coded = false, GossipOptionStatus status = GossipOptionStatus::Available);
+        void AddMenuItem(uint32 menuId, uint32 menuItemId, uint32 sender, uint32 action, GossipOptionStatus status = GossipOptionStatus::Available);
 
         void SetMenuId(uint32 menu_id) { _menuId = menu_id; }
         uint32 GetMenuId() const { return _menuId; }

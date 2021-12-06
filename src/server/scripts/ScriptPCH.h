@@ -34,4 +34,6 @@
 #include "SpellMgr.h"
 #include "SpellScript.h"
 #include "StringFormat.h"
+#include "TemporarySummon.h"
+#include "Schattenhain/Slops/SlopsHandlers.h"
 #include <sstream>

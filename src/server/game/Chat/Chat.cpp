@@ -374,6 +374,59 @@ char* ChatHandler::extractKeyFromLink(char* text, char const* const* linkTypes, 
     return nullptr;
 }
 
+char* ChatHandler::extractItemFromLink(char* text, std::vector<int32>* baseItemBonusListIds)
+{
+    // skip empty
+    if (!text)
+        return nullptr;
+
+    // skip spaces
+    while (*text == ' ' || *text == '\t' || *text == '\b')
+        ++text;
+
+    if (!*text)
+        return nullptr;
+
+    // return non link case
+    if (text[0] != '|')
+        return strtok(text, " ");
+
+    // [name] Shift-click form |color|linkType:key|h[name]|h|r
+    // or
+    // [name] Shift-click form |color|linkType:key:something1:...:somethingN|h[name]|h|r
+
+    char* check = strtok(text, "|");                        // skip color
+    if (!check)
+        return nullptr;                                     // end of data
+
+    char* cLinkType = strtok(nullptr, ":");                 // linktype
+    if (!cLinkType)
+        return nullptr;                                     // end of data
+
+    if (strcmp(cLinkType, "Hitem") != 0)
+    {
+        strtok(nullptr, " ");                               // skip link tail (to allow continue strtok(nullptr, s) use after retturn from function
+        return nullptr;
+    }
+
+    char* cKeys = strtok(nullptr, "|");                     // extract keys and values
+    char* cKeysTail = strtok(nullptr, "");
+
+    if (baseItemBonusListIds) {
+        Tokenizer itemLinkTok(cKeys, ':');
+        if (itemLinkTok.size() > 13) {
+            for (uint16 i = 0; i < atoi(itemLinkTok[12]); i++)
+                baseItemBonusListIds->push_back(atoi(itemLinkTok[13 + i]));
+        }
+    }
+
+    char* cKey = strtok(cKeys, ":|");                       // extract key
+
+    strtok(cKeysTail, "]");                                 // restart scan tail and skip name with possible spaces
+    strtok(nullptr, " ");                                   // skip link tail (to allow continue strtok(nullptr, s) use after return from function
+    return cKey;
+}
+
 GameObject* ChatHandler::GetNearbyGameObject()
 {
     if (!m_session)

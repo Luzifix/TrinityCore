@@ -28,6 +28,7 @@
 #include "GameTime.h"
 #include "GridNotifiersImpl.h"
 #include "G3DPosition.hpp"
+#include "HousingMgr.h"
 #include "InstanceScenario.h"
 #include "Item.h"
 #include "Log.h"
@@ -951,6 +952,22 @@ void WorldObject::RemoveFromWorld()
     Object::RemoveFromWorld();
 }
 
+void WorldObject::SetHousePhaseId(uint32 housePhaseId, bool update)
+{
+    _housePhaseId = housePhaseId;
+
+    if (update && IsInWorld())
+        UpdateObjectVisibility();
+}
+
+void WorldObject::SetHouseId(uint32 houseId, bool setPhase /* = true */, bool update /* = true */)
+{
+    _houseId = houseId;
+
+    if (setPhase)
+        SetHousePhaseId(houseId, update);
+}
+
 bool WorldObject::IsInWorldPvpZone() const
 {
     switch (GetZoneId())
@@ -1491,6 +1508,31 @@ bool WorldObject::CanSeeOrDetect(WorldObject const* obj, bool ignoreStealth, boo
 
         if (!corpseCheck && !viewpoint->IsWithinDist(obj, GetSightRange(obj), false))
             return false;
+
+        if (!corpseCheck && sWorld->getBoolConfig(CONFIG_VISIBILITY_GOBJECT_LOS))
+        {
+            if (Player const* player = ToPlayer())
+            {
+                if (obj->IsCreature() || obj->IsGameObject())
+                {
+                    if (!viewpoint->IsWithinDist(obj, GetSightRange(obj) / 2, false))
+                    {
+                        if (sHousingMgr->IsIndoor(player))
+                            return false;
+
+                        if (isInBack(obj, float(M_PI_2)))
+                            return false;
+
+                        float x, y, z, ox, oy, oz = 0;
+                        GetPosition(x, y, z);
+                        obj->GetPosition(ox, oy, oz);
+
+                        if (!GetMap()->isInLineOfSight(GetPhaseShift(), x, y, z, ox, oy, oz, LINEOFSIGHT_CHECK_VMAP, VMAP::ModelIgnoreFlags::M2))
+                            return false;
+                    }
+                }
+            }
+        }
     }
 
     // GM visibility off or hidden NPC
@@ -1504,22 +1546,8 @@ bool WorldObject::CanSeeOrDetect(WorldObject const* obj, bool ignoreStealth, boo
         return m_serverSideVisibilityDetect.GetValue(SERVERSIDE_VISIBILITY_GM) >= obj->m_serverSideVisibility.GetValue(SERVERSIDE_VISIBILITY_GM);
 
     // Ghost players, Spirit Healers, and some other NPCs
-    if (!corpseVisibility && !(obj->m_serverSideVisibility.GetValue(SERVERSIDE_VISIBILITY_GHOST) & m_serverSideVisibilityDetect.GetValue(SERVERSIDE_VISIBILITY_GHOST)))
-    {
-        // Alive players can see dead players in some cases, but other objects can't do that
-        if (Player const* thisPlayer = ToPlayer())
-        {
-            if (Player const* objPlayer = obj->ToPlayer())
-            {
-                if (!thisPlayer->IsGroupVisibleFor(objPlayer))
-                    return false;
-            }
-            else
-                return false;
-        }
-        else
-            return false;
-    }
+    if (!(obj->m_serverSideVisibility.GetValue(SERVERSIDE_VISIBILITY_GHOST) & m_serverSideVisibilityDetect.GetValue(SERVERSIDE_VISIBILITY_GHOST)))
+        return false;
 
     if (obj->IsInvisibleDueToDespawn(this))
         return false;
@@ -1532,7 +1560,7 @@ bool WorldObject::CanSeeOrDetect(WorldObject const* obj, bool ignoreStealth, boo
 
 bool WorldObject::CanNeverSee(WorldObject const* obj) const
 {
-    return GetMap() != obj->GetMap() || !IsInPhase(obj);
+    return GetMap() != obj->GetMap() || !InSameHousePhase(obj) || !IsInPhase(obj);
 }
 
 bool WorldObject::CanDetect(WorldObject const* obj, bool ignoreStealth, bool checkAlert) const
@@ -3462,6 +3490,41 @@ void WorldObject::MovePositionToFirstCollision(Position &pos, float dist, float 
     }
 }
 
+bool WorldObject::InSameHousePhase(WorldObject const* obj) const
+{
+    uint32 houseId = obj->GetHousePhaseId();
+
+    if (InSameHousePhase(houseId))
+        return true;
+
+    if (houseId == uint32(PHASEMASK_ANYWHERE))
+        return true;
+
+    if (GetPhaseShift().HasPhaseShiftFlag(PhaseShiftFlags::AlwaysVisible))
+        return true;
+
+    if (obj->IsGameObject() && obj->GetPhaseShift().HasPhaseShiftFlag(PhaseShiftFlags::AlwaysVisible))
+        return true;
+
+    return false;
+}
+
+bool WorldObject::InSameHouse(WorldObject const* obj) const
+{
+    uint32 houseId = obj->GetHouseId();
+
+    if (InSameHouse(houseId))
+        return true;
+
+    if (houseId == uint32(PHASEMASK_ANYWHERE))
+        return true;
+
+    if (obj->GetPhaseShift().HasPhaseShiftFlag(PhaseShiftFlags::AlwaysVisible))
+        return true;
+
+    return false;
+}
+
 void WorldObject::PlayDistanceSound(uint32 soundId, Player* target /*= nullptr*/)
 {
     if (target)
@@ -3510,6 +3573,7 @@ void WorldObject::DestroyForNearbyPlayers()
 
         DestroyForPlayer(player);
         player->m_clientGUIDs.erase(GetGUID());
+        player->GetVignetteMgr().OnWorldObjectDisappear(this);
     }
 }
 

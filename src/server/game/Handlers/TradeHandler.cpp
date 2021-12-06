@@ -668,6 +668,7 @@ void WorldSession::HandleInitiateTradeOpcode(WorldPackets::Trade::InitiateTrade&
         return;
     }
 
+    /*
     if ((pOther->GetTeam() != _player->GetTeam() ||
         pOther->HasPlayerFlagEx(PLAYER_FLAGS_EX_MERCENARY_MODE) ||
         _player->HasPlayerFlagEx(PLAYER_FLAGS_EX_MERCENARY_MODE)) &&
@@ -678,6 +679,7 @@ void WorldSession::HandleInitiateTradeOpcode(WorldPackets::Trade::InitiateTrade&
         SendTradeStatus(info);
         return;
     }
+    */
 
     if (!pOther->IsWithinDistInMap(_player, TRADE_DISTANCE, false))
     {

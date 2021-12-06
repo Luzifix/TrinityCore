@@ -104,8 +104,8 @@ struct SpawnData : public SpawnMetadata
     uint32 id = 0; // entry in respective _template table
     Position spawnPoint;
     uint8 phaseUseFlags = 0;
-    uint32 phaseId = 0;
-    uint32 phaseGroup = 0;
+    int32 phaseId = 0;
+    int32 phaseGroup = 0;
     int32 terrainSwapMap = -1;
     uint32 poolId = 0;
     int32 spawntimesecs = 0;

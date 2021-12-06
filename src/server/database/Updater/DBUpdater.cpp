@@ -182,6 +182,39 @@ BaseLocation DBUpdater<HotfixDatabaseConnection>::GetBaseLocationType()
     return LOCATION_DOWNLOAD;
 }
 
+// Website Database
+template<>
+std::string DBUpdater<WebsiteDatabaseConnection>::GetConfigEntry()
+{
+    return "Updates.Website";
+}
+
+template<>
+std::string DBUpdater<WebsiteDatabaseConnection>::GetTableName()
+{
+    return "Website";
+}
+
+template<>
+std::string DBUpdater<WebsiteDatabaseConnection>::GetBaseFile()
+{
+    return BuiltInConfig::GetSourceDirectory() +
+        "/sql/base/website_database.sql";
+}
+
+template<>
+bool DBUpdater<WebsiteDatabaseConnection>::IsEnabled(uint32 const updateMask)
+{
+    // This way silences warnings under msvc
+    return (updateMask & DatabaseLoader::DATABASE_WEBSITE) ? true : false;
+}
+
+template<>
+BaseLocation DBUpdater<WebsiteDatabaseConnection>::GetBaseLocationType()
+{
+    return LOCATION_DOWNLOAD;
+}
+
 // All
 template<class T>
 BaseLocation DBUpdater<T>::GetBaseLocationType()
@@ -443,3 +476,4 @@ template class TC_DATABASE_API DBUpdater<LoginDatabaseConnection>;
 template class TC_DATABASE_API DBUpdater<WorldDatabaseConnection>;
 template class TC_DATABASE_API DBUpdater<CharacterDatabaseConnection>;
 template class TC_DATABASE_API DBUpdater<HotfixDatabaseConnection>;
+template class TC_DATABASE_API DBUpdater<WebsiteDatabaseConnection>;

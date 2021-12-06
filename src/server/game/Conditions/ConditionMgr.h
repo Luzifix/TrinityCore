@@ -182,7 +182,8 @@ enum ConditionSourceType
     CONDITION_SOURCE_TYPE_TRAINER_SPELL                  = 31,
     CONDITION_SOURCE_TYPE_OBJECT_ID_VISIBILITY           = 32,
     CONDITION_SOURCE_TYPE_SPAWN_GROUP                    = 33,
-    CONDITION_SOURCE_TYPE_MAX                            = 34  // MAX
+    CONDITION_SOURCE_TYPE_VIGNETTE                       = 34,
+    CONDITION_SOURCE_TYPE_MAX                            = 35  // MAX
 };
 
 enum RelationType

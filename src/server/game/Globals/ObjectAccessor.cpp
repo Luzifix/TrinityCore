@@ -249,6 +249,20 @@ Creature* ObjectAccessor::GetCreatureOrPetOrVehicle(WorldObject const& u, Object
     return nullptr;
 }
 
+HashMapHolder<Player>::MapType ObjectAccessor::FindPlayerByBnetId(uint32 bnetId)
+{
+    HashMapHolder<Player>::MapType players;
+    HashMapHolder<Player>::MapType const& m = GetPlayers();
+
+    for (HashMapHolder<Player>::MapType::const_iterator itr = m.begin(); itr != m.end(); ++itr)
+    {
+        if (itr->second->GetSession()->GetBattlenetAccountId() == bnetId)
+            players.insert(std::pair<ObjectGuid, Player*>(itr->first, itr->second));
+    }
+
+    return players;
+}
+
 Player* ObjectAccessor::FindPlayer(ObjectGuid const& guid)
 {
     Player* player = HashMapHolder<Player>::Find(guid);
@@ -268,6 +282,18 @@ Player* ObjectAccessor::FindPlayerByLowGUID(ObjectGuid::LowType lowguid)
 {
     ObjectGuid guid = ObjectGuid::Create<HighGuid::Player>(lowguid);
     return ObjectAccessor::FindPlayer(guid);
+}
+
+GameObject* ObjectAccessor::FindGameObject(ObjectGuid const& guid)
+{
+    GameObject* gameObject = HashMapHolder<GameObject>::Find(guid);
+    return gameObject && gameObject->IsInWorld() ? gameObject : nullptr;
+}
+
+Creature* ObjectAccessor::FindCreature(ObjectGuid const& guid)
+{
+    Creature* creature = HashMapHolder<Creature>::Find(guid);
+    return creature && creature->IsInWorld() ? creature : nullptr;
 }
 
 Player* ObjectAccessor::FindConnectedPlayer(ObjectGuid const& guid)

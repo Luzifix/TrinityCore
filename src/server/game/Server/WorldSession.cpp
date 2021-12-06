@@ -23,6 +23,7 @@
 #include "QueryHolder.h"
 #include "AccountMgr.h"
 #include "AuthenticationPackets.h"
+#include "BattlePayMgr.h"
 #include "BattlePetMgr.h"
 #include "BattlegroundMgr.h"
 #include "BattlenetPackets.h"
@@ -152,6 +153,8 @@ WorldSession::WorldSession(uint32 id, std::string&& name, uint32 battlenetAccoun
         ResetTimeOutTime(false);
         LoginDatabase.PExecute("UPDATE account SET online = 1 WHERE id = %u;", GetAccountId());     // One-time query
     }
+
+    _battlePayMgr = std::make_shared<BattlepayManager>(this);
 
     m_Socket[CONNECTION_TYPE_REALM] = sock;
     _instanceConnectKey.Raw = UI64LIT(0);
@@ -861,6 +864,22 @@ void WorldSession::LoadAccountData(PreparedQueryResult result, uint32 mask)
     while (result->NextRow());
 }
 
+void WorldSession::LoadActivityData()
+{
+    LoginDatabasePreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_SEL_BNET_ACTIVITY);
+    stmt->setUInt32(0, GetBattlenetAccountId());
+
+    if (PreparedQueryResult result = LoginDatabase.Query(stmt))
+    {
+        Field* fields = result->Fetch();
+        _activityData.Played = fields[0].GetUInt32();
+        _activityData.Inactivity = fields[1].GetUInt8();
+        _activityData.InactivityPausedWeeks = fields[2].GetUInt8();
+        _activityData.InactivityPauseCurrentWeek = fields[3].GetBool();
+        _activityData.InactivityPauseChangeAllowed = fields[4].GetBool();
+    }
+}
+
 void WorldSession::SetAccountData(AccountDataType type, time_t time, std::string const& data)
 {
     if ((1 << type) & GLOBAL_CACHE_MASK)
@@ -888,6 +907,32 @@ void WorldSession::SetAccountData(AccountDataType type, time_t time, std::string
 
     _accountData[type].Time = time;
     _accountData[type].Data = data;
+}
+
+void WorldSession::SaveActivityData()
+{
+    HashMapHolder<Player>::MapType activePlayersForBnetAccount = ObjectAccessor::FindPlayerByBnetId(GetBattlenetAccountId());
+
+    // Update activity data for other client sessions
+    if (!activePlayersForBnetAccount.empty())
+    {
+        for (HashMapHolder<Player>::MapType::const_iterator itr = activePlayersForBnetAccount.begin(); itr != activePlayersForBnetAccount.end(); ++itr)
+        {
+            WorldSession* session = itr->second->GetSession();
+
+            if (session != this)
+                session->_activityData = _activityData;
+        }
+    }
+
+    LoginDatabasePreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_INS_BNET_ACTIVITY);
+    stmt->setUInt32(0, GetBattlenetAccountId());
+    stmt->setUInt32(1, _activityData.Inactivity);
+    stmt->setUInt32(2, _activityData.InactivityPausedWeeks);
+    stmt->setBool(3, _activityData.InactivityPauseCurrentWeek);
+    stmt->setBool(4, _activityData.InactivityPauseChangeAllowed);
+    stmt->setBool(5, _activityData.InactivityLocked);
+    LoginDatabase.Execute(stmt);
 }
 
 void WorldSession::SendAccountDataTimes(ObjectGuid playerGuid, uint32 mask)
@@ -1201,6 +1246,7 @@ void WorldSession::InitializeSessionCallback(LoginDatabaseQueryHolder const& hol
     SendAvailableHotfixes();
     SendAccountDataTimes(ObjectGuid::Empty, GLOBAL_CACHE_MASK);
     SendTutorialsData();
+    SendDisplayPromo();
 
     if (PreparedQueryResult characterCountsResult = holder.GetPreparedResult(AccountInfoQueryHolder::GLOBAL_REALM_CHARACTER_COUNTS))
     {
@@ -1385,6 +1431,7 @@ uint32 WorldSession::DosProtection::GetMaxPacketCounterAllowed(uint16 opcode) co
         case CMSG_CHAT_MESSAGE_YELL:                    //   0               3.5
         case CMSG_INSPECT:                              //   0               3.5
         case CMSG_AREA_SPIRIT_HEALER_QUERY:             // not profiled
+        case CMSG_GET_MIRROR_IMAGE_DATA:                // not profiled
         case CMSG_STAND_STATE_CHANGE:                   // not profiled
         case CMSG_RANDOM_ROLL:                          // not profiled
         case CMSG_TIME_SYNC_RESPONSE:                   // not profiled

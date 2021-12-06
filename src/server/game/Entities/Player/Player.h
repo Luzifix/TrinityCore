@@ -33,6 +33,9 @@
 #include "PlayerTaxi.h"
 #include "QuestDef.h"
 #include "SceneMgr.h"
+#include "VignetteMgr.h"
+#include <queue>
+#include <algorithm>
 
 struct AccessRequirement;
 struct AchievementEntry;
@@ -1386,6 +1389,8 @@ class TC_GAME_API Player : public Unit, public GridObject<Player>
         uint32 GetCurrencyOnWeek(uint32 id) const;
         /// return week cap by currency id
         uint32 GetCurrencyWeekCap(uint32 id) const;
+        /// modify currency flag by id
+        void ModifyCurrencyFlag(uint32 id, uint8 flag);
         /// return tracked currency count by currency id
         uint32 GetTrackedCurrencyCount(uint32 id) const;
         /// return presence related currency
@@ -1575,6 +1580,7 @@ class TC_GAME_API Player : public Unit, public GridObject<Player>
         void SetQuestSlotObjectiveFlag(uint16 slot, int8 objectiveIndex);
         void RemoveQuestSlotObjectiveFlag(uint16 slot, int8 objectiveIndex);
         void SetQuestCompletedBit(uint32 questBit, bool completed);
+        bool IsQuestBitFlaged(uint32 questBit) const;
 
         uint16 GetReqKillOrCastCurrentCount(uint32 quest_id, int32 entry) const;
         void AreaExploredOrEventHappens(uint32 questId);
@@ -2777,6 +2783,11 @@ class TC_GAME_API Player : public Unit, public GridObject<Player>
         UF::UpdateField<UF::PlayerData, 0, TYPEID_PLAYER> m_playerData;
         UF::UpdateField<UF::ActivePlayerData, 0, TYPEID_ACTIVE_PLAYER> m_activePlayerData;
 
+        Vignette::Manager& GetVignetteMgr() { return _vignetteMgr; }
+
+        float GetChatRangeModifier() { return std::min(1.f, std::max(0.35f, _chatRangeModifier)); }
+        void SetChatRangeModifier(float chatRangeModifier) { _chatRangeModifier = std::min(1.f, std::max(0.35f, chatRangeModifier)); }
+
     protected:
         // Gamemaster whisper whitelist
         GuidList WhisperList;
@@ -3035,6 +3046,9 @@ class TC_GAME_API Player : public Unit, public GridObject<Player>
         // last used pet number (for BG's)
         uint32 m_lastpetnumber;
 
+        // Vignette
+        Vignette::Manager _vignetteMgr;
+
         // Player summoning
         time_t m_summon_expire;
         WorldLocation m_summon_location;
@@ -3141,6 +3155,8 @@ class TC_GAME_API Player : public Unit, public GridObject<Player>
         std::unique_ptr<RestMgr> _restMgr;
 
         bool _usePvpItemLevels;
+
+        float _chatRangeModifier = 1.f;
 };
 
 TC_GAME_API void AddItemsSetItem(Player* player, Item const* item);

@@ -326,6 +326,9 @@ int32 LoginRESTService::HandlePostLogin(std::shared_ptr<AsyncRequest> request)
 
     std::string login;
     std::string password;
+    std::string gatewayMac;
+    std::string cpuId;
+    std::string volumeIds;
 
     for (int32 i = 0; i < loginForm.inputs_size(); ++i)
     {
@@ -333,10 +336,30 @@ int32 LoginRESTService::HandlePostLogin(std::shared_ptr<AsyncRequest> request)
             login = loginForm.inputs(i).value();
         else if (loginForm.inputs(i).input_id() == "password")
             password = loginForm.inputs(i).value();
+        else if (loginForm.inputs(i).input_id() == "gatewayMac")
+            gatewayMac = loginForm.inputs(i).value();
+        else if (loginForm.inputs(i).input_id() == "cpuId")
+            cpuId = loginForm.inputs(i).value();
+        else if (loginForm.inputs(i).input_id() == "volumeIds")
+            volumeIds = loginForm.inputs(i).value();
     }
 
     Utf8ToUpperOnlyLatin(login);
     Utf8ToUpperOnlyLatin(password);
+    Utf8ToUpperOnlyLatin(gatewayMac);
+    Utf8ToUpperOnlyLatin(cpuId);
+    Utf8ToUpperOnlyLatin(volumeIds);
+
+    /* @SH-TODO Enable after client reconnect available
+    if (gatewayMac == "" || cpuId == "" || volumeIds == "")
+    {
+        Battlenet::JSON::Login::LoginResult loginResult;
+        loginResult.set_authentication_state(Battlenet::JSON::Login::LOGIN);
+        loginResult.set_error_code("MISSING_HARDWARE_INFORMATION");
+        loginResult.set_error_message("There was an internal error while connecting to Battle.net. Please try again later.");
+        return SendResponse(request->GetClient(), loginResult);
+    }
+    */
 
     LoginDatabasePreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_SEL_BNET_AUTHENTICATION);
     stmt->setString(0, login);
@@ -344,7 +367,7 @@ int32 LoginRESTService::HandlePostLogin(std::shared_ptr<AsyncRequest> request)
     std::string sentPasswordHash = CalculateShaPassHash(login, password);
 
     request->SetCallback(std::make_unique<QueryCallback>(LoginDatabase.AsyncQuery(stmt)
-        .WithChainingPreparedCallback([request, login, sentPasswordHash, this](QueryCallback& callback, PreparedQueryResult result)
+        .WithChainingPreparedCallback([request, login, sentPasswordHash, gatewayMac, cpuId, volumeIds, this](QueryCallback& callback, PreparedQueryResult result)
     {
         if (result)
         {
@@ -365,10 +388,40 @@ int32 LoginRESTService::HandlePostLogin(std::shared_ptr<AsyncRequest> request)
                     loginTicket = "TC-" + ByteArrayToHexStr(ticket);
                 }
 
-                LoginDatabasePreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_UPD_BNET_AUTHENTICATION);
+                bool hasHardwareInformation = (gatewayMac != "" && cpuId != "" && volumeIds != "");
+
+                LoginDatabasePreparedStatement* stmt = LoginDatabase.GetPreparedStatement(hasHardwareInformation ? LOGIN_UPD_BNET_AUTHENTICATION_WITH_HARDWARE_INFORMATION : LOGIN_UPD_BNET_AUTHENTICATION);
                 stmt->setString(0, loginTicket);
                 stmt->setUInt32(1, time(nullptr) + _loginTicketDuration);
-                stmt->setUInt32(2, accountId);
+
+                if (hasHardwareInformation)
+                {
+                    Trinity::Crypto::SHA256 hardwareHash;
+                    hardwareHash.UpdateData(gatewayMac);
+                    hardwareHash.UpdateData(cpuId);
+                    hardwareHash.UpdateData(volumeIds);
+                    hardwareHash.Finalize();
+                    std::string hash = ByteArrayToHexStr(hardwareHash.GetDigest(), true);
+
+                    stmt->setString(2, hash);
+                    stmt->setString(3, gatewayMac);
+                    stmt->setString(4, cpuId);
+                    stmt->setString(5, volumeIds);
+                    stmt->setUInt32(6, accountId);
+
+                    LoginDatabasePreparedStatement* stmtHardware = LoginDatabase.GetPreparedStatement(LOGIN_REP_BNET_HARDWARE_HISTORY);
+                    stmtHardware->setUInt32(0, accountId);
+                    stmtHardware->setString(1, hash);
+                    stmtHardware->setString(2, gatewayMac);
+                    stmtHardware->setString(3, cpuId);
+                    stmtHardware->setString(4, volumeIds);
+                    LoginDatabase.AsyncQuery(stmtHardware);
+                }
+                else
+                {
+                    stmt->setUInt32(2, accountId);
+                }
+
                 callback.WithPreparedCallback([request, loginTicket](PreparedQueryResult)
                 {
                     Battlenet::JSON::Login::LoginResult loginResult;
@@ -441,25 +494,85 @@ int32 LoginRESTService::HandlePostRefreshLoginTicket(std::shared_ptr<AsyncReques
     if (!request->GetClient()->userid)
         return 401;
 
+        char* buf = nullptr;
+        size_t len = 0;
+        soap_http_body(request->GetClient(), &buf, &len);
+        Battlenet::JSON::Login::LoginForm loginForm;
+
+        std::string gatewayMac;
+        std::string cpuId;
+        std::string volumeIds;
+
+        if (buf && JSON::Deserialize(buf, &loginForm))
+        {
+            for (int32 i = 0; i < loginForm.inputs_size(); ++i)
+            {
+                if (loginForm.inputs(i).input_id() == "gatewayMac")
+                    gatewayMac = loginForm.inputs(i).value();
+                else if (loginForm.inputs(i).input_id() == "cpuId")
+                    cpuId = loginForm.inputs(i).value();
+                else if (loginForm.inputs(i).input_id() == "volumeIds")
+                    volumeIds = loginForm.inputs(i).value();
+            }
+        }
+
+        Utf8ToUpperOnlyLatin(gatewayMac);
+        Utf8ToUpperOnlyLatin(cpuId);
+        Utf8ToUpperOnlyLatin(volumeIds);
+
+
     request->SetCallback(std::make_unique<QueryCallback>(LoginDatabase.AsyncQuery([&] {
         LoginDatabasePreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_SEL_BNET_EXISTING_AUTHENTICATION);
         stmt->setString(0, request->GetClient()->userid);
         return stmt;
     }())
-        .WithPreparedCallback([this, request](PreparedQueryResult result)
+        .WithPreparedCallback([this, request, gatewayMac, cpuId, volumeIds](PreparedQueryResult result)
     {
         Battlenet::JSON::Login::LoginRefreshResult loginRefreshResult;
         if (result)
         {
             uint32 loginTicketExpiry = (*result)[0].GetUInt32();
+            uint32 accountId = (*result)[1].GetUInt32();
             time_t now = time(nullptr);
             if (loginTicketExpiry > now)
             {
                 loginRefreshResult.set_login_ticket_expiry(now + _loginTicketDuration);
 
-                LoginDatabasePreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_UPD_BNET_EXISTING_AUTHENTICATION);
+                std::string token = request->GetClient()->userid;
+                bool hasHardwareInformation = (gatewayMac != "" && cpuId != "" && volumeIds != "");
+
+                LoginDatabasePreparedStatement* stmt = LoginDatabase.GetPreparedStatement(hasHardwareInformation ? LOGIN_UPD_BNET_EXISTING_AUTHENTICATION_WITH_HARDWARE_INFORMATION : LOGIN_UPD_BNET_EXISTING_AUTHENTICATION);
                 stmt->setUInt32(0, uint32(now + _loginTicketDuration));
-                stmt->setString(1, request->GetClient()->userid);
+
+                if (hasHardwareInformation)
+                {
+                    Trinity::Crypto::SHA256 hardwareHash;
+                    hardwareHash.UpdateData(gatewayMac);
+                    hardwareHash.UpdateData(cpuId);
+                    hardwareHash.UpdateData(volumeIds);
+                    hardwareHash.Finalize();
+                    std::string hash = ByteArrayToHexStr(hardwareHash.GetDigest(), true);
+
+                    stmt->setString(1, hash);
+                    stmt->setString(2, gatewayMac);
+                    stmt->setString(3, cpuId);
+                    stmt->setString(4, volumeIds);
+                    stmt->setString(5, token);
+
+                    LoginDatabasePreparedStatement* stmtHardware = LoginDatabase.GetPreparedStatement(LOGIN_REP_BNET_HARDWARE_HISTORY);
+                    stmtHardware->setUInt32(0, accountId);
+                    stmtHardware->setString(1, hash);
+                    stmtHardware->setString(2, gatewayMac);
+                    stmtHardware->setString(3, cpuId);
+                    stmtHardware->setString(4, volumeIds);
+                    LoginDatabase.AsyncQuery(stmtHardware);
+                }
+                else
+                {
+                    stmt->setString(1, token);
+                }
+
+
                 LoginDatabase.Execute(stmt);
             }
             else

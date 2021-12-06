@@ -28,6 +28,7 @@
 #include "Common.h"
 #include "Conversation.h"
 #include "Corpse.h"
+#include "Creature.h"
 #include "DatabaseEnv.h"
 #include "DB2Stores.h"
 #include "GameTime.h"
@@ -146,6 +147,7 @@ void WorldSession::HandleWhoOpcode(WorldPackets::Who::WhoRequestPkt& whoRequest)
     WhoListInfoVector const& whoList = sWhoListStorageMgr->GetWhoList();
     for (WhoListPlayerInfo const& target : whoList)
     {
+        /*
         // player can see member of other team only if has RBAC_PERM_TWO_SIDE_WHO_LIST
         if (target.GetTeam() != team && !HasPermission(rbac::RBAC_PERM_TWO_SIDE_WHO_LIST))
             continue;
@@ -167,6 +169,7 @@ void WorldSession::HandleWhoOpcode(WorldPackets::Who::WhoRequestPkt& whoRequest)
         // check if class matches classmask
         if (request.ClassFilter >= 0 && !(request.ClassFilter & (1 << target.GetClass())))
             continue;
+*/
 
         // check if race matches racemask
         if (!request.RaceFilter.HasRace(target.GetRace()))
@@ -391,6 +394,12 @@ void WorldSession::HandleRequestCemeteryList(WorldPackets::Misc::RequestCemetery
 
 void WorldSession::HandleSetSelectionOpcode(WorldPackets::Misc::SetSelection& packet)
 {
+#ifndef DISABLE_DRESSNPCS_CORESOUNDS
+    if (packet.Selection.IsAnyTypeCreature())
+        if (Creature* creature = _player->GetMap()->GetCreature(packet.Selection))
+            creature->SendMirrorSound(_player, 0);
+#endif
+
     _player->SetSelection(packet.Selection);
 }
 
@@ -1156,6 +1165,12 @@ void WorldSession::HandleMountSetFavorite(WorldPackets::Misc::MountSetFavorite& 
 
 void WorldSession::HandleCloseInteraction(WorldPackets::Misc::CloseInteraction& closeInteraction)
 {
+#ifndef DISABLE_DRESSNPCS_CORESOUNDS
+    if (closeInteraction.SourceGuid.IsAnyTypeCreature())
+        if (Creature* creature = _player->GetMap()->GetCreature(closeInteraction.SourceGuid))
+            creature->SendMirrorSound(_player, 1);
+#endif
+
     if (_player->PlayerTalkClass->GetInteractionData().SourceGuid == closeInteraction.SourceGuid)
         _player->PlayerTalkClass->GetInteractionData().Reset();
 }

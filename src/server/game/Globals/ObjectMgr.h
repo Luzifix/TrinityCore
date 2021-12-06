@@ -39,7 +39,9 @@
 #include <iterator>
 #include <map>
 #include <unordered_map>
+#include <memory>
 
+class CreatureOutfit;
 class Item;
 class Unit;
 class Vehicle;
@@ -1135,10 +1137,12 @@ class TC_GAME_API ObjectMgr
         };
 
         typedef std::map<uint32, uint32> CharacterConversionMap;
+        typedef std::unordered_map<uint32, std::shared_ptr<CreatureOutfit>> CreatureOutfitContainer;
 
         GameObjectTemplate const* GetGameObjectTemplate(uint32 entry) const;
         GameObjectTemplateContainer const& GetGameObjectTemplates() const { return _gameObjectTemplateStore; }
         uint32 LoadReferenceVendor(int32 vendor, int32 item_id, std::set<uint32>* skip_vendors);
+
 
         void LoadGameObjectTemplate();
         void LoadGameObjectTemplateAddons();
@@ -1159,6 +1163,7 @@ class TC_GAME_API ObjectMgr
         CreatureAddon const* GetCreatureTemplateAddon(uint32 entry) const;
         CreatureMovementData const* GetCreatureMovementOverride(ObjectGuid::LowType spawnId) const;
         ItemTemplate const* GetItemTemplate(uint32 entry) const;
+        std::string ObjectMgr::GetItemLinkById(uint32 entry, std::vector<int32> bonusListIds = std::vector<int32>());
         ItemTemplateContainer const& GetItemTemplateStore() const { return _itemTemplateStore; }
 
         InstanceTemplateContainer const& GetInstanceTemplates() const { return _instanceTemplateStore; }
@@ -1649,6 +1654,11 @@ class TC_GAME_API ObjectMgr
         bool AddGameTele(GameTele& data);
         bool DeleteGameTele(std::string_view name);
 
+        const CreatureOutfitContainer& GetCreatureOutfitMap() const { return _creatureOutfitStore; }
+        std::shared_ptr<CreatureOutfit> const & GetOutfit(uint32 modelid) const;
+        uint32 GetRealDisplayId(uint32 modelid) const;
+        void LoadCreatureOutfits();
+
         Trainer::Trainer const* GetTrainer(uint32 trainerId) const;
         uint32 GetCreatureDefaultTrainer(uint32 creatureId) const
         {
@@ -1879,6 +1889,8 @@ class TC_GAME_API ObjectMgr
 
         PageTextContainer _pageTextStore;
         InstanceTemplateContainer _instanceTemplateStore;
+
+        CreatureOutfitContainer _creatureOutfitStore;
 
     public:
         PhaseInfoStruct const* GetPhaseInfo(uint32 phaseId) const;

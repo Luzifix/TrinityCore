@@ -1,5 +1,5 @@
 /*
- * This file is part of the TrinityCore Project. See AUTHORS file for Copyright information
+ * Copyright 2021 Schattenhain
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -52,6 +52,8 @@ enum BMAHMailAuctionAnswers
 };
 
 const static uint64 BMAH_MAX_BID = 1000000LL * GOLD;
+const static int32 BMAH_SELLER_ID = 1070728;
+const static uint32 BMAH_DURATION = 5 * HOUR;
 
 struct BlackMarketTemplate
 {
@@ -71,11 +73,10 @@ class BlackMarketEntry
 {
 public:
 
-    void Update(time_t newTimeOfUpdate);
-    void Initialize(int32 marketId, uint32 duration)
+    void Initialize(int32 marketId)
     {
         _marketId = marketId;
-        _secondsRemaining = duration;
+        _startTime = time(nullptr);
     }
 
     BlackMarketTemplate const* GetTemplate() const;
@@ -90,6 +91,11 @@ public:
     ObjectGuid::LowType GetBidder() const { return _bidder; }
     void SetBidder(ObjectGuid::LowType bidder) { _bidder = bidder; }
 
+    uint32 GetStartTime() const { return _startTime; }
+    void SetStartTime(uint32 startTime) { _startTime = startTime; }
+
+    uint32 GetDuration() const { return GetTemplate()->Duration; }
+
     uint32 GetSecondsRemaining() const; // Get seconds remaining relative to now
     time_t GetExpirationTime() const;
     bool IsCompleted() const;
@@ -98,7 +104,7 @@ public:
     void SaveToDB(CharacterDatabaseTransaction trans) const;
     bool LoadFromDB(Field* fields);
 
-    uint64 GetMinIncrement() const { return (_currentBid / 20) - ((_currentBid / 20) % GOLD); } //5% increase every bid (has to be round gold value)
+    uint64 GetMinIncrement() const { return roundl(_currentBid * 0.05f); } //5% increase every bid
     bool ValidateBid(uint64 bid) const;
     void PlaceBid(uint64 bid, Player* player, CharacterDatabaseTransaction trans);
 
@@ -113,17 +119,17 @@ private:
     uint64 _currentBid = 0;
     int32 _numBids = 0;
     ObjectGuid::LowType _bidder = 0;
-    uint32 _secondsRemaining = 0;
+    uint32 _startTime = 0;
     bool _mailSent = false;
 };
 
 class TC_GAME_API BlackMarketMgr
 {
-  private:
+private:
     BlackMarketMgr();
     ~BlackMarketMgr();
 
-  public:
+public:
     static BlackMarketMgr* Instance();
 
     typedef std::unordered_map<int32, BlackMarketEntry*> BlackMarketEntryMap;
@@ -150,10 +156,10 @@ class TC_GAME_API BlackMarketMgr
     void SendAuctionWonMail(BlackMarketEntry* entry, CharacterDatabaseTransaction trans);
     void SendAuctionOutbidMail(BlackMarketEntry* entry, CharacterDatabaseTransaction trans); // Call before incrementing bid
 
-  private:
-      BlackMarketEntryMap _auctions;
-      BlackMarketTemplateMap _templates;
-      time_t _lastUpdate = time_t(0);
+private:
+    BlackMarketEntryMap _auctions;
+    BlackMarketTemplateMap _templates;
+    time_t _lastUpdate = time_t(0);
 };
 
 #define sBlackMarketMgr BlackMarketMgr::Instance()

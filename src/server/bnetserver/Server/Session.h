@@ -107,6 +107,7 @@ namespace Battlenet
             uint32 LoginTicketExpiry;
             bool IsBanned;
             bool IsPermanenetlyBanned;
+            bool IsInDiscord = false;
 
             std::unordered_map<uint32, GameAccountInfo> GameAccounts;
         };

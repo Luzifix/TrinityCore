@@ -64,6 +64,9 @@ ObjectGuid::LowType GuildMgr::GenerateGuildId()
 // Guild collection
 Guild* GuildMgr::GetGuildById(ObjectGuid::LowType guildId) const
 {
+    if (guildId == 0)
+        return nullptr;
+
     GuildContainer::const_iterator itr = GuildStore.find(guildId);
     if (itr != GuildStore.end())
         return itr->second;

@@ -756,11 +756,13 @@ class TC_GAME_API Guild
         void HandleRemoveMember(WorldSession* session, ObjectGuid guid);
         void HandleUpdateMemberRank(WorldSession* session, ObjectGuid guid, bool demote);
         void HandleSetMemberRank(WorldSession* session, ObjectGuid guid, ObjectGuid setterGuid, GuildRankOrder rank);
+        void HandleShiftRank(WorldSession* session, uint32 id, bool up);
         void HandleAddNewRank(WorldSession* session, std::string_view name);
         void HandleRemoveRank(WorldSession* session, GuildRankOrder rankOrder);
         void HandleShiftRank(WorldSession* session, GuildRankOrder rankOrder, bool shiftUp);
         void HandleMemberDepositMoney(WorldSession* session, uint64 amount, bool cashFlow = false);
         bool HandleMemberWithdrawMoney(WorldSession* session, uint64 amount, bool repair = false);
+        void HandleDepositMoney(uint64 amount, ObjectGuid::LowType characterGuid = 0, bool cashFlow = false);
         void HandleMemberLogout(WorldSession* session);
         void HandleDelete(WorldSession* session);
         void HandleGuildPartyRequest(WorldSession* session) const;
@@ -945,5 +947,6 @@ class TC_GAME_API Guild
         void _SendBankContentUpdate(MoveItemData* pSrc, MoveItemData* pDest) const;
         void _SendBankContentUpdate(uint8 tabId, SlotIds slots) const;
         void SendGuildRanksUpdate(ObjectGuid setterGuid, ObjectGuid targetGuid, GuildRankId rank);
+        void SendGuildEventRanksUpdated();
 };
 #endif

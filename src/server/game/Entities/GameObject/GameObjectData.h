@@ -38,6 +38,7 @@ struct GameObjectTemplate
     std::string unk1;
     float   size;
     int32   ContentTuningId;
+    uint32  houseId;
     union
     {
         // 0 GAMEOBJECT_TYPE_DOOR
@@ -1197,6 +1198,34 @@ struct GameObjectTemplate
         }
     }
 
+    uint32 GetVignetteId() const
+    {
+        switch (type)
+        {
+            case GAMEOBJECT_TYPE_CHEST:
+                return chest.SpawnVignette;
+            case GAMEOBJECT_TYPE_GOOBER:
+                return goober.SpawnVignette;
+            case GAMEOBJECT_TYPE_GATHERING_NODE:
+                return gatheringNode.SpawnVignette;
+            case GAMEOBJECT_TYPE_CAPTURE_POINT:
+                return capturePoint.SpawnVignette;
+            default:
+                return 0;
+        }
+    }
+
+    uint32 GetTrackingQuestId() const
+    {
+        switch (type)
+        {
+            case GAMEOBJECT_TYPE_CHEST:
+                return chest.conditionID1;
+            default:
+                return 0;
+        }
+    }
+
     void InitializeQueryData();
     WorldPacket BuildQueryData(LocaleConstant loc) const;
 };
@@ -1243,6 +1272,8 @@ struct GameObjectData : public SpawnData
     uint32 animprogress = 0;
     GOState goState = GO_STATE_ACTIVE;
     uint32 artKit = 0;
+    float size = 0.0f;
+    uint32 houseId = 0;
 };
 
 enum class GameObjectActions : uint32

@@ -95,8 +95,8 @@ EnumCharactersResult::CharacterInfo::CharacterInfo(Field* fields)
     if (atLoginFlags & AT_LOGIN_RESURRECT)
         playerFlags &= ~PLAYER_FLAGS_GHOST;
 
-    if (playerFlags & PLAYER_FLAGS_GHOST)
-        Flags |= CHARACTER_FLAG_GHOST;
+    //if (playerFlags & PLAYER_FLAGS_GHOST)
+    //    Flags |= CHARACTER_FLAG_GHOST;
 
     if (atLoginFlags & AT_LOGIN_RENAME)
         Flags |= CHARACTER_FLAG_RENAME;
@@ -645,6 +645,12 @@ WorldPacket const * SetPlayerDeclinedNamesResult::Write()
     _worldPacket << Player;
 
     return &_worldPacket;
+}
+
+void WorldPackets::Character::SetCurrencyFlags::Read()
+{
+    _worldPacket >> CurrencyID;
+    _worldPacket >> Flags;
 }
 }
 }

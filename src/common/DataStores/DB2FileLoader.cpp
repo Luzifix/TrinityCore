@@ -919,6 +919,9 @@ uint32 DB2FileLoaderRegularImpl::GetMaxId() const
             maxId = id;
     }
 
+    if (maxId > _header->MaxId)
+        TC_LOG_ERROR("", "Wrong MaxId in %s", _fileName);
+
     ASSERT(maxId <= _header->MaxId);
     return maxId;
 }
