@@ -224,6 +224,8 @@ class DatabaseWorkerPool
 #endif
         }
 
+        char const* GetDatabaseName() const;
+
     private:
         uint32 OpenConnections(InternalIndex type, uint8 numConnections);
 
