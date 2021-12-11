@@ -1,0 +1,3 @@
+REPLACE INTO `rbac_linked_permissions` (`id`, `linkedId`) VALUES (195, 40);
+REPLACE INTO `rbac_linked_permissions` (`id`, `linkedId`) VALUES (195, 51);
+

@@ -1,0 +1,2 @@
+ALTER TABLE `furniture_catalog` CHANGE COLUMN `name` `name` VARCHAR(255) NOT NULL COLLATE 'utf8mb4_general_ci' AFTER `gameObjectId`;
+ALTER TABLE `furniture_catalog` CHANGE COLUMN `categorized_by` `categorized_by` VARCHAR(50) NOT NULL DEFAULT '' COLLATE 'utf8mb4_general_ci' AFTER `categorization_date`;

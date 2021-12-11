@@ -1,0 +1,2 @@
+REPLACE INTO `command` VALUES ('activity rewardnow', 2009, 'Syntax: .activity rewardnow\n\nForce activity system to send reward now (only for debugging)');
+REPLACE INTO `trinity_string` (`entry`, `content_default`, `content_loc1`, `content_loc2`, `content_loc3`, `content_loc4`, `content_loc5`, `content_loc6`, `content_loc7`, `content_loc8`) VALUES (50030, 'You are not authorised to open this door.', NULL, NULL, 'Ihr seid nicht berechtigt, diese Tür zu öffnen.', NULL, NULL, NULL, NULL, NULL);

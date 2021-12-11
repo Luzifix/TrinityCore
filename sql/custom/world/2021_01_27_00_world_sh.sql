@@ -1,0 +1,37 @@
+REPLACE INTO `furniture_category` (`id`, `name`, `icon`, `order`) VALUES (26, 'Inventar', 'inv_misc_bag_09_red', 1);
+REPLACE INTO `furniture_category` (`id`, `name`, `icon`, `order`) VALUES (1, 'Neues', 'spell_fire_fire', 2);
+REPLACE INTO `furniture_category` (`id`, `name`, `icon`, `order`) VALUES (3, 'Besondere Möbel', 'achievement_guildperk_mrpopularity_rank2', 3);
+REPLACE INTO `furniture_category` (`id`, `name`, `icon`, `order`) VALUES (4, 'Türen', 'inv_misc_key_12', 5);
+REPLACE INTO `furniture_category` (`id`, `name`, `icon`, `order`) VALUES (10, 'Tische und Co', 'misc_table', 6);
+REPLACE INTO `furniture_category` (`id`, `name`, `icon`, `order`) VALUES (11, 'Sitzgelegenheiten', 'inv_leatherworking_70_loveseat', 7);
+REPLACE INTO `furniture_category` (`id`, `name`, `icon`, `order`) VALUES (7, 'Teppiche', 'inv_cape_leather_legiondungeon_c_01', 8);
+REPLACE INTO `furniture_category` (`id`, `name`, `icon`, `order`) VALUES (8, 'Betten', 'misc_bed', 9);
+REPLACE INTO `furniture_category` (`id`, `name`, `icon`, `order`) VALUES (9, 'Aufbewahrung', 'inv_misc_bag_10', 10);
+REPLACE INTO `furniture_category` (`id`, `name`, `icon`, `order`) VALUES (22, 'Bilder', 'inv_misc_ticket_tarot_elemental02', 11);
+REPLACE INTO `furniture_category` (`id`, `name`, `icon`, `order`) VALUES (6, 'Kissen und Polster', 'inv_fabric_purple_01', 12);
+REPLACE INTO `furniture_category` (`id`, `name`, `icon`, `order`) VALUES (18, 'Beleuchtung', 'inv_misc_lantern_01', 13);
+REPLACE INTO `furniture_category` (`id`, `name`, `icon`, `order`) VALUES (17, 'Wanddekorationen', 'inv_qiraj_jewelencased', 14);
+REPLACE INTO `furniture_category` (`id`, `name`, `icon`, `order`) VALUES (15, 'Bücher und Schreibwaren', 'inv_misc_book_09', 15);
+REPLACE INTO `furniture_category` (`id`, `name`, `icon`, `order`) VALUES (13, 'Küchenutensilien', 'inv_misc_fork&knife', 16);
+REPLACE INTO `furniture_category` (`id`, `name`, `icon`, `order`) VALUES (12, 'Nahrungsmittel', 'inv_misc_food_07', 17);
+REPLACE INTO `furniture_category` (`id`, `name`, `icon`, `order`) VALUES (14, 'Badezubehör', 'inv_drink_19', 18);
+REPLACE INTO `furniture_category` (`id`, `name`, `icon`, `order`) VALUES (16, 'Professionszubehör', 'trade_engineering', 19);
+REPLACE INTO `furniture_category` (`id`, `name`, `icon`, `order`) VALUES (21, 'Waffen und Rüstungen', 'ability_dualwield', 20);
+REPLACE INTO `furniture_category` (`id`, `name`, `icon`, `order`) VALUES (23, 'Tierbedarf und Spielzeug', 'inv_misc_toy_10', 21);
+REPLACE INTO `furniture_category` (`id`, `name`, `icon`, `order`) VALUES (20, 'Magische Gegenstände', 'inv_scroll_01', 22);
+REPLACE INTO `furniture_category` (`id`, `name`, `icon`, `order`) VALUES (24, 'Naturobjekte', 'inv_misc_herb_jadetealeaf', 23);
+REPLACE INTO `furniture_category` (`id`, `name`, `icon`, `order`) VALUES (19, 'Statuen', 'inv_misc_statue_02', 24);
+REPLACE INTO `furniture_category` (`id`, `name`, `icon`, `order`) VALUES (27, 'Bodenplatten', 'misc_floorbig', 25);
+REPLACE INTO `furniture_category` (`id`, `name`, `icon`, `order`) VALUES (29, 'Bodenplatten (klein)', 'misc_floorsmall', 26);
+REPLACE INTO `furniture_category` (`id`, `name`, `icon`, `order`) VALUES (28, 'Bodenplatten (abgerundet)', 'misc_floorcurved', 27);
+REPLACE INTO `furniture_category` (`id`, `name`, `icon`, `order`) VALUES (30, 'Wand', 'misc_wall', 28);
+REPLACE INTO `furniture_category` (`id`, `name`, `icon`, `order`) VALUES (34, 'Wand (klein)', 'misc_walllow', 29);
+REPLACE INTO `furniture_category` (`id`, `name`, `icon`, `order`) VALUES (33, 'Wand (abgerundet)', 'misc_wallround', 30);
+REPLACE INTO `furniture_category` (`id`, `name`, `icon`, `order`) VALUES (31, 'Schräge', 'misc_wallangle', 31);
+REPLACE INTO `furniture_category` (`id`, `name`, `icon`, `order`) VALUES (32, 'Schräge (flach)', 'misc_wallanglelow', 32);
+REPLACE INTO `furniture_category` (`id`, `name`, `icon`, `order`) VALUES (25, 'Sonstiges', 'inv_pet_pinkmurlocegg', 254);
+REPLACE INTO `furniture_category` (`id`, `name`, `icon`, `order`) VALUES (2, 'Nicht kategorisiert', 'inv_misc_questionmark', 255);
+
+DELETE FROM `furniture_catalog_category` WHERE `category_id` = 5;
+DELETE FROM `furniture_category` WHERE `id` = 5;
+

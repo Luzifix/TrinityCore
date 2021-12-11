@@ -1,0 +1,1 @@
+UPDATE `character_mount` SET `fuel` = 100;

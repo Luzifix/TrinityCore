@@ -1,0 +1,1 @@
+REPLACE INTO `game_event` (`eventEntry`, `start_time`, `end_time`, `occurence`, `length`, `holiday`, `description`, `world_event`, `announce`) VALUES (100, '2008-01-02 20:00:00', '2020-12-31 05:00:00', 1440, 480, 0, 'Nacht', 0, 2);

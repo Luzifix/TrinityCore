@@ -1,0 +1,1 @@
+ALTER TABLE `furniture_catalog` ADD COLUMN `gameObjectId` MEDIUMINT(8) UNSIGNED NOT NULL AFTER `id`;

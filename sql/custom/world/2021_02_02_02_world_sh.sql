@@ -1,0 +1,27 @@
+REPLACE INTO `command` (`name`, `permission`, `help`) VALUES ('housing create cancel', 2002, 'Syntax: .housing create cancel\n\nCancel the current housing area creation');
+REPLACE INTO `command` (`name`, `permission`, `help`) VALUES ('housing create save', 2002, 'Syntax: .housing create save\n\nSave the current housing area creation');
+REPLACE INTO `command` (`name`, `permission`, `help`) VALUES ('housing create set height', 2002, 'Syntax: .housing create set height $min $max\n\nModify min and max height of the housing area\n');
+REPLACE INTO `command` (`name`, `permission`, `help`) VALUES ('housing create set name', 2002, 'Syntax: .housing create set name "$name"\n\nModify the name of the housing area\n');
+REPLACE INTO `command` (`name`, `permission`, `help`) VALUES ('housing create set owner', 2002, 'Syntax: .housing create set owner $bnetAccountId\n\nSet the owner for the housing area');
+REPLACE INTO `command` (`name`, `permission`, `help`) VALUES ('housing create set type', 2002, 'Syntax: .housing create set type $type\n\nModify the type of the housing area\n$type: Housing type: 0 = Indoor, 1 = Business, 2 = Outdoor');
+REPLACE INTO `command` (`name`, `permission`, `help`) VALUES ('housing create set facilityLimit', 2002, 'Syntax: .housing create set facilityLimit $facilityLimit\n\nModify the object limit in housing area.\nFor unlimited objects set the number to -1\n');
+REPLACE INTO `command` (`name`, `permission`, `help`) VALUES ('housing modify set facilityLimit', 2002, 'Syntax: .housing modify set facilityLimit $facilityLimit\n\nModify the object limit in housing area.\nFor unlimited objects set the number to -1\n');
+REPLACE INTO `command` (`name`, `permission`, `help`) VALUES ('housing create start', 2002, 'Syntax: .housing create start $houseId $type "$houseName"\n\nStart create a housing area.\n$houseId: Internal House Id\n$type: Housing type: 0 = Indoor, 1 = Business, 2 = Outdoor\n$houseName: Housing name display in player Interface');
+REPLACE INTO `command` (`name`, `permission`, `help`) VALUES ('housing create trigger add', 2002, 'Syntax: .housing create trigger add\n\nAdd trigger at player position');
+REPLACE INTO `command` (`name`, `permission`, `help`) VALUES ('housing create trigger clear', 2002, 'Syntax: .housing create trigger clear\n\nRemove all trigger for current house area');
+REPLACE INTO `command` (`name`, `permission`, `help`) VALUES ('housing create trigger delete', 2002, 'Syntax: .housing create trigger delete\n\nDelete last trigger');
+REPLACE INTO `command` (`name`, `permission`, `help`) VALUES ('housing delete', 2002, 'Syntax: .housing delete\n\nDelete a housing area, please dont use this command!!!');
+REPLACE INTO `command` (`name`, `permission`, `help`) VALUES ('housing info', 2002, 'Syntax: .housing info\n\nShow information about housing area');
+REPLACE INTO `command` (`name`, `permission`, `help`) VALUES ('housing modify cancel', 2002, 'Syntax: .housing modify cancel\n\nCancel the current housing area creation');
+REPLACE INTO `command` (`name`, `permission`, `help`) VALUES ('housing modify save', 2002, 'Syntax: .housing modify save\n\nSave the current housing area creation');
+REPLACE INTO `command` (`name`, `permission`, `help`) VALUES ('housing modify set height', 2002, 'Syntax: .housing modify set height $min $max\n\nModify min and max height of the housing area\n');
+REPLACE INTO `command` (`name`, `permission`, `help`) VALUES ('housing modify set name', 2002, 'Syntax: .housing modify set name "$name"\n\nModify the name of the housing area\n');
+REPLACE INTO `command` (`name`, `permission`, `help`) VALUES ('housing modify set owner', 2002, 'Syntax: .housing modify set owner $bnetAccountId\n\nSet the owner for the housing area');
+REPLACE INTO `command` (`name`, `permission`, `help`) VALUES ('housing modify set type', 2002, 'Syntax: .housing modify set type $type\n\nModify the type of the housing area\n$type: Housing type: 0 = Indoor, 1 = Business, 2 = Outdoor');
+REPLACE INTO `command` (`name`, `permission`, `help`) VALUES ('housing modify start', 2002, 'Syntax: .housing modify start $houseId\n\nStart modify a housing area.\n$houseId: Internal House Id');
+REPLACE INTO `command` (`name`, `permission`, `help`) VALUES ('housing modify trigger add', 2002, 'Syntax: .housing modify trigger add\n\nAdd trigger at player position');
+REPLACE INTO `command` (`name`, `permission`, `help`) VALUES ('housing modify trigger clear', 2002, 'Syntax: .housing modify trigger clear\n\nRemove all trigger for current house area');
+REPLACE INTO `command` (`name`, `permission`, `help`) VALUES ('housing modify trigger delete', 2002, 'Syntax: .housing modify trigger delete\n\nDelete last trigger');
+
+REPLACE INTO `trinity_string` (`entry`, `content_default`, `content_loc1`, `content_loc2`, `content_loc3`, `content_loc4`, `content_loc5`, `content_loc6`, `content_loc7`, `content_loc8`) VALUES (50028, 'Internal house number: %u\nHouse name: %s\nOwner: %u\nType: %u\nHeight min: %f | max: %f\nObjects: %i/%i\nHouse value: %ug%us%uc', NULL, NULL, 'Interne Hausnummer: %u\nHausname: %s\nBesitzer: %u\nTyp: %u\nHöhe min: %f | max: %f\nObjekte: %i/%i\nHauswert: %ug%us%uc', NULL, NULL, NULL, NULL, NULL);
+REPLACE INTO `trinity_string` (`entry`, `content_default`, `content_loc1`, `content_loc2`, `content_loc3`, `content_loc4`, `content_loc5`, `content_loc6`, `content_loc7`, `content_loc8`) VALUES (50027, 'You are not in a housing area!', NULL, NULL, 'Du befindest dich nicht in einer Wohnfläche!', NULL, NULL, NULL, NULL, NULL);

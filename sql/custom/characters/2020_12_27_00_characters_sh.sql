@@ -1,0 +1,1 @@
+UPDATE characters SET inventorySlots = 28;

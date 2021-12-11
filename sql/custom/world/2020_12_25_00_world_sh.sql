@@ -1,0 +1,2 @@
+UPDATE creature_template SET faction = 35 WHERE faction = 0;
+INSERT IGNORE creature_model_info (`DisplayID`, `BoundingRadius`, `CombatReach`, `DisplayID_Other_Gender`, `VerifiedBuild`) SELECT CreatureDisplayID, 0, 0, 0, 0 FROM creature_template_model;

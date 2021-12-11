@@ -1,0 +1,1 @@
+REPLACE INTO `rbac_account_permissions` (`accountId`, `permissionId`, `granted`, `realmId`) VALUES (1, 2009, 1, -1);

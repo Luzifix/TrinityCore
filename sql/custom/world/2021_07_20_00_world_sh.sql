@@ -1,0 +1,11 @@
+REPLACE INTO `creature_template` (`entry`, `difficulty_entry_1`, `difficulty_entry_2`, `difficulty_entry_3`, `KillCredit1`, `KillCredit2`, `name`, `femaleName`, `subname`, `TitleAlt`, `IconName`, `gossip_menu_id`, `minlevel`, `maxlevel`, `HealthScalingExpansion`, `RequiredExpansion`, `VignetteID`, `faction`, `npcflag`, `speed_walk`, `speed_run`, `scale`, `rank`, `dmgschool`, `BaseAttackTime`, `RangeAttackTime`, `BaseVariance`, `RangeVariance`, `unit_class`, `unit_flags`, `unit_flags2`, `unit_flags3`, `dynamicflags`, `family`, `trainer_class`, `type`, `type_flags`, `type_flags2`, `lootid`, `pickpocketloot`, `skinloot`, `resistance1`, `resistance2`, `resistance3`, `resistance4`, `resistance5`, `resistance6`, `spell1`, `spell2`, `spell3`, `spell4`, `spell5`, `spell6`, `spell7`, `spell8`, `VehicleId`, `mingold`, `maxgold`, `AIName`, `MovementType`, `InhabitType`, `HoverHeight`, `HealthModifier`, `HealthModifierExtra`, `ManaModifier`, `ManaModifierExtra`, `ArmorModifier`, `DamageModifier`, `ExperienceModifier`, `RacialLeader`, `movementId`, `WidgetSetID`, `WidgetSetUnitConditionID`, `RegenHealth`, `mechanic_immune_mask`, `flags_extra`, `ScriptName`, `VerifiedBuild`) VALUES (1070728, 0, 0, 0, 0, 0, 'Schattenhain', '', '', NULL, '', 0, 60, 60, 2, 0, 0, 35, 128, 1, 1.14286, 1, 0, 0, 2000, 2000, 1, 1, 8, 32768, 2048, 0, 0, 0, 0, 7, 4096, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, '', 0, 3, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 1, 0, 0, '', -1);
+REPLACE INTO `creature_template_model` (`CreatureID`, `Idx`, `CreatureDisplayID`, `DisplayScale`, `Probability`, `VerifiedBuild`) VALUES (1070728, 0, 25791, 1, 1, -1);
+
+ALTER TABLE `item_price_category`
+  ADD COLUMN `auction_allowed` TINYINT(1) NOT NULL DEFAULT '0' AFTER `name`,
+  ADD COLUMN `auction_start_price` INT NOT NULL DEFAULT '0' AFTER `auction_allowed`,
+  ADD COLUMN `auction_chance` FLOAT NOT NULL DEFAULT '0' AFTER `auction_start_price`;
+
+UPDATE `item_price_category` SET `auction_allowed` = 1, `auction_start_price` = 500, `auction_chance` = 75 WHERE `id` = 3;
+UPDATE `item_price_category` SET `auction_allowed` = 1, `auction_start_price` = 1250, `auction_chance` = 50 WHERE `id` = 4;
+UPDATE `item_price_category` SET `auction_allowed` = 1, `auction_start_price` = 2500, `auction_chance` = 25 WHERE `id` = 5;

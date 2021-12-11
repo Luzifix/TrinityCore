@@ -1,0 +1,2 @@
+REPLACE INTO `trinity_string` (`entry`, `content_default`, `content_loc1`, `content_loc2`, `content_loc3`, `content_loc4`, `content_loc5`, `content_loc6`, `content_loc7`, `content_loc8`) VALUES (50020, '|cFFFFFFFFMessage to visitors from %s|r:\n%s\n ', NULL, NULL, '|cFFFFFFFFNachricht an die Besucher von %s|r:\n%s\n ', NULL, NULL, NULL, NULL, NULL);
+ALTER TABLE `furniture_catalog` DROP COLUMN `fileDataId`, DROP COLUMN `name`;

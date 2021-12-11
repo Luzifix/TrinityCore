@@ -1,0 +1,1 @@
+UPDATE `gameobject_template` SET `Data3` = 1 WHERE `name` LIKE "sh_light%";

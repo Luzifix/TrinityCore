@@ -1,0 +1,9 @@
+REPLACE INTO `channels` VALUES ('Event', 67, 0, 0, NULL, NULL, 0);
+REPLACE INTO `channels` VALUES ('Event', 469, 0, 0, NULL, NULL, 0);
+REPLACE INTO `channels` VALUES ('Fragen', 469, 0, 0, NULL, NULL, 0);
+REPLACE INTO `channels` VALUES ('Info', 67, 0, 0, NULL, NULL, 0);
+REPLACE INTO `channels` VALUES ('Info', 469, 0, 0, NULL, NULL, 0);
+REPLACE INTO `channels` VALUES ('OOC', 67, 0, 0, NULL, NULL, 0);
+REPLACE INTO `channels` VALUES ('OOC', 469, 0, 0, NULL, NULL, 0);
+REPLACE INTO `channels` VALUES ('xtensionxtooltip2', 67, 0, 0, NULL, NULL, 0);
+REPLACE INTO `channels` VALUES ('xtensionxtooltip2', 469, 0, 0, NULL, NULL, 0);

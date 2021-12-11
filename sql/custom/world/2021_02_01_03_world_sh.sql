@@ -1,0 +1,1 @@
+UPDATE `gameobject_template` SET `displayId` = "220240" WHERE `entry` IN (1000000, 1000001);
