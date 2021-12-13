@@ -277,12 +277,18 @@ void MountMgr::SpawnCharacterMount(CharacterMount* characterMount, bool reload)
     if (mount && mount->IsInWorld())
         return;
 
+    if (!sMapStore.HasRecord(characterMount->GetPosition().GetMapId()))
+    {
+        TC_LOG_ERROR("server.loading", "Cant create mount for character mount (guid: " UI64FMTD ", mountTemplateId: %u). Map missing! ", characterMount->GetGuid().GetCounter(), characterMount->GetMountTemplate()->GetMountId());
+        return;
+    }
+
     Map* map = sMapMgr->CreateBaseMap(characterMount->GetPosition().GetMapId());
     mount = map->SummonCreature(MOUNTSYSTEM_CREATURE_ENTRY, characterMount->GetPosition(), nullptr, 0, nullptr, 0, MOUNTSYSTEM_VEHICLE_ID_SINGLE_SEAT);
 
     if (!mount)
     {
-        TC_LOG_ERROR("server.loading", "Cant create creature for character mount (guid: " UI64FMTD ", mountTemplateId: %u) ", characterMount->GetGuid().GetCounter(), characterMount->GetMountTemplate()->GetMountId());
+        TC_LOG_ERROR("server.loading", "Cant create mount for character mount (guid: " UI64FMTD ", mountTemplateId: %u) ", characterMount->GetGuid().GetCounter(), characterMount->GetMountTemplate()->GetMountId());
         return;
     }
 

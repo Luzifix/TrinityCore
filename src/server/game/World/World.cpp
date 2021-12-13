@@ -2552,6 +2552,9 @@ void World::SetInitialWorldSettings()
 
         for (uint32 mapId : loadMapList)
         {
+            if (!sMapStore.HasRecord(mapId))
+                continue;
+
             TC_LOG_INFO("server.loading", "Pre-loading map data for map %u", mapId);
             Map* map = sMapMgr->CreateBaseMap(mapId);
             map->LoadAllCells();

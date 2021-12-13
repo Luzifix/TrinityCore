@@ -13550,7 +13550,7 @@ float Unit::GetCollisionHeight() const
 {
     float scaleMod = GetObjectScale(); // 99% sure about this
 
-    if (HasUnitFlag2(UNIT_FLAG2_MIRROR_IMAGE))
+    if (HasUnitFlag2(UNIT_FLAG2_MIRROR_IMAGE) || !sCreatureDisplayInfoStoreRaw.HasRecord(GetNativeDisplayId()))
         return scaleMod;
 
     if (IsMounted())
