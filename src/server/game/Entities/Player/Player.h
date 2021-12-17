@@ -112,6 +112,11 @@ namespace BattlePets
     struct BattlePet;
 }
 
+namespace BattlePets
+{
+    struct BattlePet;
+}
+
 namespace WorldPackets
 {
     namespace Character
