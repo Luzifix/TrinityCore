@@ -191,7 +191,7 @@ auto BattlepayManager::ProductFilter(Product product) -> bool
         }
     }
 
-    if (product.ClassMask && (player->getClassMask() & product.ClassMask) == 0)
+    if (product.ClassMask && (player->GetClassMask() & product.ClassMask) == 0)
         return false;
 
     for (auto& itr : product.Items)
