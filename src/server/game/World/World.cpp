@@ -1713,6 +1713,12 @@ void World::LoadConfigSettings(bool reload)
     // Whether to use LoS from game objects
     m_bool_configs[CONFIG_CHECK_GOBJECT_LOS] = sConfigMgr->GetBoolDefault("CheckGameObjectLoS", true);
 
+    // FactionBalance
+    m_int_configs[CONFIG_FACTION_BALANCE_LEVEL_CHECK_DIFF] = sConfigMgr->GetIntDefault("Pvp.FactionBalance.LevelCheckDiff", 0);
+    m_float_configs[CONFIG_CALL_TO_ARMS_5_PCT] = sConfigMgr->GetFloatDefault("Pvp.FactionBalance.Pct5", 0.6f);
+    m_float_configs[CONFIG_CALL_TO_ARMS_10_PCT] = sConfigMgr->GetFloatDefault("Pvp.FactionBalance.Pct10", 0.7f);
+    m_float_configs[CONFIG_CALL_TO_ARMS_20_PCT] = sConfigMgr->GetFloatDefault("Pvp.FactionBalance.Pct20", 0.8f);
+
     // Use LoS for game object visibility
     m_bool_configs[CONFIG_VISIBILITY_GOBJECT_LOS] = sConfigMgr->GetBoolDefault("Visibility.GameObject.LoS", true);
 
