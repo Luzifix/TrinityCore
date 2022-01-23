@@ -1355,6 +1355,8 @@ void Guild::SendQueryResponse(WorldSession* session)
     WorldPackets::Guild::QueryGuildInfoResponse response;
     response.GuildGuid = GetGUID();
     response.Info.emplace();
+    response.PlayerGuid = playerGuid;
+    response.Info.emplace();
 
     response.Info->GuildGUID = GetGUID();
     response.Info->VirtualRealmAddress = GetVirtualRealmAddress();
