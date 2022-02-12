@@ -34,7 +34,6 @@
 #include "QuestDef.h"
 #include "SceneMgr.h"
 #include "VignetteMgr.h"
-#include <queue>
 #include <algorithm>
 
 struct AccessRequirement;

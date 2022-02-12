@@ -44,7 +44,6 @@
 #include "StringConvert.h"
 #include "TradeData.h"
 #include "UpdateData.h"
-#include "World.h"
 #include "WorldSession.h"
 #include <sstream>
 
