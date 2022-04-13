@@ -11,13 +11,14 @@
 #include "Player.h"
 #include "WorldSession.h"
 
-enum WorldScriptEndorsementsEvent
+enum WorldScriptEndorsementsEvent : uint32
 {
     ENDORSEMENTS_EVENT_TICK = 1,
-    ENDORSEMENTS_EVENT_TICK_INTERVALL = 60 * IN_MILLISECONDS,
     ENDORSEMENTS_EVENT_CLEANUP = 2,
-    ENDORSEMENTS_EVENT_CLEANUP_INTERVALL = 60 * IN_MILLISECONDS,
 };
+
+inline constexpr Seconds ENDORSEMENTS_EVENT_TICK_INTERVALL = 10s;
+inline constexpr Seconds ENDORSEMENTS_EVENT_CLEANUP_INTERVALL = 60s;
 
 class ws_endorsements : public WorldScript
 {

@@ -23,7 +23,8 @@ public:
     void LoadConfig(bool reload);
 
     bool isEnabled() { return _enabled; }
-    int getUpdateInterval(bool inMilliseconds = true) { return _updateInterval * (inMilliseconds ? 1000 : 1); }
+    int getUpdateIntervalInSeconds() { return _updateInterval; }
+    Milliseconds getUpdateIntervalInMilliseconds() { return std::chrono::seconds(_updateInterval); }
     AllowedMapStore getAllowedMaps() { return _allowedMaps; }
     int getCoinCap() { return _coinCap; }
     int getCoinPerHour() { return _coinPerHour; }

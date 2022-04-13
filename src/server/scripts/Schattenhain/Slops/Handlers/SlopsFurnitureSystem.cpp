@@ -351,9 +351,9 @@ void SlopsHandler::HandleFurnitureRequestCategorizationList(SlopsPackage package
         entry["categoryIds"] = JSON::Array();
         entry["override"] = (furniture->GetPrice() != 0);
 
-        Tokenizer tokens(categoryIdsStr, ',');
-        for (char const* token : tokens)
-            entry["categoryIds"].append(atoul(token));
+        std::vector<std::string> tokens = Split(categoryIdsStr, ",");
+        for (std::string token : tokens)
+            entry["categoryIds"].append(atoul(token.c_str()));
 
         data["list"].append(entry);
     } while (result->NextRow());
@@ -445,9 +445,9 @@ void SlopsHandler::HandleFurnitureCategorizationSubmitResult(SlopsPackage packag
     furnture->ResetCategorys();
 
     std::list<uint32> categoryIds;
-    Tokenizer tokens(categoryIdsStr, ',');
-    for (char const* token : tokens)
-        furnture->AssignCategory(atoul(token));
+    std::vector<std::string> tokens = Split(categoryIdsStr, ",");
+    for (std::string token : tokens)
+        furnture->AssignCategory(atoul(token.c_str()));
 
     furnture->SetCategorizedBy(categorizedBy);
     furnture->SetAuthorisedBy(player->GetName());

@@ -68,7 +68,7 @@ static GameObject* SpawnGameObject(Player* player, uint32 entry, Position positi
         return nullptr;
 
     /// @todo is it really necessary to add both the real and DB table guid here ?
-    sObjectMgr->AddGameobjectToGrid(spawnId, ASSERT_NOTNULL(sObjectMgr->GetGameObjectData(spawnId)));
+    sObjectMgr->AddGameobjectToGrid(ASSERT_NOTNULL(sObjectMgr->GetGameObjectData(spawnId)));
 
     return object;
 }
@@ -470,7 +470,7 @@ static bool CommandActionPlayer(Player* player, std::string command, float facto
             gameObject->RemoveFromWorld();
             gameObject->SetRespawnTime(0);
             gameObject->Delete();
-            gameObject->DeleteFromDB();
+            gameObject->DeleteFromDB(gameObject->GetSpawnId());
             gameObjectSelectionInfo->deleted = true;
         }
     }

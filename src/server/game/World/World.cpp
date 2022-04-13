@@ -2728,10 +2728,10 @@ void World::Update(uint32 diff)
 
             if (blackmarket_lastDrop != localTm.tm_hour)
             {
-                Tokenizer restoreHoursTok(sConfigMgr->GetStringDefault("BlackMarket.RestoreHours", "7,13,19"), ',');
+                std::vector<std::string> restoreHoursTok = Split(sConfigMgr->GetStringDefault("BlackMarket.RestoreHours", "7,13,19"), ",");
                 std::vector<int> restoreHours;
-                for (char const* token : restoreHoursTok)
-                    restoreHours.push_back(int32(atol(token)));
+                for (std::string token : restoreHoursTok)
+                    restoreHours.push_back(int32(atol(token.c_str())));
 
                 if (std::find(restoreHours.begin(), restoreHours.end(), localTm.tm_hour) != restoreHours.end())
                     sBlackMarketMgr->RefreshAuctions();

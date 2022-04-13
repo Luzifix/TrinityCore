@@ -26,8 +26,9 @@ public:
         enum ScriptEvents
         {
             FUEL_UPDATE_EVENT = 1,
-            FUEL_UPDATE_INTERVAL = 5 * IN_MILLISECONDS,
         };
+
+        static inline constexpr Seconds FUEL_UPDATE_INTERVAL = 5s;
 
         enum TROUGH_TYPE_ID : uint32
         {
@@ -142,14 +143,14 @@ public:
     {
         go_mountsystem_excretionAI(GameObject* go) : GameObjectAI(go) { }
 
-        bool GossipHello(Player* player) override
+        bool OnGossipHello(Player* player) override
         {
             uint64 money = 1 * COPPER;
             player->ModifyMoney(money);
             ChatHandler(player->GetSession()).PSendSysMessage(LANG_GET_COPPER_COINS, money);
             me->SetRespawnTime(0);
             me->Delete();
-            me->DeleteFromDB();
+            me->DeleteFromDB(me->GetSpawnId());
 
             return true;
         }

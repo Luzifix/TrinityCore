@@ -13,6 +13,7 @@
 #include "AccountMgr.h"
 #include "CollectionMgr.h"
 #include <sstream>
+#include <boost/optional.hpp>
 
 using namespace Battlepay;
 
@@ -255,7 +256,7 @@ void BattlepayManager::SendProductList()
         auto data = WriteDisplayInfo(itr.DisplayInfoID, localeIndex);
         if (std::get<0>(data))
         {
-            sEntry.DisplayInfo = boost::in_place();
+            //sEntry.DisplayInfo = boost::in_place();
             sEntry.DisplayInfo = std::get<1>(data);
         }
 
@@ -282,7 +283,7 @@ void BattlepayManager::SendProductList()
         auto dataPI = WriteDisplayInfo(product.DisplayInfoID, localeIndex);
         if (std::get<0>(dataPI))
         {
-            pInfo.DisplayInfo = boost::in_place();
+            //pInfo.DisplayInfo = boost::in_place();
             pInfo.DisplayInfo = std::get<1>(dataPI);
         }
 
@@ -305,7 +306,7 @@ void BattlepayManager::SendProductList()
             auto dataP = WriteDisplayInfo(item.DisplayInfoID, localeIndex);
             if (std::get<0>(dataP))
             {
-                pItem.DisplayInfo = boost::in_place();
+                //pItem.DisplayInfo = boost::in_place();
                 pItem.DisplayInfo = std::get<1>(dataP);
             }
 
@@ -315,7 +316,7 @@ void BattlepayManager::SendProductList()
         auto dataP = WriteDisplayInfo(product.DisplayInfoID, localeIndex);
         if (std::get<0>(dataP))
         {
-            pProduct.DisplayInfo = boost::in_place();
+            //pProduct.DisplayInfo = boost::in_place();
             pProduct.DisplayInfo = std::get<1>(dataP);
         }
 
@@ -477,7 +478,7 @@ void BattlepayManager::SendBattlePayDistribution(uint32 productId, uint8 status,
         auto dataP = WriteDisplayInfo(item.DisplayInfoID, localeIndex);
         if (std::get<0>(dataP))
         {
-            productItem.DisplayInfo = boost::in_place();
+            //productItem.DisplayInfo = boost::in_place();
             productItem.DisplayInfo = std::get<1>(dataP);
         }
 
@@ -495,7 +496,7 @@ void BattlepayManager::SendBattlePayDistribution(uint32 productId, uint8 status,
     auto dataP = WriteDisplayInfo(product.DisplayInfoID, localeIndex);
     if (std::get<0>(dataP))
     {
-        productData.DisplayInfo = boost::in_place();
+        //productData.DisplayInfo = boost::in_place();
         productData.DisplayInfo = std::get<1>(dataP);
     }
 

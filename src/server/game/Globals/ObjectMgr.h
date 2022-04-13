@@ -1163,7 +1163,7 @@ class TC_GAME_API ObjectMgr
         CreatureAddon const* GetCreatureTemplateAddon(uint32 entry) const;
         CreatureMovementData const* GetCreatureMovementOverride(ObjectGuid::LowType spawnId) const;
         ItemTemplate const* GetItemTemplate(uint32 entry) const;
-        std::string ObjectMgr::GetItemLinkById(uint32 entry, std::vector<int32> bonusListIds = std::vector<int32>());
+        std::string GetItemLinkById(uint32 entry, std::vector<int32> bonusListIds = std::vector<int32>());
         ItemTemplateContainer const& GetItemTemplateStore() const { return _itemTemplateStore; }
 
         InstanceTemplateContainer const& GetInstanceTemplates() const { return _instanceTemplateStore; }

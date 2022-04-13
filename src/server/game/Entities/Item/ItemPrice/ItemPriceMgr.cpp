@@ -7,6 +7,7 @@
 #include "Log.h"
 #include "GameTime.h"
 #include "Util.h"
+#include "StringConvert.h"
 #include <iostream>
 #include <sstream>
 #include <vector>
@@ -66,10 +67,11 @@ void ItemPriceMgr::LoadFromDB()
             uint8 priceCategoryId = fields[1].GetUInt8();
             uint8 priceMultiplier = fields[2].GetUInt8();
             uint32 baseItemId = fields[3].GetUInt32();
-            Tokenizer baseItembonusListIDsTok(fields[4].GetString(), ' ');
+
             std::vector<int32> baseItemBonusListIDs;
-            for (char const* token : baseItembonusListIDsTok)
-                baseItemBonusListIDs.push_back(int32(atol(token)));
+            for (std::string_view token : Trinity::Tokenize(fields[4].GetStringView(), ' ', false))
+                if (Optional<int32> baseItemBonusListID = Trinity::StringTo<int32>(token))
+                    baseItemBonusListIDs.push_back(*baseItemBonusListID);
 
             std::string categorizedBy = fields[5].GetString();
             uint32 categorizationDate = fields[6].GetUInt32();
@@ -110,10 +112,10 @@ void ItemPriceMgr::LoadFromDB()
 
             uint32 displayInfoId = fields[0].GetUInt32();
             uint32 baseItemId = fields[1].GetUInt32();
-            Tokenizer baseItembonusListIDsTok(fields[2].GetString(), ' ');
             std::vector<int32> baseItemBonusListIDs;
-            for (char const* token : baseItembonusListIDsTok)
-                baseItemBonusListIDs.push_back(int32(atol(token)));
+            for (std::string_view token : Trinity::Tokenize(fields[2].GetStringView(), ' ', false))
+                if (Optional<int32> baseItemBonusListID = Trinity::StringTo<int32>(token))
+                    baseItemBonusListIDs.push_back(*baseItemBonusListID);
 
             bool categorized = fields[3].GetBool();
             uint32 requestedAt = fields[4].GetUInt32();

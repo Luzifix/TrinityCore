@@ -17,6 +17,7 @@
 
 #include "VignetteMgr.h"
 #include "ObjectAccessor.h"
+#include "GameObject.h"
 #include "MiscPackets.h"
 #include "AreaTrigger.h"
 #include "Corpse.h"

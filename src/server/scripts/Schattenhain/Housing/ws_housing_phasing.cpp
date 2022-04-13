@@ -11,11 +11,11 @@
 enum HousingWorldScript
 {
     HOUSING_UPDATE_EVENT = 1,
-    HOUSING_UPDATE_INTERVAL = 30000,
-
     HOUSING_PHASING_EVENT = 2,
-    HOUSING_PHASING_INTERVAL = 1000,
 };
+
+inline constexpr Seconds HOUSING_UPDATE_INTERVAL = 1s;
+inline constexpr Seconds HOUSING_PHASING_INTERVAL = 1s;
 
 class ws_housing_phasing : public WorldScript
 {

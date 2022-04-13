@@ -29,9 +29,9 @@ void SlopsHandler::HandleItemPriceRequest(SlopsPackage package)
     std::vector<int32> bonusListIds;
     if (!bonusListIdsStr.empty())
     {
-        Tokenizer tokens(bonusListIdsStr, ' ');
-        for (char const* token : tokens)
-            bonusListIds.push_back(atoul(token));
+        std::vector<std::string> tokens = Split(bonusListIdsStr, " ");
+        for (std::string token : tokens)
+            bonusListIds.push_back(atoul(token.c_str()));
     }
 
     bool itemNotFound = false;
@@ -87,9 +87,9 @@ void SlopsHandler::HandleItemPriceCategorizeRequest(SlopsPackage package)
     std::vector<int32> bonusListIds;
     if (!bonusListIdsStr.empty())
     {
-        Tokenizer tokens(bonusListIdsStr, ' ');
-        for (char const* token : tokens)
-            bonusListIds.push_back(atoul(token));
+        std::vector<std::string> tokens = Split(bonusListIdsStr, " ");
+        for (std::string token : tokens)
+            bonusListIds.push_back(atoul(token.c_str()));
     }
 
     JSON itemPriceResponse = {

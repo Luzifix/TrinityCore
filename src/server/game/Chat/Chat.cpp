@@ -413,10 +413,10 @@ char* ChatHandler::extractItemFromLink(char* text, std::vector<int32>* baseItemB
     char* cKeysTail = strtok(nullptr, "");
 
     if (baseItemBonusListIds) {
-        Tokenizer itemLinkTok(cKeys, ':');
+        std::vector<std::string> itemLinkTok = Split(cKeys, ":");
         if (itemLinkTok.size() > 13) {
-            for (uint16 i = 0; i < atoi(itemLinkTok[12]); i++)
-                baseItemBonusListIds->push_back(atoi(itemLinkTok[13 + i]));
+            for (uint16 i = 0; i < atoi(itemLinkTok[12].c_str()); i++)
+                baseItemBonusListIds->push_back(atoi(itemLinkTok[13 + i].c_str()));
         }
     }
 

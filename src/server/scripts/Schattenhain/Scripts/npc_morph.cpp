@@ -118,7 +118,7 @@ public:
             TC_LOG_INFO("server.loading", ">> Loaded %u npc_morph categorys in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
         }
 
-        bool GossipHello(Player* player) override
+        bool OnGossipHello(Player* player) override
         {
             if (player->GetTotalPlayedTime() > MAX_PLAYTIME_FOR_MORPH)
             {
@@ -140,7 +140,7 @@ public:
             return true;
         }
 
-        bool GossipSelect(Player* player, uint32 /*menuId*/, uint32 gossipListId) override
+        bool OnGossipSelect(Player* player, uint32 /*menuId*/, uint32 gossipListId) override
         {
             uint32 action = player->PlayerTalkClass->GetGossipOptionAction(gossipListId);
             ClearGossipMenuFor(player);
@@ -156,7 +156,7 @@ public:
 
 #pragma region Warning Menu
             case GOSSIP_NPC_MORPH_MENU_WARNING_ACTION:
-                GossipHello(player);
+                OnGossipHello(player);
                 break;
 #pragma endregion
 
@@ -178,7 +178,7 @@ public:
                     }
                     else
                     {
-                        return GossipHello(player);
+                        return OnGossipHello(player);
                     }
                 }
                 else if (action > GOSSIP_NPC_MORPH_MENU_MORPH_ACTION_CLASS)
@@ -209,12 +209,12 @@ public:
                     }
                     else
                     {
-                        return GossipHello(player);
+                        return OnGossipHello(player);
                     }
                 }
                 else if (action > GOSSIP_NPC_MORPH_MENU_BACK)
                 {
-                    GossipHello(player);
+                    OnGossipHello(player);
                 }
                 break;
             }

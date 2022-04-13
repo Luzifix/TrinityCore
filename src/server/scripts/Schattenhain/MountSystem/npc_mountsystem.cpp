@@ -60,23 +60,19 @@ public:
         enum ScriptEvents
         {
             SAVE_EVENT = 1,
-            SAVE_INTERVAL = 1 * MINUTE * IN_MILLISECONDS,
-
             MOVEMENT_UPDATE_EVENT = 2,
-            MOVEMENT_UPDATE_INTERVAL = 1 * IN_MILLISECONDS,
-
             FUEL_UPDATE_EVENT = 3,
-            FUEL_UPDATE_INTERVAL = 5 * IN_MILLISECONDS,
-
             EXCRETION_UPDATE_EVENT = 4,
-            EXCRETION_UPDATE_INTERVAL = 5 * IN_MILLISECONDS,
-
             CLEANLINESS_UPDATE_EVENT = 5,
-            CLEANLINESS_UPDATE_INTERVAL = 1 * IN_MILLISECONDS,
-
             CONDITION_UPDATE_EVENT = 6,
-            CONDITION_UPDATE_INTERVAL = 5 * IN_MILLISECONDS,
         };
+
+        static inline constexpr Seconds SAVE_INTERVAL = 60s;
+        static inline constexpr Seconds MOVEMENT_UPDATE_INTERVAL = 1s;
+        static inline constexpr Seconds FUEL_UPDATE_INTERVAL = 5s;
+        static inline constexpr Seconds EXCRETION_UPDATE_INTERVAL = 5s;
+        static inline constexpr Seconds CLEANLINESS_UPDATE_INTERVAL = 1s;
+        static inline constexpr Seconds CONDITION_UPDATE_INTERVAL = 5s;
 
         npc_mountsystem_mountAI(Creature* creature) : VehicleAI(creature) { }
 
@@ -107,7 +103,7 @@ public:
             return true;
         }
 
-        bool GossipHello(Player* player) override
+        bool OnGossipHello(Player* player) override
         {
             ClearGossipMenuFor(player);
 
@@ -170,14 +166,14 @@ public:
             return true;
         }
 
-        bool GossipSelectCode(Player* player, uint32 /*menuId*/, uint32 gossipListId, char const* code) override
+        bool OnGossipSelectCode(Player* player, uint32 /*menuId*/, uint32 gossipListId, char const* code) override
         {
             CharacterMount* characterMount = GetCharacterMount(player);
             if (!characterMount)
                 return true;
 
             if (!characterMount->IsOwner(player) || characterMount->HasParkingTicket())
-                return GossipHello(player);
+                return OnGossipHello(player);
 
             uint32 const action = player->PlayerTalkClass->GetGossipOptionAction(gossipListId);
             std::string codeStr = std::string(code);
@@ -210,7 +206,7 @@ public:
                 if (sObjectMgr->CheckPlayerName(codeStr, sWorld->GetDefaultDbcLocale(), false) != CHAR_NAME_SUCCESS || sObjectMgr->IsReservedName(codeStr))
                 {
                     ChatHandler(player->GetSession()).PSendSysMessage(LANG_MOUNT_SYSTEM_ERR_INVALID_NAME, codeStr);
-                    return GossipHello(player);
+                    return OnGossipHello(player);
                 }
 
                 me->GetCharmInfo()->SetPetNumber(me->GetGUID().GetCounter(), true);
@@ -221,10 +217,10 @@ public:
                 break;
             }
 
-            return GossipHello(player);
+            return OnGossipHello(player);
         }
 
-        bool GossipSelect(Player* player, uint32 /*menuId*/, uint32 gossipListId) override
+        bool OnGossipSelect(Player* player, uint32 /*menuId*/, uint32 gossipListId) override
         {
             CharacterMount* characterMount = GetCharacterMount(player);
             if (!characterMount)
@@ -261,7 +257,7 @@ public:
                 case MountSystemGossipAction::PayTicket:
 
                     if (!player->ModifyMoney(-MOUNTSYSTEM_COST_TICKET)) {
-                        return GossipHello(player);
+                        return OnGossipHello(player);
                     }
 
                     characterMount->SetParkingTicket(false);
@@ -270,14 +266,14 @@ public:
                     break;
                 }
 
-                return GossipHello(player);
+                return OnGossipHello(player);
             }
 
             switch (action)
             {
             case MountSystemGossipAction::Broom:
                 if (characterMount->HasCleanupCooldown())
-                    return GossipHello(player);
+                    return OnGossipHello(player);
 
                 characterMount->SetDirtiness(std::max(0.f, characterMount->GetDirtiness() - 30.f));
                 characterMount->SetCondition(std::min(100.f, characterMount->GetCondition() + 5.f));
@@ -285,7 +281,7 @@ public:
                 characterMount->SetLastMoveTimestamp((uint64)std::time(0));
                 Save();
 
-                return GossipHello(player);
+                return OnGossipHello(player);
 
             case MountSystemGossipAction::Follow:
                 characterMount->SetLastMoveTimestamp((uint64)std::time(0));
@@ -306,7 +302,7 @@ public:
             case MountSystemGossipAction::Mount:
                 if (characterMount->GetFuel() <= 0 || characterMount->GetCondition() <= 0) {
                     ChatHandler(player->GetSession()).PSendSysMessage(LANG_MOUNT_SYSTEM_ERR_EMPTY_FUEL_OR_CONDITION);
-                    return GossipHello(player);
+                    return OnGossipHello(player);
                 }
 
                 CloseGossipMenuFor(player);
@@ -343,7 +339,7 @@ public:
                 break;
             }
 
-            return GossipHello(player);
+            return OnGossipHello(player);
         }
 
         void InitializeAI() override
@@ -610,7 +606,7 @@ public:
                 characterMount->GetMountTemplate()->GetMountTemplateExcretion()->gameObjectEntry,
                 position,
                 QuaternionData::fromEulerAnglesZYX(frand(-M_PI, M_PI), 0.0f, 0.0f),
-                0
+                0s
             );
 
             _excretionReady = false;

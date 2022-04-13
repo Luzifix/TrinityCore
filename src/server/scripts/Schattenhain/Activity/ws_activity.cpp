@@ -32,7 +32,7 @@ class ws_activity : public WorldScript
 public:
     ws_activity() : WorldScript("ws_activity")
     {
-        _events.ScheduleEvent(ACTIVITY_EVENT_TICK, sActivityMgr->getUpdateInterval());
+        _events.ScheduleEvent(ACTIVITY_EVENT_TICK, sActivityMgr->getUpdateIntervalInMilliseconds());
         GenerateNextPaymentTime();
     }
 
@@ -84,7 +84,7 @@ public:
                     RewardPayment();
                 }
 
-                _events.ScheduleEvent(ACTIVITY_EVENT_TICK, sActivityMgr->getUpdateInterval());
+                _events.ScheduleEvent(ACTIVITY_EVENT_TICK, sActivityMgr->getUpdateIntervalInMilliseconds());
                 break;
             }
         }
@@ -140,7 +140,7 @@ public:
         if (it != _battlenetAccountPlayerLock.end())
             return;
 
-        int _updateInterval = sActivityMgr->getUpdateInterval(false);
+        int _updateInterval = sActivityMgr->getUpdateIntervalInSeconds();
 
         // Persist playtime in database
         LoginDatabasePreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_INS_BNET_ACTIVITY_PLAYTIME);
@@ -177,7 +177,7 @@ public:
         // Persist playtime in database
         CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_GUILD_ACTIVITY_PLAYTIME);
         stmt->setUInt64(0, guildId);
-        stmt->setUInt32(1, sActivityMgr->getUpdateInterval(false));
+        stmt->setUInt32(1, sActivityMgr->getUpdateIntervalInSeconds());
         trans->Append(stmt);
 
         // Lock battlenet account for the current tick

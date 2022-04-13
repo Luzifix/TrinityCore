@@ -1909,8 +1909,8 @@ void Guild::HandleShiftRank(WorldSession* /*session*/, uint32 id, bool up)
 {
     uint32 nextID = up ? id - 1 : id + 1;
 
-    RankInfo* oldRankInfo = GetRankInfo(id);
-    RankInfo* newRankInfo = GetRankInfo(nextID);
+    RankInfo* oldRankInfo = GetRankInfo((GuildRankId)id);
+    RankInfo* newRankInfo = GetRankInfo((GuildRankId)nextID);
 
     if (!oldRankInfo || !newRankInfo)
         return;

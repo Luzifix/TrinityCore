@@ -9,6 +9,7 @@
 #include "DatabaseEnv.h"
 #include <map>
 #include <vector>
+#include "GameObject.h"
 #include "Furniture.h"
 #include "FurnitureInventory.h"
 #include "FurnitureCategory.h"

@@ -280,11 +280,11 @@ void WorldSession::SendDisplayPromo(int32 promotionID /*= 0*/)
     auto dataP = GetBattlePayMgr()->WriteDisplayInfo(product.DisplayInfoID, GetSessionDbLocaleIndex());
     if (std::get<0>(dataP))
     {
-        pProduct.DisplayInfo = boost::in_place();
+        //pProduct.DisplayInfo = boost::in_place();
         pProduct.DisplayInfo = std::get<1>(dataP);
     }
 
-    data.Product = boost::in_place();
+    //data.Product = boost::in_place();
     data.Product = pProduct;
 
     packet.DistributionObject.emplace_back(data);

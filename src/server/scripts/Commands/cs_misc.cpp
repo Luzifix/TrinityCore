@@ -1581,7 +1581,7 @@ public:
             return false;
         }
 
-        WorldPackets::Misc::Weather weatherPkg(WeatherState(type), grade, true);
+        WorldPackets::Misc::Weather weatherPkg(WeatherState(type), intensity, true);
 
         //- Returns false if there were no players found to update
         if (!sWorld->SendZoneMessage(weather->GetZone(), weatherPkg.Write()))

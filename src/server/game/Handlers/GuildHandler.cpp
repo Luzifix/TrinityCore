@@ -138,12 +138,6 @@ void WorldSession::HandleGuildSetMemberNote(WorldPackets::Guild::GuildSetMemberN
         guild->HandleSetMemberNote(this, packet.Note, packet.NoteeGUID, packet.IsPublic);
 }
 
-void WorldSession::HandleGuildShiftRank(WorldPackets::Guild::GuildShiftRank& packet)
-{
-    if (Guild* guild = GetPlayer()->GetGuild())
-        guild->HandleShiftRank(this, packet.RankOrder, packet.ShiftUp);
-}
-
 void WorldSession::HandleGuildGetRanks(WorldPackets::Guild::GuildGetRanks& packet)
 {
     TC_LOG_DEBUG("guild", "CMSG_GUILD_GET_RANKS [%s]: Guild: %s",
