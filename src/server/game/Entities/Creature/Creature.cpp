@@ -3428,25 +3428,9 @@ bool Creature::HasSpellFocus(Spell const* focusSpell) const
         if (_spellFocusInfo.Spell || _spellFocusInfo.Delay)
         {
             TC_LOG_WARN("entities.unit", "Creature '%s' (entry %u) has spell focus (spell id %u, delay %ums) despite being dead.",
-                        GetName().c_str(), GetEntry(), _spellFocusInfo.Spell ? _spellFocusInfo.Spell->GetSpellInfo()->Id : 0, _spellFocusInfo.Delay);
+                GetName().c_str(), GetEntry(), _spellFocusInfo.Spell ? _spellFocusInfo.Spell->GetSpellInfo()->Id : 0, _spellFocusInfo.Delay);
         }
         return false;
-        ReleaseSpellFocus(nullptr, false);
-        return false;
-    }
-
-    if (focusSpell && (focusSpell != _focusSpell))
-        return false;
-
-    if (!_focusSpell)
-    {
-        if (!withDelay || !_spellFocusDelay)
-            return false;
-        if (GetMSTimeDiffToNow(_spellFocusDelay) > 1000) // @todo figure out if we can get rid of this magic number somehow
-        {
-            _spellFocusDelay = 0; // save checks in the future
-            return false;
-        }
     }
 
     if (focusSpell)

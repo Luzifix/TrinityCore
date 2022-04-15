@@ -1034,45 +1034,6 @@ namespace WorldPackets
             ::Gender Gender = GENDER_NONE;
             uint32 CurrencyID = 0;
         };
-
-        struct VignetteInstanceIDList
-        {
-            GuidVector IDs;
-        };
-
-        struct VignetteClientData
-        {
-            VignetteClientData(ObjectGuid guid, Position pos, int32 vignetteID, int32 areaID) : ObjGUID(guid), Pos(pos), VignetteID(vignetteID), AreaID(areaID) { }
-
-            ObjectGuid ObjGUID;
-            TaggedPosition<Position::XYZ> Pos;
-            int32 VignetteID = 0;
-            uint32 AreaID = 0;
-            uint32 Unk901_1 = 0;
-            uint32 Unk901_2 = 0;
-        };
-
-        struct VignetteClientDataSet
-        {
-            VignetteInstanceIDList IdList;
-            std::vector<VignetteClientData> Data;
-        };
-
-        class VignetteUpdate  final : public ServerPacket
-        {
-        public:
-            VignetteUpdate() : ServerPacket(SMSG_VIGNETTE_UPDATE, 20 + 1) { }
-            VignetteUpdate(bool update) : ServerPacket(SMSG_VIGNETTE_UPDATE, 20 + 1), ForceUpdate(update) { }
-
-            WorldPacket const* Write() override;
-
-            VignetteClientDataSet Updated;
-            VignetteClientDataSet Added;
-            VignetteInstanceIDList Removed;
-            bool ForceUpdate = false;
-            bool UnkBit901 = false;
-        };
-
     }
 }
 

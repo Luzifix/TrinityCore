@@ -1417,7 +1417,6 @@ class TC_GAME_API WorldSession
         void HandleGuildNewsUpdateSticky(WorldPackets::Guild::GuildNewsUpdateSticky& packet);
         void HandleGuildSetMemberNote(WorldPackets::Guild::GuildSetMemberNote& packet);
         void HandleGuildGetRanks(WorldPackets::Guild::GuildGetRanks& packet);
-        void HandleGuildShiftRank(WorldPackets::Guild::GuildShiftRank& packet);
         void HandleGuildQueryNews(WorldPackets::Guild::GuildQueryNews& newsQuery);
         void HandleGuildSetRankPermissions(WorldPackets::Guild::GuildSetRankPermissions& packet);
         void HandleGuildAddRank(WorldPackets::Guild::GuildAddRank& packet);

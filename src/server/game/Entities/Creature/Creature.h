@@ -87,7 +87,7 @@ class TC_GAME_API Creature : public Unit, public GridObject<Creature>, public Ma
 
         std::shared_ptr<CreatureOutfit> & GetOutfit() { return m_outfit; };
         void SetOutfit(std::shared_ptr<CreatureOutfit> const & outfit);
-        void SetMirrorImageFlag(bool on) { if (on) AddUnitFlag2(UNIT_FLAG2_MIRROR_IMAGE); else RemoveUnitFlag2(UNIT_FLAG2_MIRROR_IMAGE); };
+        void SetMirrorImageFlag(bool on) { if (on) ReplaceAllUnitFlags2(UNIT_FLAG2_MIRROR_IMAGE); else RemoveUnitFlag2(UNIT_FLAG2_MIRROR_IMAGE); };
         void SendMirrorSound(Player* target, uint8 type);
 
         void DisappearAndDie() { ForcedDespawn(0); }

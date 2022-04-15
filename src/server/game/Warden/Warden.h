@@ -94,8 +94,6 @@ class TC_GAME_API Warden
 
         virtual size_t DEBUG_ForceSpecificChecks(std::vector<uint16> const& checks) = 0;
 
-        virtual size_t DEBUG_ForceSpecificChecks(std::vector<uint16> const& checks) = 0;
-
     protected:
         void DecryptData(uint8* buffer, uint32 length);
         void EncryptData(uint8* buffer, uint32 length);

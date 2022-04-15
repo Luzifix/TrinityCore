@@ -22,7 +22,6 @@
 #include "StringFormat.h"
 #include <vector>
 
-class ChatCommand;
 class ChatHandler;
 class Creature;
 class GameObject;

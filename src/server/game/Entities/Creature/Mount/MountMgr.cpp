@@ -301,9 +301,7 @@ void MountMgr::SpawnCharacterMount(CharacterMount* characterMount, bool reload)
     // Set minion information & flags
     mount->SetHomePosition(characterMount->GetHomePosition());
     mount->SetTempSummonType(TEMPSUMMON_MANUAL_DESPAWN);
-    mount->AddUnitFlag(UNIT_FLAG_IMMUNE_TO_PC);
-    mount->AddUnitFlag(UNIT_FLAG_IMMUNE_TO_NPC);
-    mount->AddUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
+    mount->SetUnitFlag(UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC | UNIT_FLAG_NON_ATTACKABLE);
 
     // Set name
     charmInfo->SetPetNumber(mount->GetGUID().GetCounter(), true);
