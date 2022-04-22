@@ -22,7 +22,7 @@ public:
     {
         go_housing_doorAI(GameObject* go) : GameObjectAI(go) { }
 
-        bool GossipHello(Player* player)
+        bool OnGossipHello(Player* player)
         {
             Housing* housing = sHousingMgr->GetByWorldObject(me);
 
@@ -56,7 +56,7 @@ public:
     {
         go_housing_basement_doorAI(GameObject* go) : GameObjectAI(go), _basementMapId(HOUSING_MAPID_BASEMENT), _basementLocation(HOUSING_MAPID_BASEMENT, -268.8766f, -260.1297f, 1.6593f, 1.5857f) { }
 
-        bool GossipHello(Player* player)
+        bool OnGossipHello(Player* player)
         {
             if (me->GetMapId() != _basementMapId)
                 TeleportIn(player);
@@ -141,7 +141,7 @@ public:
     {
         go_housing_ladderAI(GameObject* go) : GameObjectAI(go) { }
 
-        bool GossipHello(Player* player)
+        bool OnGossipHello(Player* player)
         {
             float x = me->GetPositionX();
             float y = me->GetPositionY();
