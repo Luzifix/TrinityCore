@@ -153,7 +153,7 @@ bool BattlepayManager::AlreadyOwnProduct(uint32 itemId) const
             return true;
 
         for (auto itr : itemTemplate->Effects)
-            if (itr->TriggerType == ITEM_SPELLTRIGGER_LEARN_SPELL_ID && player->HasSpell(itr->SpellID))
+            if (itr->TriggerType == ITEM_SPELLTRIGGER_ON_LEARN && player->HasSpell(itr->SpellID))
                 return true;
 
         uint8 inventoryEnd = INVENTORY_SLOT_ITEM_START + player->GetInventorySlotCount();

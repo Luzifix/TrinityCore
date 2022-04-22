@@ -526,7 +526,7 @@ class spell_gen_battleground_mercenary_shapeshift : public AuraScript
                 return false;
 
             for (uint32 displayId : displayIds)
-                if (!sCreatureDisplayInfoStore.LookupEntry(displayId))
+                if (!sCreatureDisplayInfoStoreRaw.LookupEntry(displayId))
                     return false;
         }
 
