@@ -121,6 +121,18 @@ void Warning(char const* file, int line, char const* function, char const* messa
                    file, line, function, message);
 }
 
+void WarningWithArg(char const* file, int line, char const* function, char const* message, ...)
+{
+    va_list args;
+    va_start(args, message);
+
+    std::string formattedMessage = StringFormat("\n%s:%i in %s WARNING:\n", file, line, function) + FormatAssertionMessage(message, args) + '\n';
+    va_end(args);
+
+    fprintf(stderr, "%s", formattedMessage.c_str());
+    fflush(stderr);
+}
+
 void Abort(char const* file, int line, char const* function)
 {
     std::string formattedMessage = StringFormat("\n%s:%i in %s ABORTED.\n", file, line, function);
