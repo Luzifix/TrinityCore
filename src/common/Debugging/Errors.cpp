@@ -130,7 +130,6 @@ void WarningWithArg(char const* file, int line, char const* function, char const
     va_end(args);
 
     fprintf(stderr, "%s", formattedMessage.c_str());
-    fflush(stderr);
 }
 
 void Abort(char const* file, int line, char const* function)

@@ -34,7 +34,7 @@ namespace Trinity
     [[noreturn]] TC_COMMON_API void Abort(char const* file, int line, char const* function, char const* message, ...);
 
     TC_COMMON_API void Warning(char const* file, int line, char const* function, char const* message);
-    [[noreturn]] TC_COMMON_API void WarningWithArg(char const* file, int line, char const* function, char const* message, ...) ATTR_PRINTF(4, 5);
+    TC_COMMON_API void WarningWithArg(char const* file, int line, char const* function, char const* message, ...) ATTR_PRINTF(4, 5);
 
     [[noreturn]] TC_COMMON_API void AbortHandler(int sigval);
 
