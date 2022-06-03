@@ -276,7 +276,7 @@ static DWORD LoadHashArray(
             // Move buffer
             pbBuffer += MD5_HASH_SIZE;
         }
-        
+
         dwErrCode = ERROR_SUCCESS;
     }
 
@@ -423,7 +423,7 @@ static DWORD LoadVfsRootEntry(TCascStorage * hs, const char * szVariableName, co
                     pCKeyEntry = (PCASC_CKEY_ENTRY)pArray->InsertAt(VfsRootIndex - 1);
                     if(pCKeyEntry == NULL)
                         return ERROR_NOT_ENOUGH_MEMORY;
-                    
+
                     // Initialize the new entry
                     pCKeyEntry->Init();
                 }
@@ -613,7 +613,7 @@ static DWORD ParseFile_BuildInfo(TCascStorage * hs, CASC_CSV & Csv)
                 nDefault = i;
             }
         }
-        
+
         // Only if there is more than one active products
         if(nProductCount > 1)
         {
@@ -781,7 +781,7 @@ static DWORD ParseFile_CdnConfig(TCascStorage * hs, void * pvListFile)
         if(CheckConfigFileVariable(hs, szLineBegin, szLineEnd, "archives", LoadQueryKey, &hs->ArchivesKey))
             continue;
 
-        // CDN keys of patch archives (needs research) 
+        // CDN keys of patch archives (needs research)
         if(CheckConfigFileVariable(hs, szLineBegin, szLineEnd, "patch-archives", LoadQueryKey, &hs->PatchArchivesKey))
             continue;
 
@@ -837,7 +837,7 @@ static DWORD ParseFile_CdnBuild(TCascStorage * hs, void * pvListFile)
             continue;
 
         // Content key + encoded key of the ENCODING file. Contains CKey+EKey
-        // If either none or 1 is found, the game (at least Wow) switches to plain-data(?). Seen in build 20173 
+        // If either none or 1 is found, the game (at least Wow) switches to plain-data(?). Seen in build 20173
         if(CheckConfigFileVariable(hs, szLineBegin, szLineEnd, "encoding*", LoadCKeyEntry, &hs->EncodingCKey))
             continue;
 
@@ -1193,7 +1193,8 @@ static DWORD RibbitDownloadFile(LPCTSTR szCdnHostUrl, LPCTSTR szProduct, LPCTSTR
 
     // Construct the full URL (https://wowdev.wiki/Ribbit)
     // Old (HTTP) download: wget http://us.patch.battle.net:1119/wow_classic/cdns
-    CascStrPrintf(szRemoteUrl, _countof(szRemoteUrl), _T("%s/%s/%s"), szCdnHostUrl, szProduct, szFileName);
+    //CascStrPrintf(szRemoteUrl, _countof(szRemoteUrl), _T("%s/%s/%s"), szCdnHostUrl, szProduct, szFileName);
+    CascStrPrintf(szRemoteUrl, _countof(szRemoteUrl), _T("http://%s.s92.schattenhain.de/%s/%s"), bnet_region, szProduct, szFileName);
 
     // Open the file stream
     if((pStream = FileStream_OpenFile(szRemoteUrl, 0)) != NULL)
@@ -1287,7 +1288,7 @@ DWORD DownloadFileFromCDN(TCascStorage * hs, CASC_CDN_DOWNLOAD & CdnsInfo)
         {
             // Attempt to download the file from the remote server
             dwErrCode = DownloadFileFromCDN2(hs, CdnsInfo);
-            
+
             // If the download succeeded, exit immediately.
             // Also exit when there is a low memory condition,
             // as it will most likely end up with low memory on next download
