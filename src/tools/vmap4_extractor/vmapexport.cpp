@@ -43,6 +43,7 @@
     #include <direct.h>
     #define mkdir _mkdir
 #endif
+#include <Utilities/Util.h>
 
 //-----------------------------------------------------------------------------
 
@@ -63,6 +64,7 @@ boost::filesystem::path input_path;
 bool preciseVectorData = false;
 char const* CascProduct = "wow";
 char const* CascRegion = "eu";
+std::list<uint16> AllowedMapIds = {};
 bool UseRemoteCasc = false;
 uint32 DbcLocale = 0;
 std::unordered_map<std::string, WMODoodadData> WmoDoodads;
@@ -387,6 +389,17 @@ bool processArgv(int argc, char ** argv, const char *versionString)
             else
                 result = false;
         }
+        else if (strcmp("-m", argv[i]) == 0)
+        {
+            if (i + 1 < argc && strlen(argv[i + 1]))
+            {
+                const char* mapIdsStr = argv[i++ + 1];
+                for (std::string_view mapIdStr : Trinity::Tokenize(mapIdsStr, ',', false))
+                    AllowedMapIds.push_back(atoi(mapIdStr.data()));
+            }
+            else
+                result = false;
+        }
         else
         {
             result = false;
@@ -405,6 +418,7 @@ bool processArgv(int argc, char ** argv, const char *versionString)
         printf("   -c  use remote casc\n");
         printf("   -r  set remote casc region - standard: eu\n");
         printf("   -dl dbc locale\n");
+        printf("   -m list of comma separated map ids\n");
         printf("   -? : This message.\n");
     }
 
@@ -516,7 +530,7 @@ int main(int argc, char ** argv)
     }
 
     // Extract models, listed in GameObjectDisplayInfo.dbc
-    ExtractGameobjectModels();
+    //ExtractGameobjectModels();
 
     //xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
     //map.dbc
@@ -542,6 +556,9 @@ int main(int argc, char ** argv)
         {
             DB2Record record = db2.GetRecord(x);
             if (!record)
+                continue;
+
+            if (!AllowedMapIds.empty() && std::find(AllowedMapIds.begin(), AllowedMapIds.end(), record.GetId()) == AllowedMapIds.end())
                 continue;
 
             MapEntry map;

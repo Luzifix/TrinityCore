@@ -24,6 +24,7 @@
 #include "ExtractorDB2LoadInfo.h"
 #include "MapDefines.h"
 #include "StringFormat.h"
+#include "Util.h"
 #include "adt.h"
 #include "wdt.h"
 #include <CascLib.h>
@@ -109,6 +110,7 @@ uint32 CONF_Locale = 0;
 
 char const* CONF_Product = "wow";
 char const* CONF_Region = "eu";
+std::list<uint16> CONF_MapIds = {};
 bool CONF_UseRemoteCasc = false;
 
 #define CASC_LOCALES_COUNT 17
@@ -165,6 +167,7 @@ void Usage(char const* prg)
         "-p which installed product to open (wow/wowt/wow_beta)\n"\
         "-c use remote casc\n"\
         "-r set remote casc region - standard: eu\n"\
+        "-m list of comma separated map ids\n"\
         "Example: %s -f 0 -i \"c:\\games\\game\"\n", prg, prg);
     exit(1);
 }
@@ -181,6 +184,7 @@ void HandleArgs(int argc, char* arg[])
         // l - dbc locale
         // c - use remote casc
         // r - set casc remote region - standard: eu
+        // m - list of comma separated map ids
         if (arg[c][0] != '-')
             Usage(arg[0]);
 
@@ -243,6 +247,16 @@ void HandleArgs(int argc, char* arg[])
                 else
                     Usage(arg[0]);
                 break;
+            case 'm':
+                if (c + 1 < argc && strlen(arg[c + 1]))      // all ok
+                {
+                    const char* mapIdsStr = arg[c++ + 1];
+                    for (std::string_view mapIdStr : Trinity::Tokenize(mapIdsStr, ',', false))
+                        CONF_MapIds.push_back(atoi(mapIdStr.data()));
+                }
+                else
+                    Usage(arg[0]);
+                break;
             case 'h':
                 Usage(arg[0]);
                 break;
@@ -279,6 +293,9 @@ void ReadMapDBC()
     {
         DB2Record record = db2.GetRecord(x);
         if (!record)
+            continue;
+
+        if (!CONF_MapIds.empty() && std::find(CONF_MapIds.begin(), CONF_MapIds.end(), record.GetId()) == CONF_MapIds.end())
             continue;
 
         MapEntry map;
