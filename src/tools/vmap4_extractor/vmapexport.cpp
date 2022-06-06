@@ -61,6 +61,7 @@ struct MapEntry
 std::vector<MapEntry> map_ids; // partitioned by parent maps first
 std::unordered_set<uint32> maps_that_are_parents;
 boost::filesystem::path input_path;
+boost::filesystem::path output_path;
 bool preciseVectorData = false;
 char const* CascProduct = "wow";
 char const* CascRegion = "eu";
@@ -71,7 +72,7 @@ std::unordered_map<std::string, WMODoodadData> WmoDoodads;
 
 // Constants
 
-char const* szWorkDirWmo = "./Buildings";
+char const* szWorkDirWmo = "Buildings";
 
 #define CASC_LOCALES_COUNT 17
 char const* CascLocaleNames[CASC_LOCALES_COUNT] =
@@ -351,6 +352,18 @@ bool processArgv(int argc, char ** argv, const char *versionString)
                 result = false;
             }
         }
+        else if (strcmp("-o", argv[i]) == 0)
+        {
+            if ((i + 1) < argc)
+            {
+                output_path = boost::filesystem::path(argv[i + 1]);
+                ++i;
+            }
+            else
+            {
+                result = false;
+            }
+        }
         else if (strcmp("-?", argv[1]) == 0)
         {
             result = false;
@@ -413,7 +426,8 @@ bool processArgv(int argc, char ** argv, const char *versionString)
         printf("%s [-?][-s][-l][-d <path>][-p <product>]\n", argv[0]);
         printf("   -s  : (default) small size (data size optimization), ~500MB less vmap data.\n");
         printf("   -l  : large size, ~500MB more vmap data. (might contain more details)\n");
-        printf("   -d  <path>: Path to the vector data source folder.\n");
+        printf("   -d  <path>: Input path.\n");
+        printf("   -o  <path>: Output path.\n");
         printf("   -p  <product>: which installed product to open (wow/wowt/wow_beta)\n");
         printf("   -c  use remote casc\n");
         printf("   -r  set remote casc region - standard: eu\n");
@@ -466,6 +480,10 @@ int main(int argc, char ** argv)
     // Use command line arguments, when some
     if (!processArgv(argc, argv, VMAP::VMAP_MAGIC))
         return 1;
+
+    boost::filesystem::path const outputPath(boost::filesystem::canonical(output_path) / szWorkDirWmo);
+    std::string outputPathStr = outputPath.string();
+    szWorkDirWmo = outputPathStr.c_str();
 
     if (!RetardCheck())
         return 1;
@@ -530,7 +548,7 @@ int main(int argc, char ** argv)
     }
 
     // Extract models, listed in GameObjectDisplayInfo.dbc
-    //ExtractGameobjectModels();
+    ExtractGameobjectModels();
 
     //xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
     //map.dbc
