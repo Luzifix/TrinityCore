@@ -1,1 +1,1 @@
-UPDATE `realmlist` SET `address`='sh92.login.schattenhain.de' WHERE  `id`=1;
+UPDATE `realmlist` SET `address`='eu.92.schattenhain.de' WHERE  `id`=1;
