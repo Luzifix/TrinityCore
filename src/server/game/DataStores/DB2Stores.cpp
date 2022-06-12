@@ -2590,7 +2590,7 @@ ItemModifiedAppearanceEntry const* DB2Manager::GetItemModifiedAppearance(uint32 
 ItemModifiedAppearanceEntry const* DB2Manager::GetDefaultItemModifiedAppearance(uint32 itemId) const
 {
     for (ItemModifiedAppearanceEntry const* itemModifiedAppearance : sItemModifiedAppearanceStore)
-        if (itemModifiedAppearance->ItemID == itemId && itemModifiedAppearance->ItemAppearanceModifierID == 0)
+        if (uint32(itemModifiedAppearance->ItemID) == itemId && itemModifiedAppearance->ItemAppearanceModifierID == 0)
             return itemModifiedAppearance;
 
     for (ItemModifiedAppearanceEntry const* itemModifiedAppearance : sItemModifiedAppearanceStore)
