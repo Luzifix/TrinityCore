@@ -1,1 +1,1 @@
-UPDATE `realmlist` SET `address`='eu.92.schattenhain.de' WHERE  `id`=1;
+UPDATE `realmlist` SET `address`='eu.92.schattenhain.de', `port` = '9085' WHERE `id`=1;
