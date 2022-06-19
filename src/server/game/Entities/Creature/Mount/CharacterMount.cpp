@@ -60,6 +60,13 @@ void CharacterMount::SavePositionToDB()
     CharacterDatabase.DirectExecute(stmt);
 }
 
+void CharacterMount::Delete()
+{
+    CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_REP_CHARACTER_MOUNT);
+    stmt->setUInt32(0, GetId());
+    CharacterDatabase.Execute(stmt);
+}
+
 bool CharacterMount::IsOwner(Player* player)
 {
     if (!player)

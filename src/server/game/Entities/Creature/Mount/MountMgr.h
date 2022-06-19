@@ -46,6 +46,7 @@ public:
     std::unordered_map<const char*, const char*> GetDirtinessSteps();
 
     // Character Mount
+    CharacterMount* GetCharacterMountById(uint32 id);
     std::list<CharacterMount*> GetCharacterMountsByGuid(ObjectGuid guid);
     CharacterMount* GetCharacterMountByCreatureGuid(ObjectGuid creatureGuid);
     void RespawnCharacterMount(CharacterMount* characterMount);

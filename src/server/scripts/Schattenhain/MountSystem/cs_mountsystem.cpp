@@ -15,6 +15,7 @@
 class cs_mountsystem : public CommandScript
 {
 public:
+
     cs_mountsystem() : CommandScript("cs_mountsystem") { }
 
     std::vector<ChatCommand> GetCommands() const override
@@ -29,6 +30,8 @@ public:
         static std::vector<ChatCommand> housingCommandTable =
         {
             { "create",       rbac::RBAC_PERM_COMMAND_MOUNTSYSTEM_CREATE,  false, NULL,                               "", mountSystemCreateCommandTable },
+            { "reset",        rbac::RBAC_PERM_COMMAND_MOUNTSYSTEM_CREATE,  false, &HandleResetCommand,                ""                                },
+            { "delete",       rbac::RBAC_PERM_COMMAND_MOUNTSYSTEM_CREATE,  false, &HandleDeleteCommand,               ""                                },
             { "info",         rbac::RBAC_PERM_COMMAND_HOUSING_INFO,        false, &HandleInfoCommand,                 ""                                },
         };                                                                                                           
                                                                                                                      
@@ -154,6 +157,65 @@ public:
             characterMount->GetCondition(), characterMount->GetMountTemplate()->GetConditionCapacity(),
             characterMount->GetDirtiness()
         );
+
+        return true;
+    }
+
+    static bool HandleResetCommand(ChatHandler* handler, char const* args)
+    {
+        if (!*args)
+            return false;
+
+        char* _characterMountId = strtok((char*)args, " ");
+
+        if (!_characterMountId)
+            return false;
+
+        Player* target = handler->getSelectedPlayerOrSelf();
+        uint32 characterMountId = atoi(_characterMountId);
+
+        CharacterMount* characterMount = sMountMgr->GetCharacterMountById(characterMountId);
+        if (!characterMount)
+        {
+            handler->SendSysMessage(LANG_MOUNTSYSTEM_CREATE_ERR_ID_NOT_FOUND);
+            handler->SetSentErrorMessage(true);
+            return false;
+        }
+
+        WorldLocation MOUNTSYSTEM_LOCATION_DEFAULT = WorldLocation(5000, -9.5843f, -494.1369f, 5.5607f, 4.6343f);
+
+        characterMount->SetPosition(MOUNTSYSTEM_LOCATION_DEFAULT);
+        sMountMgr->RespawnCharacterMount(characterMount);
+
+        return true;
+    }
+
+    static bool HandleDeleteCommand(ChatHandler* handler, char const* args)
+    {
+        Creature* creature = handler->getSelectedCreature();
+        if (!creature || creature->GetEntry() != MOUNTSYSTEM_CREATURE_ENTRY)
+        {
+            handler->SendSysMessage(LANG_MOUNTSYSTEM_INFO_ERR_INVALID_TARGET);
+            handler->SetSentErrorMessage(true);
+            return false;
+        }
+
+        CharacterMount* characterMount = sMountMgr->GetCharacterMountByCreatureGuid(creature->GetGUID());
+        if (!characterMount)
+        {
+            handler->SendSysMessage(LANG_MOUNTSYSTEM_CREATE_ERR_ID_NOT_FOUND);
+            handler->SetSentErrorMessage(true);
+            return false;
+        }
+
+        characterMount->Delete();
+
+        // Delete the creature
+        creature->CombatStop();
+        creature->DeleteFromDB();
+        creature->AddObjectToRemoveList();
+
+        handler->SendSysMessage(LANG_COMMAND_DELCREATMESSAGE);
 
         return true;
     }

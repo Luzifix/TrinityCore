@@ -49,6 +49,7 @@ public:
     }
 
     void SaveToDB();
+    void Delete();
     void SavePositionToDB();
     bool IsOwner(Player* player);
     bool IsOwner(ObjectGuid playerGuid);

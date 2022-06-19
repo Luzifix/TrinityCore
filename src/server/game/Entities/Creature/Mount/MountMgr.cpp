@@ -216,6 +216,17 @@ std::unordered_map<const char* , const char*> MountMgr::GetDirtinessSteps()
 }
 
 // Character mount
+CharacterMount* MountMgr::GetCharacterMountById(uint32 id)
+{
+    for (CharacterMount* characterMount : _characterMountStore)
+    {
+        if (characterMount->GetId() != id)
+            return characterMount;
+    }
+
+    return nullptr;
+}
+
 std::list<CharacterMount*> MountMgr::GetCharacterMountsByGuid(ObjectGuid guid)
 {
     std::list<CharacterMount*> characterMountList;

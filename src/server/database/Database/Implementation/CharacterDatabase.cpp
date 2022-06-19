@@ -794,6 +794,8 @@ void CharacterDatabaseConnection::DoPrepareStatements()
     PrepareStatement(CHAR_REP_CHARACTER_MOUNT, "REPLACE INTO `character_mount` (`id`, `guid`, `mountTemplateId`, `name`, `fuel`, `condition`, `positionX`, `positionY`, `positionZ`, `orientation`, `map`, `homePositionX`, `homePositionY`, `homePositionZ`, `homeOrientation`, `homeMap`, `dirtiness`, `lastCleanupTimestamp`, `lastMoveTimestamp`, `parkingTicket`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);", CONNECTION_ASYNC);
     PrepareStatement(CHAR_REP_CHARACTER_MOUNT_PERMISSION, "REPLACE INTO `character_mount_permission` (`characterMountId`, `characterGuid`) VALUES (?, ?);", CONNECTION_ASYNC);
     PrepareStatement(CHAR_UPD_CHARACTER_MOUNT_POSITION_BY_GUID_AND_TEMPLATE_ID, "UPDATE `character_mount` SET `positionX` = ?, `positionY` = ?, `positionZ` = ?, `orientation` = ?, `map` = ? WHERE `guid` = ? AND `mountTemplateId` = ?;", CONNECTION_BOTH);
+    PrepareStatement(CHAR_DEL_CHARACTER_MOUNT, "DELETE FROM `character_mount` WHERE `id` = ?;", CONNECTION_ASYNC);
+
 }
 
 CharacterDatabaseConnection::CharacterDatabaseConnection(MySQLConnectionInfo& connInfo) : MySQLConnection(connInfo)
