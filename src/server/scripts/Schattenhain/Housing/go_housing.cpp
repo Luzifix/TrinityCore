@@ -58,6 +58,11 @@ public:
 
         bool OnGossipHello(Player* player)
         {
+            // Disable basement doors in gamemaster mode
+            // @TODO Add message
+            if (player->IsGameMaster())
+                return true;
+
             if (me->GetMapId() != _basementMapId)
                 TeleportIn(player);
             else
