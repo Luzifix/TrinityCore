@@ -512,6 +512,7 @@ class TC_GAME_API WorldObject : public Object, public WorldLocation
         float GetDistanceZ(WorldObject const* obj) const;
 
         bool IsSelfOrInSameMap(WorldObject const* obj) const;
+        bool IsInMap() const { return m_currMap; }
         bool IsInMap(WorldObject const* obj) const;
         bool IsWithinDist3d(float x, float y, float z, float dist) const;
         bool IsWithinDist3d(Position const* pos, float dist) const;

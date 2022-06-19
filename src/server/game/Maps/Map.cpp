@@ -744,7 +744,7 @@ void Map::Update(uint32 t_diff)
         WorldObject* obj = *m_activeNonPlayersIter;
         ++m_activeNonPlayersIter;
 
-        if (!obj || !obj->IsInWorld())
+        if (!obj || !obj->IsInWorld() || !obj->IsInMap())
             continue;
 
         VisitNearbyCellsOf(obj, grid_object_update, world_object_update);
