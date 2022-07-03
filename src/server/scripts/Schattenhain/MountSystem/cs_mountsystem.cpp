@@ -212,7 +212,7 @@ public:
 
         // Delete the creature
         creature->CombatStop();
-        creature->DeleteFromDB();
+        creature->DeleteFromDB(creature->GetSpawnId());
         creature->AddObjectToRemoveList();
 
         handler->SendSysMessage(LANG_COMMAND_DELCREATMESSAGE);
