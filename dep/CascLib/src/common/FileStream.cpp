@@ -251,7 +251,7 @@ static bool BaseFile_Read(
             SetCascError(ERROR_HANDLE_EOF);
         }
     }
-        
+
     return (dwBytesRead == dwBytesToRead);
 }
 
@@ -651,6 +651,11 @@ static DWORD BaseHttp_ParseURL(TFileStream * pStream, LPCTSTR szFileName, int * 
             CascStrCopy(szPort, _countof(szPort), szPortPtr, (szPortEnd - szPortPtr));
             pPortNum[0] = atoi(szPort);
         }
+
+        LPCTSTR szPortPtr = hostName;
+        // Remove Port
+        if ((szPortPtr = _tcschr(hostName, ':')) != NULL)
+            CascStrCopy(hostName, 256, hostName, (szPortPtr - hostName));
 
         // Allocate file name
         if((fileName = CascNewStrT2A(szFilePtr)) != NULL)
