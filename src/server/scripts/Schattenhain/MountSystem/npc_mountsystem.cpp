@@ -417,6 +417,15 @@ public:
                 me->RemoveAura(MOUNTSYSTEM_GEAR_THREE_AURA);
 
                 _boardedTimestamp = 0;
+
+                CharmInfo* charmInfo = me->GetCharmInfo();
+                if (charmInfo == nullptr)
+                {
+                    me->InitCharmInfo();
+                    charmInfo = me->GetCharmInfo();
+                    charmInfo->SetCommandState(COMMAND_STAY);
+                    charmInfo->SaveStayPosition();
+                }
             }
 
             if (CharacterMount* characterMount = GetCharacterMount())
