@@ -17,12 +17,12 @@
 enum NpcMorphEnum {
     GOSSIP_NPC_MORPH_MENU_BASE = 61000,
     GOSSIP_NPC_MORPH_MENU_BASE_ACTION = 1000,
-    GOSSIP_NPC_MORPH_MENU_BASE_TEXT = 60000,
+    GOSSIP_NPC_MORPH_MENU_BASE_TEXT = 100000,
 
     GOSSIP_NPC_MORPH_MENU_WARNING = 61001,
     GOSSIP_NPC_MORPH_MENU_BACK = 61002,
     GOSSIP_NPC_MORPH_MENU_WARNING_ACTION = 1200,
-    GOSSIP_NPC_MORPH_MENU_WARNING_TEXT = 60001,
+    GOSSIP_NPC_MORPH_MENU_WARNING_TEXT = 100001,
 
     GOSSIP_NPC_MORPH_MENU_MORPH_ACTION = 1500,
 
@@ -120,6 +120,7 @@ public:
 
         bool OnGossipHello(Player* player) override
         {
+            uint32 menuId = me->GetCreatureTemplate()->GossipMenuId;
             if (player->GetTotalPlayedTime() > MAX_PLAYTIME_FOR_MORPH)
             {
                 ChatHandler(player->GetSession()).SendSysMessage(MAX_PLAYTIME_FOR_MORPH_MESSAGE);
@@ -127,7 +128,7 @@ public:
             }
 
             player->PlayerTalkClass->ClearMenus();
-            AddGossipItemFor(player, GOSSIP_NPC_MORPH_MENU_BASE, 0, GOSSIP_SENDER_MAIN, GOSSIP_NPC_MORPH_MENU_BASE_ACTION);
+            AddGossipItemFor(player, menuId, 0, GOSSIP_SENDER_MAIN, GOSSIP_NPC_MORPH_MENU_BASE_ACTION); 
 
             MorphCategoryContainer::iterator it;
             for (it = _morphCategoryContainer.begin(); it != _morphCategoryContainer.end(); it++)
@@ -135,6 +136,7 @@ public:
                 AddGossipItemFor(player, GossipOptionIcon(it->second.icon), it->second.name, GOSSIP_SENDER_MAIN, GOSSIP_NPC_MORPH_MENU_MORPH_ACTION + it->second.id);
             }
 
+            player->PlayerTalkClass->GetGossipMenu().SetMenuId(menuId);
             player->TalkedToCreature(me->GetEntry(), me->GetGUID());
             SendGossipMenuFor(player, GOSSIP_NPC_MORPH_MENU_BASE_TEXT, me->GetGUID());
             return true;
