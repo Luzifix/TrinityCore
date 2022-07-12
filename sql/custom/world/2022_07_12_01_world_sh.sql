@@ -2,7 +2,7 @@ DELETE FROM `gossip_menu` WHERE MenuID = 30000;
 DELETE FROM `gossip_menu_option` WHERE MenuID = 30000;
 DELETE FROM `gossip_menu_option_locale` WHERE MenuID = 30000;
 
-REPLACE INTO `gossip_menu` (`MenuID`, `TextID`, `VerifiedBuild`) VALUES (300000, 60000, -1);
+REPLACE INTO `gossip_menu` (`MenuID`, `TextID`, `VerifiedBuild`) VALUES (300000, 0, -1);
 UPDATE `creature_template` SET `gossip_menu_id`='300000' WHERE `entry`=1050000;
 
 REPLACE INTO `gossip_menu_option` (`MenuID`, `OptionID`, `OptionIcon`, `OptionText`, `OptionBroadcastTextID`, `OptionType`, `OptionNpcFlag`, `Language`, `ActionMenuID`, `ActionPoiID`, `BoxCoded`, `BoxMoney`, `BoxText`, `BoxBroadcastTextID`, `VerifiedBuild`) VALUES (300000, 9, 0, 'Pay parking ticket', 0, 0, 0, 0, 0, 0, 0, 0, NULL, 0, -1);
