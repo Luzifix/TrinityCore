@@ -1,0 +1,10 @@
+REPLACE INTO `creature_template_outfits_customizations` (`outfitID`, `chrCustomizationOptionID`, `chrCustomizationChoiceID`) VALUES (3000000009, 110, 1599);
+REPLACE INTO `creature_template_outfits_customizations` (`outfitID`, `chrCustomizationOptionID`, `chrCustomizationChoiceID`) VALUES (3000000009, 113, 1666);
+REPLACE INTO `creature_template_outfits_customizations` (`outfitID`, `chrCustomizationOptionID`, `chrCustomizationChoiceID`) VALUES (3000000005, 72, 1100);
+REPLACE INTO `creature_template_outfits_customizations` (`outfitID`, `chrCustomizationOptionID`, `chrCustomizationChoiceID`) VALUES (3000000134, 19, 354);
+REPLACE INTO `creature_template_outfits_customizations` (`outfitID`, `chrCustomizationOptionID`, `chrCustomizationChoiceID`) VALUES (3000000137, 58, 6425);
+REPLACE INTO `creature_template_outfits_customizations` (`outfitID`, `chrCustomizationOptionID`, `chrCustomizationChoiceID`) VALUES (3000000138, 131, 1924);
+REPLACE INTO `creature_template_outfits_customizations` (`outfitID`, `chrCustomizationOptionID`, `chrCustomizationChoiceID`) VALUES (3000000096, 43, 753);
+REPLACE INTO `creature_template_outfits_customizations` (`outfitID`, `chrCustomizationOptionID`, `chrCustomizationChoiceID`) VALUES (3000000140, 63, 6386);
+REPLACE INTO `creature_template_outfits_customizations` (`outfitID`, `chrCustomizationOptionID`, `chrCustomizationChoiceID`) VALUES (3000000113, 9, 8);
+REPLACE INTO `creature_template_outfits_customizations` (`outfitID`, `chrCustomizationOptionID`, `chrCustomizationChoiceID`) VALUES (3000000098, 683, 7619);
