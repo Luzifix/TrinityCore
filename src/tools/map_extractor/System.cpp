@@ -1078,6 +1078,11 @@ bool IsDeepWaterIgnored(uint32 mapId, uint32 x, uint32 y)
         return x == 43 && (y == 39 || y == 40);
     }
 
+    if (mapId == 5000 || mapId == 5001)
+    {
+        return true;
+    }
+
     return false;
 }
 
