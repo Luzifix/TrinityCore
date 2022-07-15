@@ -455,7 +455,7 @@ void WorldSession::HandleCharEnum(CharacterDatabaseQueryHolder const& holder)
         WorldPackets::Character::EnumCharactersResult::RaceUnlock raceUnlock;
         raceUnlock.RaceID = requirement.first;
         raceUnlock.HasExpansion = GetAccountExpansion() >= requirement.second.Expansion;
-        raceUnlock.HasAchievement = (requirement.second.AchievementId == 0 || sWorld->getBoolConfig(CONFIG_CHARACTER_CREATING_DISABLE_ALLIED_RACE_ACHIEVEMENT_REQUIREMENT));
+        raceUnlock.HasAchievement = (requirement.second.AchievementId == 0);
         charEnum.RaceUnlockData.push_back(raceUnlock);
     }
 
