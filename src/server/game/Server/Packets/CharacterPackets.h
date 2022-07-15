@@ -184,7 +184,7 @@ namespace WorldPackets
 
             bool Success                          = false; ///<
             bool IsDeletedCharacters              = false; ///< used for character undelete list
-            bool IsNewPlayerRestrictionSkipped    = false; ///< allows client to skip new player restrictions
+            bool IsNewPlayerRestrictionSkipped    = true;  ///< allows client to skip new player restrictions
             bool IsNewPlayerRestricted            = false; ///< forbids using level boost and class trials
             bool IsNewPlayer                      = false; ///< forbids hero classes and allied races
             bool IsAlliedRacesCreationAllowed     = false;
