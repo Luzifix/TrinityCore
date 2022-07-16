@@ -1,0 +1,28 @@
+variables:
+    GIT_SUBMODULE_STRATEGY: recursive
+stages:
+    - "prepare"
+    - "build"
+"tc cmake":
+    stage: prepare
+    only:
+        - tags
+    tags:
+        - schattenhain-trinity
+    script:
+        - echo "Update source"
+        - sudo git --git-dir $TC_SOURCE_DIR/.git --work-tree $TC_SOURCE_DIR fetch
+        - sudo git --git-dir $TC_SOURCE_DIR/.git --work-tree $TC_SOURCE_DIR reset --hard origin/schattenhain-2.4
+        - echo "Delete old compile files"
+        - sudo rm -rf $TC_SOURCE_DIR/build/*
+        - echo "Generate build files"
+        - sudo $TC_SOURCE_DIR/build/.gen.sh
+"tc make install":
+    stage: "build"
+    only:
+        - tags
+    tags:
+        - schattenhain-trinity
+    script:
+        - echo "Build core"
+        - sudo $TC_SOURCE_DIR/build/.make.sh
