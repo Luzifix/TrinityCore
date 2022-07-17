@@ -19,12 +19,18 @@ ByteBuffer& operator<<(ByteBuffer& data, WorldPackets::BattlePay::ProductDisplay
     data.WriteBit(displayInfo.Flags2.has_value());
     data.WriteBit(displayInfo.Flags3.has_value());
     data.WriteBit(displayInfo.Flags4.has_value());
+    data.WriteBit(displayInfo.Flags5.has_value());
 
     data.WriteBits(displayInfo.UnkString.length(), 13);
-    data.FlushBits();
+
+    data << uint16(0);
 
     data << static_cast<uint32>(displayInfo.Visuals.size());
     data << static_cast<uint32>(displayInfo.DisplayCardWidth);
+    data.FlushBits();
+
+    data << uint32(0);
+    data << uint32(0);
 
     if (displayInfo.FileDataID)
         data << *displayInfo.FileDataID;
@@ -49,6 +55,9 @@ ByteBuffer& operator<<(ByteBuffer& data, WorldPackets::BattlePay::ProductDisplay
 
     if (displayInfo.Flags4)
         data << *displayInfo.Flags4;
+
+    if (displayInfo.Flags5)
+        data << *displayInfo.Flags5;
 
     data.WriteString(displayInfo.UnkString);
 

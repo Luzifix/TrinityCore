@@ -54,6 +54,7 @@ namespace WorldPackets
             Optional<uint32> Flags2;
             Optional<uint32> Flags3;
             Optional<uint32> Flags4;
+            Optional<uint32> Flags5;
             uint32 DisplayCardWidth;
             std::string Name1;
             std::string Name2;
