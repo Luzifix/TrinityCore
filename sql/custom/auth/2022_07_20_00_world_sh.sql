@@ -1,3 +1,6 @@
+ALTER TABLE `battlepay_purchases`
+	ADD COLUMN `BuyAt` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP() AFTER `RemoteAddress`;
+
 CREATE TABLE IF NOT EXISTS `battlenet_account_conditional_appearance` (
 	`battlenetAccountId` INT(10) UNSIGNED NOT NULL,
 	`conditional_appearance_id` INT(11) UNSIGNED NOT NULL COMMENT 'Referenced ChrCustomizationReq.ReqAchievementID',

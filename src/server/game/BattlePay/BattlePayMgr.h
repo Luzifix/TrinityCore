@@ -115,6 +115,7 @@ namespace Battlepay
         BattlePet = 14,
         CharacterBoost = 15,
         Toy = 16,
+        CharacterCustomizationOption = 17,
 
         MaxWebsiteType
     };
@@ -172,10 +173,18 @@ namespace Battlepay
         bool IgnoreOwnCheck;
     };
 
+    struct ProductConditionalAppearance
+    {
+        uint32 ID;
+        uint32 ConditionalAppearanceId;
+        bool IgnoreOwnCheck;
+    };
+
     struct Product
     {
         /// Databases fields
         std::vector<ProductItem> Items;
+        std::vector<ProductConditionalAppearance> ConditionalAppearances;
         uint64 NormalPriceFixedPoint;
         uint64 CurrentPriceFixedPoint;
         uint32 ProductID;
@@ -245,7 +254,9 @@ public:
 
     uint32 GetShopCurrency() const;
     bool IsAvailable() const;
-    bool AlreadyOwnProduct(uint32 itemId) const;
+    bool AlreadyOwnProduct(Battlepay::Product product) const;
+    bool AlreadyOwnProductItem(Battlepay::ProductItem productItem) const;
+    bool AlreadyOwnProductConditionalAppearance(Battlepay::ProductConditionalAppearance productConditionalAppearance) const;
     void SavePurchase(Battlepay::Purchase* purchase);
     void ProcessDelivery(Battlepay::Purchase* purchase);
     void RegisterStartPurchase(Battlepay::Purchase purchase);

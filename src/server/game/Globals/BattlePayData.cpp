@@ -143,73 +143,101 @@ void BattlePayDataStoreMgr::LoadProduct()
         auto fields = result->Fetch();
 
         Battlepay::Product product;
-        product.ProductID               = fields[0].GetUInt32();
-        product.WebsiteType             = fields[4].GetUInt8();
+        product.ProductID = fields[0].GetUInt32();
+        product.WebsiteType = fields[4].GetUInt8();
         if (product.WebsiteType >= Battlepay::MaxWebsiteType)
         {
             TC_LOG_ERROR("SQL", "BattlePayDataStoreMgr: battlepay_product websiteType >= max types - skip loading: type %u; productId: %u ", product.WebsiteType, product.ProductID);
             continue;
         }
 
-        product.NormalPriceFixedPoint   = fields[1].GetUInt64();
-        product.CurrentPriceFixedPoint  = fields[2].GetUInt64();
-        product.Type                    = fields[3].GetUInt8();
-        product.CustomValue             = fields[5].GetUInt64();
-        product.ChoiceType              = fields[6].GetUInt8();
-        product.Flags                   = fields[7].GetUInt32();
-        product.DisplayInfoID           = fields[8].GetUInt32();
-        product.SpellID                 = fields[9].GetUInt32();
-        product.CreatureID              = fields[10].GetUInt32();
-        product.ClassMask               = fields[11].GetUInt32();
-        product.ScriptName              = fields[12].GetString();
+        product.NormalPriceFixedPoint = fields[1].GetUInt64();
+        product.CurrentPriceFixedPoint = fields[2].GetUInt64();
+        product.Type = fields[3].GetUInt8();
+        product.CustomValue = fields[5].GetUInt64();
+        product.ChoiceType = fields[6].GetUInt8();
+        product.Flags = fields[7].GetUInt32();
+        product.DisplayInfoID = fields[8].GetUInt32();
+        product.SpellID = fields[9].GetUInt32();
+        product.CreatureID = fields[10].GetUInt32();
+        product.ClassMask = fields[11].GetUInt32();
+        product.ScriptName = fields[12].GetString();
 
         switch (product.WebsiteType)
         {
-            case Battlepay::Toy:
-                if (!sItemStore.HasRecord(product.CustomValue))
-                {
-                    TC_LOG_ERROR("SQL", "BattlePayDataStoreMgr: battlepay_product skip toy because itemId %lu not found productId: %u ", product.CustomValue, product.ProductID);
-                    continue;
-                }
-                break;
+        case Battlepay::Toy:
+            if (!sItemStore.HasRecord(product.CustomValue))
+            {
+                TC_LOG_ERROR("SQL", "BattlePayDataStoreMgr: battlepay_product skip toy because itemId %lu not found productId: %u ", product.CustomValue, product.ProductID);
+                continue;
+            }
+            break;
         }
 
         _products.insert(std::make_pair(product.ProductID, product));
     } while (result->NextRow());
 
     result = WorldDatabase.PQuery("SELECT ID, ProductID, ItemID, Quantity, DisplayID, PetResult, IgnoreOwnCheck FROM battlepay_product_item");
-    if (!result)
-        return;
-
-    do
+    if (result)
     {
-        auto fields = result->Fetch();
-
-        auto productID          = fields[1].GetUInt32();
-        if (_products.find(productID) == _products.end())
-            continue;
-
-        Battlepay::ProductItem productItem;
-        productItem.DisplayInfoID = fields[4].GetUInt32();
-        if (productItem.DisplayInfoID != 0 && _displayInfos.find(productItem.DisplayInfoID) == _displayInfos.end())
-            continue;
-
-        productItem.ItemID      = fields[2].GetUInt32();
-        if (!sItemStore.HasRecord(productItem.ItemID))
+        do
         {
-            TC_LOG_ERROR("SQL", "BattlePayDataStoreMgr: battlepay_product_item skip item because item (%u) in product (%u) not found", productItem.ItemID, productID);
-            continue;
-        }
+            auto fields = result->Fetch();
 
-        productItem.ID             = fields[0].GetUInt32();
-        productItem.Quantity       = fields[3].GetUInt32();
-        productItem.PetResult      = fields[5].GetUInt8();
-        productItem.IgnoreOwnCheck = fields[6].GetBool();
-        _products[productID].Items.push_back(productItem);
-    } while (result->NextRow());
+            auto productID = fields[1].GetUInt32();
+            if (_products.find(productID) == _products.end())
+                continue;
+
+            Battlepay::ProductItem productItem;
+            productItem.DisplayInfoID = fields[4].GetUInt32();
+            if (productItem.DisplayInfoID != 0 && _displayInfos.find(productItem.DisplayInfoID) == _displayInfos.end())
+                continue;
+
+            productItem.ItemID = fields[2].GetUInt32();
+            if (!sItemStore.HasRecord(productItem.ItemID))
+            {
+                TC_LOG_ERROR("SQL", "BattlePayDataStoreMgr: battlepay_product_item skip item because item (%u) in product (%u) not found", productItem.ItemID, productID);
+                continue;
+            }
+
+            productItem.ID = fields[0].GetUInt32();
+            productItem.Quantity = fields[3].GetUInt32();
+            productItem.PetResult = fields[5].GetUInt8();
+            productItem.IgnoreOwnCheck = fields[6].GetBool();
+            _products[productID].Items.push_back(productItem);
+        } while (result->NextRow());
+    }
+
+    result = WorldDatabase.PQuery("SELECT id, product_id, conditional_appearance_id, ignore_own_check FROM battlepay_product_conditional_appearance");
+    if (result)
+    {
+        do
+        {
+            auto fields = result->Fetch();
+
+            auto productID = fields[1].GetUInt32();
+            if (_products.find(productID) == _products.end())
+                continue;
+
+            Battlepay::ProductConditionalAppearance productConditionalAppearance;
+
+            productConditionalAppearance.ConditionalAppearanceId = fields[2].GetUInt32();
+            if (!sAchievementStore.HasRecord(productConditionalAppearance.ConditionalAppearanceId))
+            {
+                TC_LOG_ERROR("SQL", "BattlePayDataStoreMgr: battlepay_product_conditional_appearance skip conditional appearance because conditional appearance (%u) in product (%u) not found in achievement store", productConditionalAppearance.ConditionalAppearanceId, productID);
+                continue;
+            }
+
+            productConditionalAppearance.ID = fields[0].GetUInt32();
+            productConditionalAppearance.IgnoreOwnCheck = fields[3].GetBool();
+            _products[productID].ConditionalAppearances.push_back(productConditionalAppearance);
+        } while (result->NextRow());
+    }
 
     TC_LOG_INFO("server.loading", ">> Loaded %lu Battlepay products in %u ms", uint64(_products.size()), GetMSTimeDiffToNow(oldMsTime));
 }
+
+
 
 void BattlePayDataStoreMgr::LoadShopEntries()
 {

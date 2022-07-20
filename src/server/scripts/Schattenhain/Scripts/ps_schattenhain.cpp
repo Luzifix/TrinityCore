@@ -5,6 +5,7 @@
 #include "ScriptMgr.h"
 #include "Housing.h"
 #include "Player.h"
+#include "CollectionMgr.h"
 #include "WorldSession.h"
 #include "DatabaseEnv.h"
 #include "ObjectMgr.h"
@@ -27,6 +28,7 @@ public:
         CheckCharName(player);
         SetSpeedAndScale(player);
         SetHousingBasement(player);
+        ApplyConditionalAppearanceAchievements(player);
 
         player->DurabilityRepairAll(false, 0, false);
         player->SetBankBagSlotCount(7);
@@ -136,6 +138,17 @@ public:
         player->m_serverSideVisibilityDetect.SetValue(SERVERSIDE_VISIBILITY_GHOST, GHOST_VISIBILITY_ALIVE);
         player->RemoveAurasDueToSpell(SPELL_OOC_MODE);
     }
+
+    void ApplyConditionalAppearanceAchievements(Player* player)
+    {
+        for (auto const& conditionalAppearance : player->GetSession()->GetCollectionMgr()->GetAccountConditionalAppearance())
+        {
+            if (!player->HasAchieved(conditionalAppearance))
+                if (auto achievement = sAchievementStore.LookupEntry(conditionalAppearance))
+                    player->CompletedAchievement(achievement);
+        }
+    }
+
 };
 
 void AddSC_Scripts_Schattenhain_PlayerScript()

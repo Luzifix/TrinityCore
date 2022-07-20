@@ -89,11 +89,6 @@ void WorldSession::SendMakePurchase(ObjectGuid targetCharacter, uint32 clientTok
         return;
 
     auto mgr = session->GetBattlePayMgr();
-
-    auto player = session->GetPlayer();
-    if (!player)
-        return;
-
     auto accountID = session->GetAccountId();
 
     Battlepay::Purchase purchase;
@@ -102,6 +97,13 @@ void WorldSession::SendMakePurchase(ObjectGuid targetCharacter, uint32 clientTok
     purchase.TargetCharacter = targetCharacter;
     purchase.Status = Battlepay::UpdateStatus::Loading;
     purchase.DistributionId = mgr->GenerateNewDistributionId();
+
+    auto player = session->GetPlayer();
+    if (!player)
+    {
+        SendStartPurchaseResponse(session, purchase, Battlepay::Error::PurchaseDenied);
+        return;
+    }
 
     if (!sBattlePayDataStore->ProductExist(productID))
     {
@@ -132,15 +134,11 @@ void WorldSession::SendMakePurchase(ObjectGuid targetCharacter, uint32 clientTok
         }
     }
 
-    for (auto itr : product.Items)
+    if (mgr->AlreadyOwnProduct(product))
     {
-        if (!itr.IgnoreOwnCheck && mgr->AlreadyOwnProduct(itr.ItemID))
-        {
-            SendStartPurchaseResponse(session, *purchaseData, Battlepay::Error::ConsumableTokenOwned);
-            return;
-        }
+        SendStartPurchaseResponse(session, *purchaseData, Battlepay::Error::ConsumableTokenOwned);
+        return;
     }
-
 
     if (product.WebsiteType == Battlepay::BattlePet && player->HasSpell(product.CustomValue))
     {
@@ -202,6 +200,12 @@ void WorldSession::HandleBattlePayConfirmPurchase(WorldPackets::BattlePay::Confi
         return;
     }
 
+    if (GetBattlePayMgr()->AlreadyOwnProduct(product))
+    {
+        SendStartPurchaseResponse(this, *purchase, Battlepay::Error::ConsumableTokenOwned);
+        return;
+    }
+
     if (product.WebsiteType == Battlepay::BattlePet && player->HasSpell(product.CustomValue))
     {
         SendPurchaseUpdate(this, *purchase, Battlepay::Error::ConsumableTokenOwned);
@@ -219,18 +223,9 @@ void WorldSession::HandleBattlePayConfirmPurchase(WorldPackets::BattlePay::Confi
 
     auto displayInfo = sBattlePayDataStore->GetDisplayInfo(product.DisplayInfoID);
 
-    if (!product.Items.empty())
+    if (!product.Items.empty() && product.WebsiteType == Battlepay::Item)
     {
         if (product.Items.size() > GetBagsFreeSlots(player))
-        {
-            SendStartPurchaseResponse(this, *purchase, Battlepay::Error::PurchaseDenied);
-            return;
-        }
-    }
-
-    for (auto itr : product.Items)
-    {
-        if (!itr.IgnoreOwnCheck && GetBattlePayMgr()->AlreadyOwnProduct(itr.ItemID))
         {
             SendStartPurchaseResponse(this, *purchase, Battlepay::Error::PurchaseDenied);
             return;

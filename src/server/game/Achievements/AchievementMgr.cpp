@@ -21,7 +21,6 @@
 #include "DB2Stores.h"
 #include "CellImpl.h"
 #include "ChatTextBuilder.h"
-#include "CollectionMgr.h"
 #include "DatabaseEnv.h"
 #include "GameTime.h"
 #include "GridNotifiersImpl.h"
@@ -411,12 +410,7 @@ void PlayerAchievementMgr::SendAllData(Player const* /*receiver*/) const
     WorldPackets::Achievement::AllAccountCriteria allAccountCriteria;
 
     WorldPackets::Achievement::AllAchievementData achievementData;
-    std::vector<uint32> conditionalAppearances = _owner->GetSession()->GetCollectionMgr()->GetAccountConditionalAppearance();
-
-    uint64 completedAchievementSize = _completedAchievements.size();
-    completedAchievementSize += conditionalAppearances.size();
-
-    achievementData.Data.Earned.reserve(completedAchievementSize);
+    achievementData.Data.Earned.reserve(_completedAchievements.size());
     achievementData.Data.Progress.reserve(_criteriaProgress.size());
 
     for (std::pair<uint32 const, CompletedAchievementData> const& completedAchievement : _completedAchievements)
@@ -433,16 +427,6 @@ void PlayerAchievementMgr::SendAllData(Player const* /*receiver*/) const
             earned.Owner = _owner->GetGUID();
             earned.VirtualRealmAddress = earned.NativeRealmAddress = GetVirtualRealmAddress();
         }
-        achievementData.Data.Earned.push_back(earned);
-    }
-
-    for (uint32 conditionalAppearance : conditionalAppearances)
-    {
-        WorldPackets::Achievement::EarnedAchievement earned;
-        earned.Id = conditionalAppearance;
-        earned.Date = std::time(0);
-        earned.Owner = _owner->GetGUID();
-        earned.VirtualRealmAddress = earned.NativeRealmAddress = GetVirtualRealmAddress();
         achievementData.Data.Earned.push_back(earned);
     }
 

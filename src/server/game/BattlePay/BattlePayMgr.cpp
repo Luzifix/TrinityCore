@@ -87,6 +87,8 @@ void BattlepayManager::ProcessDelivery(Purchase * purchase)
 
     auto const& product = sBattlePayDataStore->GetProduct(purchase->ProductID);
     auto const& productDisplay = sBattlePayDataStore->GetDisplayInfo(product.ProductID);
+    auto const& collectionMgr = player->GetSession()->GetCollectionMgr();
+
     switch (product.WebsiteType)
     {
     case Battlepay::Item:
@@ -98,10 +100,10 @@ void BattlepayManager::ProcessDelivery(Purchase * purchase)
         if (player)
             player->ModifyMoney(product.CustomValue);
         break;
-        /*case Battlepay::Currency:
-            if (player)
-                player->ModifyCurrency(currencyID, product.CustomValue); // implement currencyID in DB
-            break;*/
+    /*case Battlepay::Currency:
+        if (player)
+            player->ModifyCurrency(currencyID, product.CustomValue); // implement currencyID in DB
+        break;*/
     case Battlepay::Level:
     {
         if (player)
@@ -136,31 +138,78 @@ void BattlepayManager::ProcessDelivery(Purchase * purchase)
         break;
     case Battlepay::Toy:
         if (player)
-            player->GetSession()->GetCollectionMgr()->AddToy(product.CustomValue, false, false);
+            collectionMgr->AddToy(product.CustomValue, false, false);
+        break;
+    case Battlepay::CharacterCustomizationOption:
+        if (player)
+        {
+            for (auto const& itr : product.ConditionalAppearances)
+            {
+                if (auto achievement = sAchievementStore.LookupEntry(itr.ConditionalAppearanceId))
+                {
+                    player->CompletedAchievement(achievement);
+                    collectionMgr->AddConditionalAppearance(itr.ConditionalAppearanceId);
+                }
+            }
+        }
         break;
     default:
         break;
     }
 }
 
-bool BattlepayManager::AlreadyOwnProduct(uint32 itemId) const
+bool BattlepayManager::AlreadyOwnProduct(Product product) const
 {
     auto const& player = _session->GetPlayer();
-    if (player)
+
+    if (!player)
+        return false;
+
+    switch (product.WebsiteType)
     {
-        auto itemTemplate = sObjectMgr->GetItemTemplate(itemId);
-        if (!itemTemplate)
+        case Battlepay::CharacterCustomizationOption:
+            for (auto const& conditionalAppearance : product.ConditionalAppearances)
+                if (AlreadyOwnProductConditionalAppearance(conditionalAppearance))
+                    return true;
+
+        case Battlepay::Item:
+            for (auto const& item : product.Items)
+                if (AlreadyOwnProductItem(item))
+                    return true;
+    }
+
+    return false;
+}
+
+
+bool BattlepayManager::AlreadyOwnProductItem(ProductItem productItem) const
+{
+    if (productItem.IgnoreOwnCheck)
+        return false;
+
+    auto itemTemplate = sObjectMgr->GetItemTemplate(productItem.ItemID);
+    if (!itemTemplate)
+        return true;
+
+    auto const& player = _session->GetPlayer();
+
+    for (auto itr : itemTemplate->Effects)
+        if (itr->TriggerType == ITEM_SPELLTRIGGER_ON_LEARN && player->HasSpell(itr->SpellID))
             return true;
 
-        for (auto itr : itemTemplate->Effects)
-            if (itr->TriggerType == ITEM_SPELLTRIGGER_ON_LEARN && player->HasSpell(itr->SpellID))
-                return true;
+    if (player->GetItemCount(productItem.ItemID, true))
+        return true;
 
-        uint8 inventoryEnd = INVENTORY_SLOT_ITEM_START + player->GetInventorySlotCount();
-        for (uint8 i = INVENTORY_SLOT_ITEM_START; i < inventoryEnd; i++)
-            if (player->GetItemCount(itemId))
-                return true;
-    }
+    return false;
+}
+
+bool BattlepayManager::AlreadyOwnProductConditionalAppearance(ProductConditionalAppearance productConditionalAppearance) const
+{
+    if (productConditionalAppearance.IgnoreOwnCheck)
+        return false;
+
+    if (_session->GetCollectionMgr()->HasConditionalAppearance(productConditionalAppearance.ConditionalAppearanceId))
+        return true;
 
     return false;
 }
@@ -182,11 +231,8 @@ auto BattlepayManager::ProductFilter(Product product) -> bool
     if (product.ClassMask && (!player || (player->GetClassMask() & product.ClassMask) == 0))
         return false;
 
-    for (auto& itr : product.Items)
-    {
-        if (!itr.IgnoreOwnCheck && AlreadyOwnProduct(itr.ItemID))
-            return false;
-    }
+    if (AlreadyOwnProduct(product))
+        return false;
 
     return true;
 };
@@ -277,7 +323,7 @@ void BattlepayManager::SendProductList()
             pItem.ID = item.ID;
             pItem.ItemID = product.Items.size() > 1 ? 0 : item.ItemID; ///< Disable tooltip for packs (client handle only one tooltip).
             pItem.Quantity = item.Quantity;
-            pItem.HasPet = (!item.IgnoreOwnCheck && AlreadyOwnProduct(item.ItemID));
+            pItem.HasPet = AlreadyOwnProductItem(item);
             pItem.PetResult = item.PetResult;
 
             auto dataP = WriteDisplayInfo(item.DisplayInfoID, localeIndex);
