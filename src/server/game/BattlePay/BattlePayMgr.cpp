@@ -165,18 +165,6 @@ bool BattlepayManager::AlreadyOwnProduct(uint32 itemId) const
     return false;
 }
 
-auto GroupFilterForSession = [](uint32 groupId) -> bool
-{
-    switch (groupId)
-    {
-    case ProductGroups::Mount:
-    case ProductGroups::Pets:
-        return true;
-    default:
-        return false;
-    }
-};
-
 auto BattlepayManager::ProductFilter(Product product) -> bool
 {
     auto player = _session->GetPlayer();
@@ -185,21 +173,19 @@ auto BattlepayManager::ProductFilter(Product product) -> bool
         switch (product.WebsiteType)
         {
         case Battlepay::BattlePet:
-        case CharacterBoost:
+        case Battlepay::CharacterBoost:
+        case Battlepay::CharacterRename:
             return true;
-        default:
-            return false;
         }
     }
 
-    if (product.ClassMask && (player->GetClassMask() & product.ClassMask) == 0)
+    if (product.ClassMask && (!player || (player->GetClassMask() & product.ClassMask) == 0))
         return false;
 
     for (auto& itr : product.Items)
     {
         if (!itr.IgnoreOwnCheck && AlreadyOwnProduct(itr.ItemID))
             return false;
-
     }
 
     return true;
@@ -222,9 +208,6 @@ void BattlepayManager::SendProductList()
 
     for (auto& itr : sBattlePayDataStore->GetProductGroups())
     {
-        if (!_session->GetPlayer() && !GroupFilterForSession(itr.GroupID))
-            continue;
-
         WorldPackets::BattlePay::BattlePayProductGroup pGroup;
         pGroup.GroupID = itr.GroupID;
         pGroup.IconFileDataID = itr.IconFileDataID;
@@ -242,9 +225,6 @@ void BattlepayManager::SendProductList()
 
     for (auto const& itr : sBattlePayDataStore->GetShopEntries())
     {
-        if (!_session->GetPlayer() && !GroupFilterForSession(itr.GroupID))
-            continue;
-
         WorldPackets::BattlePay::BattlePayShopEntry sEntry;
         sEntry.EntryID = itr.EntryID;
         sEntry.GroupID = itr.GroupID;
@@ -267,9 +247,6 @@ void BattlepayManager::SendProductList()
     {
         auto const& product = itr.second;
         if (!ProductFilter(product))
-            continue;
-
-        if (!_session->GetPlayer() && !GroupFilterForSession(sBattlePayDataStore->GetProductGroupId(product.ProductID)))
             continue;
 
         WorldPackets::BattlePay::ProductInfoStruct pInfo;
@@ -403,6 +380,9 @@ std::tuple<bool, WorldPackets::BattlePay::ProductDisplayInfo> BattlepayManager::
 
     if (displayInfo->FileDataID != 0)
         info.FileDataID = displayInfo->FileDataID;
+
+    if (displayInfo->UiTextureAltlasId != 0)
+        info.UiTextureAltlasId = displayInfo->UiTextureAltlasId;
 
     info.DisplayCardWidth = displayInfo->DisplayCardWidth;
 

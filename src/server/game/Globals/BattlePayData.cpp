@@ -48,7 +48,7 @@ void BattlePayDataStoreMgr::LoadDisplayInfos()
     TC_LOG_INFO("server.loading", "Loading Battlepay display info ...");
     _displayInfos.clear();
 
-    auto result = WorldDatabase.PQuery("SELECT DisplayInfoId, CreatureDisplayInfoID, FileDataID, DisplayCardWidth, Flags, Name1, Name2, Name3, Name4, Name5 FROM battlepay_display_info");
+    auto result = WorldDatabase.PQuery("SELECT DisplayInfoId, CreatureDisplayInfoID, FileDataID, UiTextureAltlasId, DisplayCardWidth, Flags, Name1, Name2, Name3, Name4, Name5 FROM battlepay_display_info");
     if (!result)
         return;
 
@@ -61,13 +61,14 @@ void BattlePayDataStoreMgr::LoadDisplayInfos()
         Battlepay::DisplayInfo displayInfo;
         displayInfo.CreatureDisplayInfoID   = fields[1].GetUInt32();
         displayInfo.FileDataID              = fields[2].GetInt32();
-        displayInfo.DisplayCardWidth        = fields[3].GetInt32();
-        displayInfo.Flags                   = fields[4].GetUInt32();
-        displayInfo.Name1                   = fields[5].GetString();
-        displayInfo.Name2                   = fields[6].GetString();
-        displayInfo.Name3                   = fields[7].GetString();
-        displayInfo.Name4                   = fields[8].GetString();
-        displayInfo.Name5                   = fields[9].GetString();
+        displayInfo.UiTextureAltlasId       = fields[3].GetInt32();
+        displayInfo.DisplayCardWidth        = fields[4].GetInt32();
+        displayInfo.Flags                   = fields[5].GetUInt32();
+        displayInfo.Name1                   = fields[6].GetString();
+        displayInfo.Name2                   = fields[7].GetString();
+        displayInfo.Name3                   = fields[8].GetString();
+        displayInfo.Name4                   = fields[9].GetString();
+        displayInfo.Name5                   = fields[10].GetString();
         _displayInfos.insert(std::make_pair(fields[0].GetUInt32(), displayInfo));
     } while (result->NextRow());
 

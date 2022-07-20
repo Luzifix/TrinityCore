@@ -119,30 +119,6 @@ namespace Battlepay
         MaxWebsiteType
     };
 
-    namespace ProductGroups
-    {
-        enum : uint32
-        {
-            Mount = 1,  // filedataid = 132261
-            Pets = 2,  // filedataid = 656556
-            Services = 3,  // filedataid = 134328
-            Golds = 4,  // filedataid = 133784
-            Professions = 5,  // filedataid = 132642
-            ProfessionItems = 6,  // filedataid = 962048
-            professionRecipes = 7,  // filedataid = 133739
-            Armors = 8,  // filedataid = 132738
-            Weapons = 9,  // filedataid = 135561
-            Toys = 10, // filedataid = 237429
-            Boosts = 11, // filedataid = 136235
-            Bags = 12, // filedataid = 1029751
-            Heirlooms = 13, // filedataid = 132690
-            ItemBundles = 14, // filedataid = 132596
-            Transmogs = 15, // filedataid = 132642
-            SpecialOffers = 16, // filedataid = 237541
-            Featured = 17  // filedataid = 413589
-        };
-    }
-
     namespace BattlepayGroupDisplayType
     {
         enum : uint8
@@ -174,6 +150,7 @@ namespace Battlepay
     {
         uint32 CreatureDisplayInfoID;
         uint32 FileDataID;
+        uint32 UiTextureAltlasId;
         uint32 DisplayCardWidth;
         uint32 Flags;
         std::string Name1;

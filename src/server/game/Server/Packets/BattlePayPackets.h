@@ -52,7 +52,7 @@ namespace WorldPackets
             Optional<uint32> FileDataID;
             Optional<uint32> Flags;
             Optional<uint32> Flags2;
-            Optional<uint32> Flags3;
+            Optional<uint32> UiTextureAltlasId;
             Optional<uint32> Flags4;
             Optional<uint32> Flags5;
             uint32 DisplayCardWidth;

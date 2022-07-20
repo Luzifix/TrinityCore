@@ -17,7 +17,7 @@ ByteBuffer& operator<<(ByteBuffer& data, WorldPackets::BattlePay::ProductDisplay
 
     data.WriteBit(displayInfo.Flags.has_value());
     data.WriteBit(displayInfo.Flags2.has_value());
-    data.WriteBit(displayInfo.Flags3.has_value());
+    data.WriteBit(displayInfo.UiTextureAltlasId.has_value());
     data.WriteBit(displayInfo.Flags4.has_value());
     data.WriteBit(displayInfo.Flags5.has_value());
 
@@ -50,8 +50,8 @@ ByteBuffer& operator<<(ByteBuffer& data, WorldPackets::BattlePay::ProductDisplay
     if (displayInfo.Flags2)
         data << *displayInfo.Flags2;
 
-    if (displayInfo.Flags3)
-        data << *displayInfo.Flags3;
+    if (displayInfo.UiTextureAltlasId)
+        data << *displayInfo.UiTextureAltlasId;
 
     if (displayInfo.Flags4)
         data << *displayInfo.Flags4;
