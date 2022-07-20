@@ -973,3 +973,37 @@ bool CollectionMgr::HasTransmogIllusion(uint32 transmogIllusionId) const
 {
     return transmogIllusionId < _transmogIllusions->size() && _transmogIllusions->test(transmogIllusionId);
 }
+
+void CollectionMgr::LoadAccountConditionalAppearance(PreparedQueryResult activeConditionalAppearances)
+{
+    if (!activeConditionalAppearances)
+        return;
+
+    do
+    {
+        Field* fields = activeConditionalAppearances->Fetch();
+        _conditionalAppearances.push_back(fields[1].GetUInt32());
+    } while (activeConditionalAppearances->NextRow());
+}
+
+bool CollectionMgr::HasConditionalAppearance(uint32 conditionalAppearance) const
+{
+    return std::find(_conditionalAppearances.begin(), _conditionalAppearances.end(), conditionalAppearance) != _conditionalAppearances.end();
+}
+
+void CollectionMgr::AddConditionalAppearance(uint32 conditionalAppearance)
+{
+    _conditionalAppearances.push_back(conditionalAppearance);
+}
+
+void CollectionMgr::SaveConditionalAppearances(LoginDatabaseTransaction trans)
+{
+    LoginDatabasePreparedStatement* stmt = nullptr;
+    for (uint32 conditionalAppearance : _conditionalAppearances)
+    {
+        stmt = LoginDatabase.GetPreparedStatement(LOGIN_REP_BNET_CONDITIONAL_APPEARANCE);
+        stmt->setUInt32(0, _owner->GetBattlenetAccountId());
+        stmt->setUInt32(1, conditionalAppearance);
+        trans->Append(stmt);
+    }
+}

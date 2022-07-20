@@ -145,6 +145,13 @@ public:
     void AddTransmogIllusion(uint32 transmogIllusionId);
     bool HasTransmogIllusion(uint32 transmogIllusionId) const;
 
+    // Conditional Appearance
+    void LoadAccountConditionalAppearance(PreparedQueryResult activeConditionalAppearances);
+    bool HasConditionalAppearance(uint32 conditionalAppearance) const;
+    void SaveConditionalAppearances(LoginDatabaseTransaction trans);
+    void AddConditionalAppearance(uint32 conditionalAppearance);
+    std::vector<uint32> GetAccountConditionalAppearance() { return _conditionalAppearances; };
+
     enum class FavoriteAppearanceState
     {
         New,
@@ -169,6 +176,7 @@ private:
     std::unordered_map<uint32, std::unordered_set<ObjectGuid>> _temporaryAppearances;
     std::unordered_map<uint32, FavoriteAppearanceState> _favoriteAppearances;
     std::unique_ptr<boost::dynamic_bitset<uint32>> _transmogIllusions;
+    std::vector<uint32> _conditionalAppearances;
 };
 
 #endif // CollectionMgr_h__

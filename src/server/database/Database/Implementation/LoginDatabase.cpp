@@ -212,6 +212,10 @@ void LoginDatabaseConnection::DoPrepareStatements()
     PrepareStatement(LOGIN_REP_ENDORSEMENT_REQUEST, "REPLACE INTO endorsements_request (senderBnetId, receiverBnetId, receiverCharacterName, createdAt) VALUES (?, ?, ?, ?)", CONNECTION_ASYNC);
     PrepareStatement(LOGIN_UPD_ENDORSEMENT_REQUEST_SELECTED_TYPE, "UPDATE endorsements_request SET selectedType = ?, submitAt = ? WHERE senderBnetId = ? AND receiverBnetId = ?", CONNECTION_SYNCH);
     PrepareStatement(LOGIN_INS_ENDORSEMENT, "INSERT INTO endorsements (type, senderBnetId, receiverBnetId, characterName, createdAt) VALUES (?, ?, ?, ?, ?)", CONNECTION_SYNCH);
+
+    // Conditional Appearance
+    PrepareStatement(LOGIN_SEL_BNET_CONDITIONAL_APPEARANCE, "SELECT battlenetAccountId, conditional_appearance_id FROM battlenet_account_conditional_appearance WHERE battlenetAccountId = ?", CONNECTION_ASYNC);
+    PrepareStatement(LOGIN_REP_BNET_CONDITIONAL_APPEARANCE, "REPLACE INTO battlenet_account_conditional_appearance (battlenetAccountId, conditional_appearance_id) VALUES (?, ?)", CONNECTION_ASYNC);
 }
 
 LoginDatabaseConnection::LoginDatabaseConnection(MySQLConnectionInfo& connInfo) : MySQLConnection(connInfo)

@@ -459,6 +459,15 @@ void WorldSession::HandleCharEnum(CharacterDatabaseQueryHolder const& holder)
         charEnum.RaceUnlockData.push_back(raceUnlock);
     }
 
+    for (uint32 conditionalAppearance : GetCollectionMgr()->GetAccountConditionalAppearance())
+    {
+        WorldPackets::Character::EnumCharactersResult::UnlockedConditionalAppearance appearanceUnlock;
+        appearanceUnlock.AchievementID = conditionalAppearance;
+        appearanceUnlock.Unused = 0;
+
+        charEnum.UnlockedConditionalAppearances.push_back(appearanceUnlock);
+    }
+
     SendPacket(charEnum.Write());
 }
 
@@ -507,7 +516,7 @@ bool WorldSession::MeetsChrCustomizationReq(ChrCustomizationReqEntry const* req,
     if (req->ClassMask && !(req->ClassMask & (1 << (playerClass - 1))))
         return false;
 
-    if (req->AchievementID /*&& !HasAchieved(req->AchievementID)*/)
+    if (req->AchievementID && !GetCollectionMgr()->HasConditionalAppearance(req->AchievementID))
         return false;
 
     if (req->ItemModifiedAppearanceID && !GetCollectionMgr()->HasItemAppearance(req->ItemModifiedAppearanceID).first)

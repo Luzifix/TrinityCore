@@ -1133,6 +1133,7 @@ public:
         ITEM_APPEARANCES,
         ITEM_FAVORITE_APPEARANCES,
         TRANSMOG_ILLUSIONS,
+        CONDITIONAL_APPEARANCE,
 
         MAX_QUERIES
     };
@@ -1179,6 +1180,10 @@ public:
         stmt = LoginDatabase.GetPreparedStatement(LOGIN_SEL_BNET_TRANSMOG_ILLUSIONS);
         stmt->setUInt32(0, battlenetAccountId);
         ok = SetPreparedQuery(TRANSMOG_ILLUSIONS, stmt) && ok;
+
+        stmt = LoginDatabase.GetPreparedStatement(LOGIN_SEL_BNET_CONDITIONAL_APPEARANCE);
+        stmt->setUInt32(0, battlenetAccountId);
+        ok = SetPreparedQuery(CONDITIONAL_APPEARANCE, stmt) && ok;
 
         return ok;
     }
@@ -1232,6 +1237,7 @@ void WorldSession::InitializeSessionCallback(LoginDatabaseQueryHolder const& hol
     _collectionMgr->LoadAccountMounts(holder.GetPreparedResult(AccountInfoQueryHolder::MOUNTS));
     _collectionMgr->LoadAccountItemAppearances(holder.GetPreparedResult(AccountInfoQueryHolder::ITEM_APPEARANCES), holder.GetPreparedResult(AccountInfoQueryHolder::ITEM_FAVORITE_APPEARANCES));
     _collectionMgr->LoadAccountTransmogIllusions(holder.GetPreparedResult(AccountInfoQueryHolder::TRANSMOG_ILLUSIONS));
+    _collectionMgr->LoadAccountConditionalAppearance(holder.GetPreparedResult(AccountInfoQueryHolder::CONDITIONAL_APPEARANCE));
 
     if (!m_inQueue)
         SendAuthResponse(ERROR_OK, false);
