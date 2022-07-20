@@ -62,6 +62,7 @@ namespace WorldPackets
             std::string Name4;
             std::string Name5;
             std::string UnkString;
+            uint32 StackCount = 0;
         };
 
         struct ProductItem

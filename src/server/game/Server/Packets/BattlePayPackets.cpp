@@ -30,7 +30,7 @@ ByteBuffer& operator<<(ByteBuffer& data, WorldPackets::BattlePay::ProductDisplay
     data.FlushBits();
 
     data << uint32(0);
-    data << uint32(0);
+    data << static_cast<uint32>(displayInfo.StackCount);
 
     if (displayInfo.FileDataID)
         data << *displayInfo.FileDataID;
