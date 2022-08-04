@@ -943,7 +943,7 @@ void ObjectMgr::CheckCreatureTemplate(CreatureTemplate const* cInfo)
         {
             TC_LOG_ERROR("sql.sql", "Creature (Entry: %u, faction: %u) has different `faction` in difficulty %u mode (Entry: %u, faction: %u).",
                 cInfo->Entry, cInfo->faction, diff + 1, cInfo->DifficultyEntry[diff], difficultyInfo->faction);
-            TC_LOG_ERROR("sql.sql", "Possible FIX: UPDATE `creature_template` SET `faction`=%u WHERE `entry`=%u;",
+            TC_LOG_INFO("sql.fixes", "UPDATE `creature_template` SET `faction`=%u WHERE `entry`=%u;",
                 cInfo->faction, cInfo->DifficultyEntry[diff]);
         }
 
@@ -951,7 +951,7 @@ void ObjectMgr::CheckCreatureTemplate(CreatureTemplate const* cInfo)
         {
             TC_LOG_ERROR("sql.sql", "Creature (Entry: %u, class: %u) has different `unit_class` in difficulty %u mode (Entry: %u, class: %u).",
                 cInfo->Entry, cInfo->unit_class, diff + 1, cInfo->DifficultyEntry[diff], difficultyInfo->unit_class);
-            TC_LOG_ERROR("sql.sql", "Possible FIX: UPDATE `creature_template` SET `unit_class`=%u WHERE `entry`=%u;",
+            TC_LOG_INFO("sql.fixes", "UPDATE `creature_template` SET `unit_class`=%u WHERE `entry`=%u;",
                 cInfo->unit_class, cInfo->DifficultyEntry[diff]);
             continue;
         }
@@ -961,7 +961,7 @@ void ObjectMgr::CheckCreatureTemplate(CreatureTemplate const* cInfo)
         {
             TC_LOG_ERROR("sql.sql", "Creature (Entry: %u, `npcflag`: " UI64FMTD ") has different `npcflag` in difficulty %u mode (Entry: %u, `npcflag`: " UI64FMTD ").",
                 cInfo->Entry, cInfo->npcflag, diff + 1, cInfo->DifficultyEntry[diff], difficultyInfo->npcflag);
-            TC_LOG_ERROR("sql.sql", "Possible FIX: UPDATE `creature_template` SET `npcflag`=`npcflag`^%u WHERE `entry`=%u;",
+            TC_LOG_INFO("sql.fixes", "UPDATE `creature_template` SET `npcflag`=`npcflag`^%u WHERE `entry`=%u;",
                 differenceMask, cInfo->DifficultyEntry[diff]);
             continue;
         }
@@ -970,7 +970,7 @@ void ObjectMgr::CheckCreatureTemplate(CreatureTemplate const* cInfo)
         {
             TC_LOG_ERROR("sql.sql", "Creature (Entry: %u, `dmgschool`: %u) has different `dmgschool` in difficulty %u mode (Entry: %u, `dmgschool`: %u).",
                 cInfo->Entry, cInfo->dmgschool, diff + 1, cInfo->DifficultyEntry[diff], difficultyInfo->dmgschool);
-            TC_LOG_ERROR("sql.sql", "Possible FIX: UPDATE `creature_template` SET `dmgschool`=%u WHERE `entry`=%u;",
+            TC_LOG_INFO("sql.fixes", "UPDATE `creature_template` SET `dmgschool`=%u WHERE `entry`=%u;",
                 cInfo->dmgschool, cInfo->DifficultyEntry[diff]);
         }
 
@@ -979,7 +979,7 @@ void ObjectMgr::CheckCreatureTemplate(CreatureTemplate const* cInfo)
         {
             TC_LOG_ERROR("sql.sql", "Creature (Entry: %u, `unit_flags2`: %u) has different `unit_flags2` in difficulty %u mode (Entry: %u, `unit_flags2`: %u).",
                 cInfo->Entry, cInfo->unit_flags2, diff + 1, cInfo->DifficultyEntry[diff], difficultyInfo->unit_flags2);
-            TC_LOG_ERROR("sql.sql", "Possible FIX: UPDATE `creature_template` SET `unit_flags2`=`unit_flags2`^%u WHERE `entry`=%u;",
+            TC_LOG_INFO("sql.fixes", "UPDATE `creature_template` SET `unit_flags2`=`unit_flags2`^%u WHERE `entry`=%u;",
                 differenceMask, cInfo->DifficultyEntry[diff]);
         }
 
@@ -987,7 +987,7 @@ void ObjectMgr::CheckCreatureTemplate(CreatureTemplate const* cInfo)
         {
             TC_LOG_ERROR("sql.sql", "Creature (Entry: %u, family: %u) has different `family` in difficulty %u mode (Entry: %u, family: %u).",
                 cInfo->Entry, cInfo->family, diff + 1, cInfo->DifficultyEntry[diff], difficultyInfo->family);
-            TC_LOG_ERROR("sql.sql", "Possible FIX: UPDATE `creature_template` SET `family`=%u WHERE `entry`=%u;",
+            TC_LOG_INFO("sql.fixes", "UPDATE `creature_template` SET `family`=%u WHERE `entry`=%u;",
                 cInfo->family, cInfo->DifficultyEntry[diff]);
         }
 
@@ -995,7 +995,7 @@ void ObjectMgr::CheckCreatureTemplate(CreatureTemplate const* cInfo)
         {
             TC_LOG_ERROR("sql.sql", "Creature (Entry: %u, trainer_class: %u) has different `trainer_class` in difficulty %u mode (Entry: %u, trainer_class: %u).",
                 cInfo->Entry, cInfo->trainer_class, diff + 1, cInfo->DifficultyEntry[diff], difficultyInfo->trainer_class);
-            TC_LOG_ERROR("sql.sql", "Possible FIX: UPDATE `creature_template` SET `trainer_class`=%u WHERE `entry`=%u;",
+            TC_LOG_INFO("sql.fixes", "UPDATE `creature_template` SET `trainer_class`=%u WHERE `entry`=%u;",
                 cInfo->trainer_class, cInfo->DifficultyEntry[diff]);
             continue;
         }
@@ -1004,7 +1004,7 @@ void ObjectMgr::CheckCreatureTemplate(CreatureTemplate const* cInfo)
         {
             TC_LOG_ERROR("sql.sql", "Creature (Entry: %u, type: %u) has different `type` in difficulty %u mode (Entry: %u, type: %u).",
                 cInfo->Entry, cInfo->type, diff + 1, cInfo->DifficultyEntry[diff], difficultyInfo->type);
-            TC_LOG_ERROR("sql.sql", "Possible FIX: UPDATE `creature_template` SET `type`=%u WHERE `entry`=%u;",
+            TC_LOG_INFO("sql.fixes", "UPDATE `creature_template` SET `type`=%u WHERE `entry`=%u;",
                 cInfo->type, cInfo->DifficultyEntry[diff]);
         }
 
@@ -1018,7 +1018,7 @@ void ObjectMgr::CheckCreatureTemplate(CreatureTemplate const* cInfo)
         {
             TC_LOG_ERROR("sql.sql", "Creature (Entry: %u, RegenHealth: %u) has different `RegenHealth` in difficulty %u mode (Entry: %u, RegenHealth: %u).",
                 cInfo->Entry, cInfo->RegenHealth, diff + 1, cInfo->DifficultyEntry[diff], difficultyInfo->RegenHealth);
-            TC_LOG_ERROR("sql.sql", "Possible FIX: UPDATE `creature_template` SET `RegenHealth`=%u WHERE `entry`=%u;",
+            TC_LOG_INFO("sql.fixes", "UPDATE `creature_template` SET `RegenHealth`=%u WHERE `entry`=%u;",
                 cInfo->RegenHealth, cInfo->DifficultyEntry[diff]);
         }
 
@@ -1027,7 +1027,7 @@ void ObjectMgr::CheckCreatureTemplate(CreatureTemplate const* cInfo)
         {
             TC_LOG_ERROR("sql.sql", "Creature (Entry: %u, mechanic_immune_mask: %u) has weaker immunities in difficulty %u mode (Entry: %u, mechanic_immune_mask: %u).",
                 cInfo->Entry, cInfo->MechanicImmuneMask, diff + 1, cInfo->DifficultyEntry[diff], difficultyInfo->MechanicImmuneMask);
-            TC_LOG_ERROR("sql.sql", "Possible FIX: UPDATE `creature_template` SET `mechanic_immune_mask`=`mechanic_immune_mask`|%u WHERE `entry`=%u;",
+            TC_LOG_INFO("sql.fixes", "UPDATE `creature_template` SET `mechanic_immune_mask`=`mechanic_immune_mask`|%u WHERE `entry`=%u;",
                 differenceMask, cInfo->DifficultyEntry[diff]);
         }
 
@@ -1036,7 +1036,7 @@ void ObjectMgr::CheckCreatureTemplate(CreatureTemplate const* cInfo)
         {
             TC_LOG_ERROR("sql.sql", "Creature (Entry: %u, flags_extra: %u) has different `flags_extra` in difficulty %u mode (Entry: %u, flags_extra: %u).",
                 cInfo->Entry, cInfo->flags_extra, diff + 1, cInfo->DifficultyEntry[diff], difficultyInfo->flags_extra);
-            TC_LOG_ERROR("sql.sql", "Possible FIX: UPDATE `creature_template` SET `flags_extra`=`flags_extra`^%u WHERE `entry`=%u;",
+            TC_LOG_INFO("sql.fixes", "UPDATE `creature_template` SET `flags_extra`=`flags_extra`^%u WHERE `entry`=%u;",
                 differenceMask, cInfo->DifficultyEntry[diff]);
         }
 
@@ -1063,6 +1063,8 @@ void ObjectMgr::CheckCreatureTemplate(CreatureTemplate const* cInfo)
     {
         TC_LOG_ERROR("sql.sql", "Creature (Entry: %u) has `mingold` %u which is greater than `maxgold` %u, setting `maxgold` to %u.",
             cInfo->Entry, cInfo->mingold, cInfo->maxgold, cInfo->mingold);
+        TC_LOG_INFO("sql.fixes", "UPDATE `creature_template` SET `maxgold`=%u WHERE `entry`=%u; ", cInfo->mingold, cInfo->Entry);
+
         const_cast<CreatureTemplate*>(cInfo)->maxgold = cInfo->mingold;
     }
 
@@ -1089,6 +1091,8 @@ void ObjectMgr::CheckCreatureTemplate(CreatureTemplate const* cInfo)
     if (!factionTemplate)
     {
         TC_LOG_ERROR("sql.sql", "Creature (Entry: %u) has non-existing faction template (%u). This can lead to crashes, set to faction 35.", cInfo->Entry, cInfo->faction);
+        TC_LOG_INFO("sql.fixes", "UPDATE `creature_template` SET `faction`=%u WHERE `entry`=%u; ", 35, cInfo->Entry);
+
         const_cast<CreatureTemplate*>(cInfo)->faction = sFactionTemplateStore.AssertEntry(35)->ID; // this might seem stupid but all shit will would break if faction 35 did not exist
     }
 
@@ -1110,12 +1114,16 @@ void ObjectMgr::CheckCreatureTemplate(CreatureTemplate const* cInfo)
     if (!cInfo->unit_class || ((1 << (cInfo->unit_class-1)) & CLASSMASK_ALL_CREATURES) == 0)
     {
         TC_LOG_ERROR("sql.sql", "Creature (Entry: %u) has invalid unit_class (%u) in creature_template. Set to 1 (UNIT_CLASS_WARRIOR).", cInfo->Entry, cInfo->unit_class);
+        TC_LOG_INFO("sql.fixes", "UPDATE `creature_template` SET `unit_class`=%u WHERE `entry`=%u; ", uint32(UNIT_CLASS_WARRIOR), cInfo->Entry);
+
         const_cast<CreatureTemplate*>(cInfo)->unit_class = UNIT_CLASS_WARRIOR;
     }
 
     if (cInfo->dmgschool >= MAX_SPELL_SCHOOL)
     {
         TC_LOG_ERROR("sql.sql", "Creature (Entry: %u) has invalid spell school value (%u) in `dmgschool`.", cInfo->Entry, cInfo->dmgschool);
+        TC_LOG_INFO("sql.fixes", "UPDATE `creature_template` SET `dmgschool`=%u WHERE `entry`=%u; ", uint32(SPELL_SCHOOL_NORMAL), cInfo->Entry);
+
         const_cast<CreatureTemplate*>(cInfo)->dmgschool = SPELL_SCHOOL_NORMAL;
     }
 
@@ -1128,24 +1136,32 @@ void ObjectMgr::CheckCreatureTemplate(CreatureTemplate const* cInfo)
     if (cInfo->speed_walk == 0.0f)
     {
         TC_LOG_ERROR("sql.sql", "Creature (Entry: %u) has wrong value (%f) in speed_walk, set to 1.", cInfo->Entry, cInfo->speed_walk);
+        TC_LOG_INFO("sql.fixes", "UPDATE `creature_template` SET `speed_walk`=%f WHERE `entry`=%u; ", 1.0f, cInfo->Entry);
+
         const_cast<CreatureTemplate*>(cInfo)->speed_walk = 1.0f;
     }
 
     if (cInfo->speed_run == 0.0f)
     {
         TC_LOG_ERROR("sql.sql", "Creature (Entry: %u) has wrong value (%f) in speed_run, set to 1.14286.", cInfo->Entry, cInfo->speed_run);
+        TC_LOG_INFO("sql.fixes", "UPDATE `creature_template` SET `speed_run`=%f WHERE `entry`=%u; ", 1.14286f, cInfo->Entry);
+
         const_cast<CreatureTemplate*>(cInfo)->speed_run = 1.14286f;
     }
 
     if (cInfo->type && !sCreatureTypeStore.LookupEntry(cInfo->type))
     {
         TC_LOG_ERROR("sql.sql", "Creature (Entry: %u) has invalid creature type (%u) in `type`.", cInfo->Entry, cInfo->type);
+        TC_LOG_INFO("sql.fixes", "UPDATE `creature_template` SET `type`=%u WHERE `entry`=%u; ", uint32(CREATURE_TYPE_HUMANOID), cInfo->Entry);
+
         const_cast<CreatureTemplate*>(cInfo)->type = CREATURE_TYPE_HUMANOID;
     }
 
     if (cInfo->family && !sCreatureFamilyStore.LookupEntry(cInfo->family))
     {
         TC_LOG_ERROR("sql.sql", "Creature (Entry: %u) has invalid creature family (%u) in `family`.", cInfo->Entry, cInfo->family);
+        TC_LOG_INFO("sql.fixes", "UPDATE `creature_template` SET `family`=%u WHERE `entry`=%u; ", uint32(CREATURE_FAMILY_NONE), cInfo->Entry);
+
         const_cast<CreatureTemplate*>(cInfo)->family = CREATURE_FAMILY_NONE;
     }
 
@@ -1154,6 +1170,8 @@ void ObjectMgr::CheckCreatureTemplate(CreatureTemplate const* cInfo)
     if (cInfo->HoverHeight < 0.0f)
     {
         TC_LOG_ERROR("sql.sql", "Creature (Entry: %u) has wrong value (%f) in `HoverHeight`", cInfo->Entry, cInfo->HoverHeight);
+        TC_LOG_INFO("sql.fixes", "UPDATE `creature_template` SET `HoverHeight`=1 WHERE `entry`=%u; ", cInfo->Entry);
+
         const_cast<CreatureTemplate*>(cInfo)->HoverHeight = 1.0f;
     }
 
@@ -1163,6 +1181,8 @@ void ObjectMgr::CheckCreatureTemplate(CreatureTemplate const* cInfo)
         if (!vehId)
         {
              TC_LOG_ERROR("sql.sql", "Creature (Entry: %u) has a non-existing VehicleId (%u). This *WILL* cause the client to freeze!", cInfo->Entry, cInfo->VehicleId);
+             TC_LOG_INFO("sql.fixes", "UPDATE `creature_template` SET `VehicleId`=0 WHERE `entry`=%u; ", cInfo->Entry);
+
              const_cast<CreatureTemplate*>(cInfo)->VehicleId = 0;
         }
     }
@@ -1172,6 +1192,8 @@ void ObjectMgr::CheckCreatureTemplate(CreatureTemplate const* cInfo)
         if (cInfo->spells[j] && !sSpellMgr->GetSpellInfo(cInfo->spells[j], DIFFICULTY_NONE))
         {
             TC_LOG_ERROR("sql.sql", "Creature (Entry: %u) has non-existing Spell%d (%u), set to 0.", cInfo->Entry, j+1, cInfo->spells[j]);
+            TC_LOG_INFO("sql.fixes", "DELETE FROM `creature_template_spell` WHERE `CreatureID`=%u AND `Spell`=%u; ", cInfo->Entry, cInfo->spells[j]);
+
             const_cast<CreatureTemplate*>(cInfo)->spells[j] = 0;
         }
     }
@@ -1179,48 +1201,64 @@ void ObjectMgr::CheckCreatureTemplate(CreatureTemplate const* cInfo)
     if (cInfo->MovementType >= MAX_DB_MOTION_TYPE)
     {
         TC_LOG_ERROR("sql.sql", "Creature (Entry: %u) has wrong movement generator type (%u), ignored and set to IDLE.", cInfo->Entry, cInfo->MovementType);
+        TC_LOG_INFO("sql.fixes", "UPDATE `creature_template` SET `MovementType`=%u WHERE `entry`=%u; ", uint32(IDLE_MOTION_TYPE), cInfo->Entry);
+
         const_cast<CreatureTemplate*>(cInfo)->MovementType = IDLE_MOTION_TYPE;
     }
 
     if (cInfo->HealthScalingExpansion < EXPANSION_LEVEL_CURRENT || cInfo->HealthScalingExpansion >= MAX_EXPANSIONS)
     {
         TC_LOG_ERROR("sql.sql", "Table `creature_template` lists creature (ID: %u) with invalid `HealthScalingExpansion` %i. Ignored and set to 0.", cInfo->Entry, cInfo->HealthScalingExpansion);
+        TC_LOG_INFO("sql.fixes", "UPDATE `creature_template` SET `HealthScalingExpansion`=0 WHERE `entry`=%u; ", cInfo->Entry);
+
         const_cast<CreatureTemplate*>(cInfo)->HealthScalingExpansion = 0;
     }
 
     if (cInfo->RequiredExpansion >= MAX_EXPANSIONS)
     {
         TC_LOG_ERROR("sql.sql", "Table `creature_template` lists creature (Entry: %u) with `RequiredExpansion` %u. Ignored and set to 0.", cInfo->Entry, cInfo->RequiredExpansion);
+        TC_LOG_INFO("sql.fixes", "UPDATE `creature_template` SET `RequiredExpansion`=0 WHERE `entry`=%u; ", cInfo->Entry);
+
         const_cast<CreatureTemplate*>(cInfo)->RequiredExpansion = 0;
     }
 
     if (uint32 badFlags = (cInfo->flags_extra & ~CREATURE_FLAG_EXTRA_DB_ALLOWED))
     {
         TC_LOG_ERROR("sql.sql", "Table `creature_template` lists creature (Entry: %u) with disallowed `flags_extra` %u, removing incorrect flag.", cInfo->Entry, badFlags);
+
         const_cast<CreatureTemplate*>(cInfo)->flags_extra &= CREATURE_FLAG_EXTRA_DB_ALLOWED;
+        TC_LOG_INFO("sql.fixes", "UPDATE `creature_template` SET `flags_extra`=%u WHERE `entry`=%u; ", cInfo->flags_extra, cInfo->Entry);
     }
 
     if (uint32 disallowedUnitFlags = (cInfo->unit_flags & ~UNIT_FLAG_ALLOWED))
     {
         TC_LOG_ERROR("sql.sql", "Table `creature_template` lists creature (Entry: %u) with disallowed `unit_flags` %u, removing incorrect flag.", cInfo->Entry, disallowedUnitFlags);
+
         const_cast<CreatureTemplate*>(cInfo)->unit_flags &= UNIT_FLAG_ALLOWED;
+        TC_LOG_INFO("sql.fixes", "UPDATE `creature_template` SET `unit_flags`=%u WHERE `entry`=%u; ", cInfo->unit_flags, cInfo->Entry);
     }
 
     if (uint32 disallowedUnitFlags2 = (cInfo->unit_flags2 & ~UNIT_FLAG2_ALLOWED))
     {
         TC_LOG_ERROR("sql.sql", "Table `creature_template` lists creature (Entry: %u) with disallowed `unit_flags2` %u, removing incorrect flag.", cInfo->Entry, disallowedUnitFlags2);
+
         const_cast<CreatureTemplate*>(cInfo)->unit_flags2 &= UNIT_FLAG2_ALLOWED;
+        TC_LOG_INFO("sql.fixes", "UPDATE `creature_template` SET `unit_flags2`=%u WHERE `entry`=%u; ", cInfo->unit_flags2, cInfo->Entry);
     }
 
     if (uint32 disallowedUnitFlags3 = (cInfo->unit_flags3 & ~UNIT_FLAG3_ALLOWED))
     {
-        TC_LOG_ERROR("sql.sql", "Table `creature_template` lists creature (Entry: %u) with disallowed `unit_flags2` %u, removing incorrect flag.", cInfo->Entry, disallowedUnitFlags3);
+        TC_LOG_ERROR("sql.sql", "Table `creature_template` lists creature (Entry: %u) with disallowed `unit_flags3` %u, removing incorrect flag.", cInfo->Entry, disallowedUnitFlags3);
+
         const_cast<CreatureTemplate*>(cInfo)->unit_flags3 &= UNIT_FLAG3_ALLOWED;
+        TC_LOG_INFO("sql.fixes", "UPDATE `creature_template` SET `unit_flags3`=%u WHERE `entry`=%u; ", cInfo->unit_flags3, cInfo->Entry);
     }
 
     if (cInfo->dynamicflags)
     {
         TC_LOG_ERROR("sql.sql", "Table `creature_template` lists creature (Entry: %u) with `dynamicflags` > 0. Ignored and set to 0.", cInfo->Entry);
+        TC_LOG_INFO("sql.fixes", "UPDATE `creature_template` SET `dynamicflags`=0 WHERE `entry`=%u; ", cInfo->Entry);
+
         const_cast<CreatureTemplate*>(cInfo)->dynamicflags = 0;
     }
 
@@ -1229,6 +1267,8 @@ void ObjectMgr::CheckCreatureTemplate(CreatureTemplate const* cInfo)
     {
         TC_LOG_ERROR("sql.sql", "Creature (ID: %u): Calculated minLevel %i is not within [1, 255], value has been set to %u.", cInfo->Entry, cInfo->minlevel,
             cInfo->HealthScalingExpansion == EXPANSION_LEVEL_CURRENT ? MAX_LEVEL : 1);
+        TC_LOG_INFO("sql.fixes", "UPDATE `creature_template` SET `minlevel`=%u WHERE `entry`=%u; ", cInfo->HealthScalingExpansion == EXPANSION_LEVEL_CURRENT ? 0 : 1, cInfo->Entry);
+
         const_cast<CreatureTemplate*>(cInfo)->minlevel = cInfo->HealthScalingExpansion == EXPANSION_LEVEL_CURRENT ? 0 : 1;
     }
 
@@ -1236,15 +1276,23 @@ void ObjectMgr::CheckCreatureTemplate(CreatureTemplate const* cInfo)
     {
         TC_LOG_ERROR("sql.sql", "Creature (ID: %u): Calculated maxLevel %i is not within [1, 255], value has been set to %u.", cInfo->Entry, cInfo->maxlevel,
             cInfo->HealthScalingExpansion == EXPANSION_LEVEL_CURRENT ? MAX_LEVEL : 1);
+        TC_LOG_INFO("sql.fixes", "UPDATE `creature_template` SET `maxlevel`=%u WHERE `entry`=%u; ", cInfo->HealthScalingExpansion == EXPANSION_LEVEL_CURRENT ? 0 : 1, cInfo->Entry);
+
         const_cast<CreatureTemplate*>(cInfo)->maxlevel = cInfo->HealthScalingExpansion == EXPANSION_LEVEL_CURRENT ? 0 : 1;
     }
 
     const_cast<CreatureTemplate*>(cInfo)->ModDamage *= Creature::_GetDamageMod(cInfo->rank);
 
     if (cInfo->GossipMenuId && !(cInfo->npcflag & UNIT_NPC_FLAG_GOSSIP))
+    {
         TC_LOG_INFO("sql.sql", "Creature (Entry: %u) has assigned gossip menu %u, but npcflag does not include UNIT_NPC_FLAG_GOSSIP.", cInfo->Entry, cInfo->GossipMenuId);
+        TC_LOG_INFO("sql.fixes", "UPDATE `creature_template` SET `gossip_menu_id`=0 WHERE `entry`=%u; ", cInfo->Entry);
+    }
     else if (!cInfo->GossipMenuId && cInfo->npcflag & UNIT_NPC_FLAG_GOSSIP)
+    {
         TC_LOG_INFO("sql.sql", "Creature (Entry: %u) has npcflag UNIT_NPC_FLAG_GOSSIP, but gossip menu is unassigned.", cInfo->Entry);
+        TC_LOG_INFO("sql.fixes", "UPDATE `creature_template` SET `npcflag`=`npcflag`^%u WHERE `entry`=%u; ", uint32(UNIT_NPC_FLAG_GOSSIP), cInfo->Entry);
+    }
 }
 
 void ObjectMgr::CheckCreatureMovement(char const* table, uint64 id, CreatureMovementData& creatureMovement)
@@ -6318,6 +6366,7 @@ void ObjectMgr::LoadInstanceEncounters()
         if (!dungeonEncounter)
         {
             TC_LOG_ERROR("sql.sql", "Table `instance_encounters` has an invalid encounter id %u, skipped!", entry);
+            TC_LOG_INFO("sql.fixes", "DELETE FROM `instance_encounters` WHERE `entry` = %u;", entry);
             continue;
         }
 
@@ -6469,6 +6518,8 @@ void ObjectMgr::LoadNPCText()
         if (probabilitySum <= 0.0f)
         {
             TC_LOG_ERROR("sql.sql", "NPCText (ID: %u) has a probability sum 0, no text can be selected from it, skipped.", textID);
+            TC_LOG_INFO("sql.fixes", "DELETE FROM `npc_text` WHERE `ID`=%u; ", textID);
+
             continue;
         }
 
@@ -7162,6 +7213,7 @@ void ObjectMgr::LoadWorldSafeLocs()
             if (!MapManager::IsValidMapCoord(loc))
             {
                 TC_LOG_ERROR("sql.sql", "World location (ID: %u) has a invalid position MapID: %u %s, skipped", id, loc.GetMapId(), loc.ToString().c_str());
+                TC_LOG_INFO("sql.fixes", "DELETE FROM `world_safe_locs` WHERE `ID` = %u;", id);
                 continue;
             }
 
@@ -7639,7 +7691,9 @@ inline void CheckGOLockId(GameObjectTemplate const* goInfo, uint32 dataN, uint32
         return;
 
     TC_LOG_ERROR("sql.sql", "Gameobject (Entry: %u GoType: %u) have data%d=%u but lock (Id: %u) not found.",
-        goInfo->entry, goInfo->type, N, goInfo->door.open, goInfo->door.open);
+        goInfo->entry, goInfo->type, N, dataN, dataN);
+
+    TC_LOG_INFO("sql.fixes", "UPDATE `gameobject_template` SET `data%d`=0 WHERE `entry`=%u;", N, goInfo->entry);
 }
 
 inline void CheckGOLinkedTrapId(GameObjectTemplate const* goInfo, uint32 dataN, uint32 N)
@@ -7647,8 +7701,12 @@ inline void CheckGOLinkedTrapId(GameObjectTemplate const* goInfo, uint32 dataN, 
     if (GameObjectTemplate const* trapInfo = sObjectMgr->GetGameObjectTemplate(dataN))
     {
         if (trapInfo->type != GAMEOBJECT_TYPE_TRAP)
+        {
             TC_LOG_ERROR("sql.sql", "Gameobject (Entry: %u GoType: %u) have data%d=%u but GO (Entry %u) have not GAMEOBJECT_TYPE_TRAP (%u) type.",
-            goInfo->entry, goInfo->type, N, dataN, dataN, uint32(GAMEOBJECT_TYPE_TRAP));
+                goInfo->entry, goInfo->type, N, dataN, dataN, uint32(GAMEOBJECT_TYPE_TRAP));
+
+            TC_LOG_INFO("sql.fixes", "UPDATE `gameobject_template` SET `type`=%u WHERE `entry`=%u;", uint32(GAMEOBJECT_TYPE_TRAP), goInfo->entry);
+        }
     }
 }
 
@@ -7659,6 +7717,8 @@ inline void CheckGOSpellId(GameObjectTemplate const* goInfo, uint32 dataN, uint3
 
     TC_LOG_ERROR("sql.sql", "Gameobject (Entry: %u GoType: %u) have data%d=%u but Spell (Entry %u) not exist.",
         goInfo->entry, goInfo->type, N, dataN, dataN);
+
+    TC_LOG_INFO("sql.fixes", "UPDATE `gameobject_template` SET `type`=0, `data%d`=0 WHERE `entry`=%u;", N, goInfo->entry);
 }
 
 inline void CheckAndFixGOChairHeightId(GameObjectTemplate const* goInfo, uint32& dataN, uint32 N)
@@ -7668,6 +7728,8 @@ inline void CheckAndFixGOChairHeightId(GameObjectTemplate const* goInfo, uint32&
 
     TC_LOG_ERROR("sql.sql", "Gameobject (Entry: %u GoType: %u) have data%d=%u but correct chair height in range 0..%i.",
         goInfo->entry, goInfo->type, N, dataN, UNIT_STAND_STATE_SIT_HIGH_CHAIR-UNIT_STAND_STATE_SIT_LOW_CHAIR);
+
+    TC_LOG_INFO("sql.fixes", "UPDATE `gameobject_template` SET `data%d`=0 WHERE `entry`=%u;", N, goInfo->entry);
 
     // prevent client and server unexpected work
     dataN = 0;
@@ -7680,6 +7742,8 @@ inline void CheckGONoDamageImmuneId(GameObjectTemplate* goTemplate, uint32 dataN
         return;
 
     TC_LOG_ERROR("sql.sql", "Gameobject (Entry: %u GoType: %u) have data%d=%u but expected boolean (0/1) noDamageImmune field value.", goTemplate->entry, goTemplate->type, N, dataN);
+
+    TC_LOG_INFO("sql.fixes", "UPDATE `gameobject_template` SET `data%d`=0 WHERE `entry`=%u;", N, goTemplate->entry);
 }
 
 inline void CheckGOConsumable(GameObjectTemplate const* goInfo, uint32 dataN, uint32 N)
@@ -7690,6 +7754,8 @@ inline void CheckGOConsumable(GameObjectTemplate const* goInfo, uint32 dataN, ui
 
     TC_LOG_ERROR("sql.sql", "Gameobject (Entry: %u GoType: %u) have data%d=%u but expected boolean (0/1) consumable field value.",
         goInfo->entry, goInfo->type, N, dataN);
+
+    TC_LOG_INFO("sql.fixes", "UPDATE `gameobject_template` SET `data%d`=0 WHERE `entry`=%u;", N, goInfo->entry);
 }
 
 void ObjectMgr::LoadGameObjectTemplate()
@@ -7805,8 +7871,12 @@ void ObjectMgr::LoadGameObjectTemplate()
                 if (got.spellFocus.spellFocusType)
                 {
                     if (!sSpellFocusObjectStore.LookupEntry(got.spellFocus.spellFocusType))
+                    {
                         TC_LOG_ERROR("sql.sql", "GameObject (Entry: %u GoType: %u) have data0=%u but SpellFocus (Id: %u) not exist.",
-                        entry, got.type, got.spellFocus.spellFocusType, got.spellFocus.spellFocusType);
+                            entry, got.type, got.spellFocus.spellFocusType, got.spellFocus.spellFocusType);
+
+                        TC_LOG_INFO("sql.fixes", "UPDATE `gameobject_template` SET `type`=0, `data0`=0 WHERE `entry`=%u;", entry);
+                    }
                 }
 
                 if (got.spellFocus.linkedTrap)        // linked trap
@@ -7825,7 +7895,10 @@ void ObjectMgr::LoadGameObjectTemplate()
                     if (!GetPageText(got.goober.pageID))
                         TC_LOG_ERROR("sql.sql", "GameObject (Entry: %u GoType: %u) have data7=%u but PageText (Entry %u) not exist.",
                         entry, got.type, got.goober.pageID, got.goober.pageID);
+
+                    TC_LOG_INFO("sql.fixes", "UPDATE `gameobject_template` SET `data7`=0 WHERE `entry`=%u;", entry);
                 }
+
                 CheckGONoDamageImmuneId(&got, got.goober.noDamageImmune, 11);
                 if (got.goober.linkedTrap)            // linked trap
                     CheckGOLinkedTrapId(&got, got.goober.linkedTrap, 12);
@@ -8497,6 +8570,9 @@ void ObjectMgr::LoadQuestPOI()
 
         if (!GetQuestTemplate(questID))
             TC_LOG_ERROR("sql.sql", "`quest_poi` quest id (%u) Idx1 (%u) does not exist in `quest_template`", questID, idx1);
+            TC_LOG_INFO("sql.fixes", "DELETE FROM `quest_poi` WHERE `QuestID`=%u;", questID);
+            TC_LOG_INFO("sql.fixes", "DELETE FROM `quest_poi_points` WHERE `QuestID`=%u;", questID);
+        }
 
         if (std::map<int32, std::vector<QuestPOIBlobPoint>>* blobs = Trinity::Containers::MapGetValuePtr(allPoints, questID))
         {
@@ -8575,6 +8651,8 @@ void ObjectMgr::LoadNPCSpellClickSpells()
         if ((creatureTemplatePair.second.npcflag & UNIT_NPC_FLAG_SPELLCLICK) && !_spellClickInfoStore.count(creatureTemplatePair.first))
         {
             TC_LOG_ERROR("sql.sql", "npc_spellclick_spells: Creature template %u has UNIT_NPC_FLAG_SPELLCLICK but no data in spellclick table! Removing flag", creatureTemplatePair.first);
+            TC_LOG_INFO("sql.fixes", "UPDATE `creature_template` SET `npcflag`=`npcflag`^%u WHERE `entry`=%u; ", uint32(UNIT_NPC_FLAG_SPELLCLICK), creatureTemplatePair.first);
+
             creatureTemplatePair.second.npcflag &= ~UNIT_NPC_FLAG_SPELLCLICK;
         }
     }
@@ -8652,9 +8730,16 @@ void ObjectMgr::LoadGameobjectQuestStarters()
     {
         GameObjectTemplate const* goInfo = GetGameObjectTemplate(itr->first);
         if (!goInfo)
+        {
             TC_LOG_ERROR("sql.sql", "Table `gameobject_queststarter` has data for nonexistent gameobject entry (%u) and existed quest %u", itr->first, itr->second);
+            TC_LOG_INFO("sql.fixes", "DELETE FROM `gameobject_queststarter` WHERE `id` = %u;", itr->first);
+
+        }
         else if (goInfo->type != GAMEOBJECT_TYPE_QUESTGIVER)
+        {
             TC_LOG_ERROR("sql.sql", "Table `gameobject_queststarter` has data gameobject entry (%u) for quest %u, but GO is not GAMEOBJECT_TYPE_QUESTGIVER", itr->first, itr->second);
+            TC_LOG_INFO("sql.fixes", "DELETE FROM `gameobject_queststarter` WHERE `id` = %u;", itr->first);
+        }
     }
 }
 
@@ -8666,9 +8751,15 @@ void ObjectMgr::LoadGameobjectQuestEnders()
     {
         GameObjectTemplate const* goInfo = GetGameObjectTemplate(itr->first);
         if (!goInfo)
+        {
             TC_LOG_ERROR("sql.sql", "Table `gameobject_questender` has data for nonexistent gameobject entry (%u) and existed quest %u", itr->first, itr->second);
+            TC_LOG_INFO("sql.fixes", "DELETE FROM `gameobject_questender` WHERE `id` = %u;", itr->first);
+        }
         else if (goInfo->type != GAMEOBJECT_TYPE_QUESTGIVER)
+        {
             TC_LOG_ERROR("sql.sql", "Table `gameobject_questender` has data gameobject entry (%u) for quest %u, but GO is not GAMEOBJECT_TYPE_QUESTGIVER", itr->first, itr->second);
+            TC_LOG_INFO("sql.fixes", "DELETE FROM `gameobject_questender` WHERE `id` = %u;", itr->first);
+        }
     }
 }
 
@@ -8680,9 +8771,15 @@ void ObjectMgr::LoadCreatureQuestStarters()
     {
         CreatureTemplate const* cInfo = GetCreatureTemplate(itr->first);
         if (!cInfo)
+        {
             TC_LOG_ERROR("sql.sql", "Table `creature_queststarter` has data for nonexistent creature entry (%u) and existed quest %u", itr->first, itr->second);
+            TC_LOG_INFO("sql.fixes", "DELETE FROM `creature_queststarter` WHERE `id` = %u;", itr->first);
+        }
         else if (!(cInfo->npcflag & UNIT_NPC_FLAG_QUESTGIVER))
+        {
             TC_LOG_ERROR("sql.sql", "Table `creature_queststarter` has creature entry (%u) for quest %u, but npcflag does not include UNIT_NPC_FLAG_QUESTGIVER", itr->first, itr->second);
+            TC_LOG_INFO("sql.fixes", "DELETE FROM `creature_queststarter` WHERE `id` = %u;", itr->first);
+        }
     }
 }
 
@@ -8694,9 +8791,15 @@ void ObjectMgr::LoadCreatureQuestEnders()
     {
         CreatureTemplate const* cInfo = GetCreatureTemplate(itr->first);
         if (!cInfo)
+        {
             TC_LOG_ERROR("sql.sql", "Table `creature_questender` has data for nonexistent creature entry (%u) and existed quest %u", itr->first, itr->second);
+            TC_LOG_INFO("sql.fixes", "DELETE FROM `creature_questender` WHERE `id` = %u;", itr->first);
+        }
         else if (!(cInfo->npcflag & UNIT_NPC_FLAG_QUESTGIVER))
+        {
             TC_LOG_ERROR("sql.sql", "Table `creature_questender` has creature entry (%u) for quest %u, but npcflag does not include UNIT_NPC_FLAG_QUESTGIVER", itr->first, itr->second);
+            TC_LOG_INFO("sql.fixes", "DELETE FROM `creature_questender` WHERE `id` = %u;", itr->first);
+        }
     }
 }
 

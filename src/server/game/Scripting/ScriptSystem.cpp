@@ -76,7 +76,10 @@ void SystemMgr::LoadScriptWaypoints()
         }
 
         if (!info->ScriptID)
+        {
             TC_LOG_ERROR("sql.sql", "SystemMgr: DB table script_waypoint has waypoint for creature entry %u, but creature does not have ScriptName defined and then useless.", entry);
+            TC_LOG_INFO("sql.fixes", "DELETE FROM `script_waypoint` WHERE `entry`=%u; ", entry);
+        }
 
         WaypointPath& path = _waypointStore[entry];
         path.id = entry;

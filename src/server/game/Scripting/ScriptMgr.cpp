@@ -50,6 +50,7 @@
 #include "Weather.h"
 #include "WorldPacket.h"
 #include <unordered_map>
+#include <boost/algorithm/string/join.hpp>
 
 // Trait which indicates whether this script type
 // must be assigned in the database.
@@ -1260,6 +1261,35 @@ void ScriptMgr::Initialize()
 
         TC_LOG_ERROR("sql.sql", "Script '%s' is referenced by the database, but does not exist in the core!", scriptName.c_str());
     }
+
+    if (unusedScriptNames.size() > 0)
+    {
+        std::string joinedUnusedScriptNames = boost::algorithm::join(unusedScriptNames, "', '");
+
+        TC_LOG_INFO("sql.fixes", "DELETE FROM `spell_script_names` WHERE `ScriptName` IN ('%s');", joinedUnusedScriptNames.c_str());
+        TC_LOG_INFO("sql.fixes", "DELETE FROM `item_script_names` WHERE `ScriptName` IN ('%s');", joinedUnusedScriptNames.c_str());
+
+        TC_LOG_INFO("sql.fixes", "DELETE FROM `achievement_scripts` WHERE `ScriptName` IN ('%s');", joinedUnusedScriptNames.c_str());
+        TC_LOG_INFO("sql.fixes", "DELETE FROM `areatrigger_scripts` WHERE `ScriptName` IN ('%s');", joinedUnusedScriptNames.c_str());
+
+        TC_LOG_INFO("sql.fixes", "UPDATE `creature_template` SET `ScriptName` = '' WHERE `ScriptName` IN ('%s');", joinedUnusedScriptNames.c_str());
+        TC_LOG_INFO("sql.fixes", "UPDATE `gameobject_template` SET `ScriptName` = '' WHERE `ScriptName` IN ('%s');", joinedUnusedScriptNames.c_str());
+        TC_LOG_INFO("sql.fixes", "UPDATE `criteria_data` SET `ScriptName` = '' WHERE `ScriptName` IN ('%s');", joinedUnusedScriptNames.c_str());
+        TC_LOG_INFO("sql.fixes", "UPDATE `battlefield_template` SET `ScriptName` = '' WHERE `ScriptName` IN ('%s');", joinedUnusedScriptNames.c_str());
+        TC_LOG_INFO("sql.fixes", "UPDATE `conditions` SET `ScriptName` = '' WHERE `ScriptName` IN ('%s');", joinedUnusedScriptNames.c_str());
+        TC_LOG_INFO("sql.fixes", "UPDATE `areatrigger_create_properties` SET `ScriptName` = '' WHERE `ScriptName` IN ('%s');", joinedUnusedScriptNames.c_str());
+        TC_LOG_INFO("sql.fixes", "UPDATE `areatrigger` SET `ScriptName` = '' WHERE `ScriptName` IN ('%s');", joinedUnusedScriptNames.c_str());
+        TC_LOG_INFO("sql.fixes", "UPDATE `conversation_template` SET `ScriptName` = '' WHERE `ScriptName` IN ('%s');", joinedUnusedScriptNames.c_str());
+        TC_LOG_INFO("sql.fixes", "UPDATE `creature` SET `ScriptName` = '' WHERE `ScriptName` IN ('%s');", joinedUnusedScriptNames.c_str());
+        TC_LOG_INFO("sql.fixes", "UPDATE `gameobject` SET `ScriptName` = '' WHERE `ScriptName` IN ('%s');", joinedUnusedScriptNames.c_str());
+        TC_LOG_INFO("sql.fixes", "UPDATE `instance_template` SET `script` = '' WHERE `script` IN ('%s');", joinedUnusedScriptNames.c_str());
+        TC_LOG_INFO("sql.fixes", "UPDATE `scene_template` SET `ScriptName` = '' WHERE `ScriptName` IN ('%s');", joinedUnusedScriptNames.c_str());
+        TC_LOG_INFO("sql.fixes", "UPDATE `outdoorpvp_template` SET `ScriptName` = '' WHERE `ScriptName` IN ('%s');", joinedUnusedScriptNames.c_str());
+        TC_LOG_INFO("sql.fixes", "UPDATE `quest_template_addon` SET `ScriptName` = '' WHERE `ScriptName` IN ('%s');", joinedUnusedScriptNames.c_str());
+        TC_LOG_INFO("sql.fixes", "UPDATE `game_weather` SET `ScriptName` = '' WHERE `ScriptName` IN ('%s');", joinedUnusedScriptNames.c_str());
+        TC_LOG_INFO("sql.fixes", "UPDATE `world_state` SET `ScriptName` = '' WHERE `ScriptName` IN ('%s');", joinedUnusedScriptNames.c_str());
+    }
+    
 
     TC_LOG_INFO("server.loading", ">> Loaded %u C++ scripts in %u ms",
         GetScriptCount(), GetMSTimeDiffToNow(oldMSTime));

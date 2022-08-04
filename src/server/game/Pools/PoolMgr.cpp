@@ -728,6 +728,8 @@ void PoolMgr::LoadFromDB()
         if (IsEmpty(poolId))
         {
             TC_LOG_ERROR("sql.sql", "Pool Id %u is empty (has no creatures and no gameobects and either no child pools or child pools are all empty. The pool will not be spawned", poolId);
+            TC_LOG_INFO("sql.fixes", "DELETE FROM `pool_template` WHERE `entry`=%u;", poolId);
+
             continue;
         }
         ASSERT(templateData.MapId != -1);

@@ -401,18 +401,24 @@ void GameEventMgr::LoadFromDB()
                 if (!data)
                 {
                     TC_LOG_ERROR("sql.sql", "`game_event_creature` contains creature (GUID: " UI64FMTD ") not found in `creature` table.", guid);
+                    TC_LOG_INFO("sql.fixes", "DELETE FROM `game_event_creature` WHERE `guid`=" UI64FMTD "; ", guid);
+
                     continue;
                 }
 
                 if (internal_event_id < 0 || internal_event_id >= int32(mGameEventCreatureGuids.size()))
                 {
                     TC_LOG_ERROR("sql.sql", "`game_event_creature`: game event id (%i) is out of range compared to max event id in `game_event`.", event_id);
+                    TC_LOG_INFO("sql.fixes", "DELETE FROM `game_event_creature` WHERE `id`=%u; ", event_id);
                     continue;
                 }
 
                 // Log error for pooled object, but still spawn it
                 if (data->poolId)
+                {
                     TC_LOG_ERROR("sql.sql", "`game_event_creature`: game event id (%i) contains creature (" UI64FMTD ") which is part of a pool (%u). This should be spawned in game_event_pool", event_id, guid, data->poolId);
+                    TC_LOG_INFO("sql.fixes", "DELETE FROM `game_event_creature` WHERE `guid`=" UI64FMTD "; ", guid);
+                }
 
                 GuidList& crelist = mGameEventCreatureGuids[internal_event_id];
                 crelist.push_back(guid);
@@ -451,18 +457,23 @@ void GameEventMgr::LoadFromDB()
                 if (!data)
                 {
                     TC_LOG_ERROR("sql.sql", "`game_event_gameobject` contains gameobject (GUID: " UI64FMTD ") not found in `gameobject` table.", guid);
+                    TC_LOG_INFO("sql.fixes", "DELETE FROM `game_event_gameobject` WHERE `guid`=" UI64FMTD "; ", guid);
                     continue;
                 }
 
                 if (internal_event_id < 0 || internal_event_id >= int32(mGameEventGameobjectGuids.size()))
                 {
                     TC_LOG_ERROR("sql.sql", "`game_event_gameobject`: game event id (%i) is out of range compared to max event id in `game_event`.", event_id);
+                    TC_LOG_INFO("sql.fixes", "DELETE FROM `game_event_gameobject` WHERE `id`=%u;", event_id);
                     continue;
                 }
 
                 // Log error for pooled object, but still spawn it
                 if (data->poolId)
+                {
                     TC_LOG_ERROR("sql.sql", "`game_event_gameobject`: game event id (%i) contains game object (" UI64FMTD ") which is part of a pool (%u). This should be spawned in game_event_pool", event_id, guid, data->poolId);
+                    TC_LOG_INFO("sql.fixes", "DELETE FROM `game_event_gameobject` WHERE `guid`=" UI64FMTD "; ", guid);
+                }
 
                 GuidList& golist = mGameEventGameobjectGuids[internal_event_id];
                 golist.push_back(guid);
