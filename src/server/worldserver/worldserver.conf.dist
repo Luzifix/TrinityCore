@@ -4557,6 +4557,35 @@ Schattenhain.Activity.Guild.Enable = 1
 
 Schattenhain.Activity.Guild.CoinPerHour = 0.5
 
+#
+#    Schattenhain.Weather.Enable
+#        Description: Enables the weather system
+#        Default:     1 - (Enabled)
+#                     0 - (Disabled)
+
+Schattenhain.Weather.Enable = 0
+
+#
+#    Schattenhain.Weather.Interval
+#        Description: Fetch Interval from Openweathermap api (Rate limit per day is 1000)
+#        Default:     300
+
+Schattenhain.Weather.Interval = 300
+
+#
+#    Schattenhain.Weather.ApiKey
+#        Description: Openweathermap api key
+#        Default:     ""
+
+Schattenhain.Weather.ApiKey = ""
+
+#
+#    Schattenhain.Weather.CityId
+#        Description: Openweathermap api key
+#        Default:     734517 - Polygyros
+
+Schattenhain.Weather.CityId = 734517
+
 
 #
 ###################################################################################################

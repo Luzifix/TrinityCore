@@ -10,6 +10,7 @@ void AddSC_Housing_CommandScript();
 void AddSC_Housing_GameObjectScript();
 void AddSC_Scripts_Schattenhain_PlayerScript();
 void AddSC_Activity_WorldScript();
+void AddSC_Weather_WorldScript();
 void AddSC_Npc_Morph();
 void AddSC_Price_CommandScript();
 void AddSC_MountSystem_CreatureScript();
@@ -29,6 +30,7 @@ void AddSchattenhainScripts()
     AddSC_Housing_GameObjectScript();
     AddSC_Scripts_Schattenhain_PlayerScript();
     AddSC_Activity_WorldScript();
+    AddSC_Weather_WorldScript();
     AddSC_Npc_Morph();
     AddSC_Price_CommandScript();
     AddSC_MountSystem_CreatureScript();
