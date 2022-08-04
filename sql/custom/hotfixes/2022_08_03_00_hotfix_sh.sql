@@ -1,0 +1,1 @@
+DELETE FROM hotfix_blob WHERE TableHash = 4021368146;
