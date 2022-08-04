@@ -7,8 +7,6 @@
 #include "Guild.h"
 #include "HousingMgr.h"
 
-using json::JSON;
-
 inline Housing* HousingValidateOwner(uint32 housingId, Player* player)
 {
     if (Housing* housingEntry = sHousingMgr->GetById(housingId))

@@ -36,7 +36,4 @@
 #include "StringFormat.h"
 #include "TemporarySummon.h"
 #include "Schattenhain/Slops/SlopsHandlers.h"
-#include "StringFormat.h"
-#include "TemporarySummon.h"
-#include "Schattenhain/Slops/SlopsHandlers.h"
 #include <sstream>

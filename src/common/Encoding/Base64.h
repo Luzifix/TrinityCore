@@ -27,10 +27,22 @@ namespace Trinity
 {
 namespace Encoding
 {
+
+static const std::string base64Chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
+
 struct TC_COMMON_API Base64
 {
     static std::string Encode(std::vector<uint8> const& data);
     static Optional<std::vector<uint8>> Decode(std::string const& data);
+
+    static std::string EncodeString(std::string stringToEncode);
+    static std::string DecodeString(std::string stringToDecode);
+
+private:
+
+    static inline bool IsBase64Char(unsigned char c) {
+        return (isalnum(c) || (c == '+') || (c == '/'));
+    }
 };
 }
 }

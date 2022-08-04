@@ -13,8 +13,6 @@
 #include <string>
 #include <sstream>
 
-using json::JSON;
-
 void SlopsHandler::HandleItemPriceRequest(SlopsPackage package)
 {
     JSON data = JSON::Load(package.message);

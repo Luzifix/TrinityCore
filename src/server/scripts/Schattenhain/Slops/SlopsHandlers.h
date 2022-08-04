@@ -7,7 +7,9 @@
 #define SlopsHandler_h__
 
 #include "Slops.h"
-#include "Json.h"
+#include <Json.h>
+
+using Trinity::Encoding::JSON;
 
 class TC_GAME_API SlopsHandler
 {

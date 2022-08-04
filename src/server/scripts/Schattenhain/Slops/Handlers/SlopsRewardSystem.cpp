@@ -6,8 +6,6 @@
 #include "WorldSession.h"
 #include "ActivityMgr.h"
 
-using json::JSON;
-
 void SlopsHandler::HandleRewardSystemRequest(SlopsPackage package)
 {
     ActivityData activityData = package.sender->GetSession()->GetActivityData();

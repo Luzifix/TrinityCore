@@ -92,7 +92,7 @@ inline void SendMessage(SchattenhainLuaOpcodeServer opcode, std::string data, Pl
         out.push(original);
         boost::iostreams::copy(out, compressed);
         std::string compressedData = compressed.str();
-        std::string message = base64_encode(reinterpret_cast<const unsigned char*>(compressedData.c_str()), compressedData.length());
+        std::string message = Trinity::Encoding::Base64::EncodeString(compressedData);
 
         int packageId = 1;
         int packageCount = std::ceil((float)message.length() / (float)SlopsMessageSize);
@@ -163,7 +163,7 @@ void Slops::Receive(std::string data, Player* sender)
         uint32 opcode = atoi(package[2].c_str());
         uint32 packageId = atoi(package[3].c_str());
         uint32 packageSize = atoi(package[4].c_str());
-        std::string message = base64_decode(package[5]);
+        std::string message = Trinity::Encoding::Base64::DecodeString(package[5]);
 
 #pragma region Valid package content
         // Check opcode

@@ -12,7 +12,6 @@
 #include <Language.h>
 #include <sstream>
 
-using json::JSON;
 
 void SlopsHandler::HandleFurnitureListRequest(SlopsPackage package)
 {

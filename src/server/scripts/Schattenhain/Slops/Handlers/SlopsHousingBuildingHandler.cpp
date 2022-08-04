@@ -20,8 +20,6 @@
 #include <Language.h>
 #include <DB2Stores.h>
 
-using json::JSON;
-
 static void ResponseSelected(Player* player, std::list<GameObject*> objects)
 {
     JSON data = {

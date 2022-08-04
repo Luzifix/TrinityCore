@@ -9,8 +9,6 @@
 #include "Chat.h"
 #include "Language.h"
 
-using json::JSON;
-
 enum Spells
 {
     SPELL_OOC_MODE = 37800,

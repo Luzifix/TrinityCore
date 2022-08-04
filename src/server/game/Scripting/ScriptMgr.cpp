@@ -1289,7 +1289,6 @@ void ScriptMgr::Initialize()
         TC_LOG_INFO("sql.fixes", "UPDATE `game_weather` SET `ScriptName` = '' WHERE `ScriptName` IN ('%s');", joinedUnusedScriptNames.c_str());
         TC_LOG_INFO("sql.fixes", "UPDATE `world_state` SET `ScriptName` = '' WHERE `ScriptName` IN ('%s');", joinedUnusedScriptNames.c_str());
     }
-    
 
     TC_LOG_INFO("server.loading", ">> Loaded %u C++ scripts in %u ms",
         GetScriptCount(), GetMSTimeDiffToNow(oldMSTime));

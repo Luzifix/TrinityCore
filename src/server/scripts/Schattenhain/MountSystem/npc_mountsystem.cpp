@@ -22,9 +22,9 @@
 #include "WorldSession.h"
 #include "World.h"
 #include "GridNotifiersImpl.h"
-#include "../Slops/Json.h"
+#include <Json.h>
 
-using json::JSON;
+using Trinity::Encoding::JSON;
 
 class npc_mountsystem_mount : public CreatureScript
 {

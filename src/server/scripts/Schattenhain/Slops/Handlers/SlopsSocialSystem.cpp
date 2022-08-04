@@ -9,8 +9,6 @@
 #include "SpellMgr.h"-
 #include "WorldSession.h"
 
-using json::JSON;
-
 void SlopsHandler::HandleSocialChatTyping(SlopsPackage package)
 {
     int SPELL_CHAT_BUBBLE = 211565;

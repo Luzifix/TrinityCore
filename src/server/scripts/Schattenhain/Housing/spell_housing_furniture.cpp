@@ -21,8 +21,6 @@
 #include "PoolMgr.h"
 #include <ScriptPCH.h>
 
-using json::JSON;
-
 class spell_housing_furniture_spawn : public SpellScriptLoader
 {
 public:

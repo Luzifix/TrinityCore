@@ -14,8 +14,10 @@
 #include <iostream>
 #include <boost/algorithm/string.hpp>
 
-namespace json {
-
+namespace Trinity
+{
+    namespace Encoding
+    {
     using std::map;
     using std::deque;
     using std::string;
@@ -58,7 +60,7 @@ namespace json {
     }
 
     // SimpleJSON - https://github.com/Luzifix/SimpleJSON
-    class JSON
+    class TC_COMMON_API JSON
     {
         union BackingData {
             BackingData(double d) : Float(d) {}
@@ -650,6 +652,6 @@ namespace json {
             return JSON();
         }
     }
-} // End Namespace json
-
+} // End Namespace Encoding
+} // End Namespace Trinity
 #endif // Json_h__
