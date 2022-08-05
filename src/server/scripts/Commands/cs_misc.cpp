@@ -1560,7 +1560,7 @@ public:
         return true;
     }
 
-    static bool HandleChangeWeather(ChatHandler* handler, WeatherType type, float intensity)
+    static bool HandleChangeWeather(ChatHandler* handler, uint32 type, float intensity)
     {
         // Weather is OFF
         if (!sWorld->getBoolConfig(CONFIG_WEATHER))
@@ -1573,6 +1573,11 @@ public:
         Player* player = handler->GetSession()->GetPlayer();
         uint32 zoneid = player->GetZoneId();
 
+        WorldPackets::Misc::Weather weatherDefaultPkg(WeatherState(0), 0, false);
+        player->SendDirectMessage(weatherDefaultPkg.Write());
+        WorldPackets::Misc::Weather weatherPkg(WeatherState(type), intensity, true);
+        player->SendDirectMessage(weatherPkg.Write());
+
         Weather* weather = player->GetMap()->GetOrGenerateZoneDefaultWeather(zoneid);
         if (!weather)
         {
@@ -1580,8 +1585,6 @@ public:
             handler->SetSentErrorMessage(true);
             return false;
         }
-
-        WorldPackets::Misc::Weather weatherPkg(WeatherState(type), intensity, true);
 
         //- Returns false if there were no players found to update
         if (!sWorld->SendZoneMessage(weather->GetZone(), weatherPkg.Write()))

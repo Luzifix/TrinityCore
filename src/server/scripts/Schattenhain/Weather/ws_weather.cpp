@@ -13,9 +13,11 @@
 #include "Language.h"
 #include "RBAC.h"
 #include "Chat.h"
+#include "Optional.h"
 #include <HttpClient.h>
 #include <Json.h>
 #include <unordered_map>
+#include "../Slops/Slops.h"
 
 class ws_weather : public WorldScript
 {
@@ -31,6 +33,7 @@ private:
         uint8 category;
         uint32 gameWeatherId = 0;
         float gameWeatherGrad = 0;
+        std::string descriptionColor;
         bool defaultWeatherForCategory = false;
     };
 
@@ -39,19 +42,19 @@ private:
         uint32 id;
         uint8 category;
         std::string icon = "01d";
-        std::string description = "";
-        std::string sourceCity = "";
-        std::string soruceCountry = "";
+        Optional<std::string> description;
+        Optional<std::string> sourceCity;
+        Optional<std::string> soruceCountry;
 
-        float temprature = 0.f;
-        float feelTemprature = 0.f;
-        int pressure = 0;
-        int humidity = 0;
-        float windSpeed = 0.f;
+        Optional<float> temperature;
+        Optional<float> feelTemperature;
+        Optional<int> pressure;
+        Optional<int> humidity;
+        Optional<float> windSpeed;
     };
 
-    const static inline const char* API_HOST = "api.openweathermap.org";
-    const static inline const char* API_PATH = "/data/2.5/weather?id=%u&units=metric&lang=de&appid=%s";
+    const static inline char* API_HOST = "api.openweathermap.org";
+    const static inline char* API_PATH = "/data/2.5/weather?id=%u&units=metric&lang=de&appid=%s";
 public:
 
     ws_weather() : WorldScript("ws_weather")
@@ -70,10 +73,14 @@ public:
     {
         _active = sConfigMgr->GetBoolDefault("Schattenhain.Weather.Enable", false);
         _interval = std::chrono::seconds(sConfigMgr->GetIntDefault("Schattenhain.Weather.Interval", 300));
-        _apiKey = sConfigMgr->GetStringDefault("Schattenhain.Weather.ApiKey", "").c_str();
+        _apiKey = sConfigMgr->GetStringDefault("Schattenhain.Weather.ApiKey", "");
         _apiCityCode = sConfigMgr->GetIntDefault("Schattenhain.Weather.CityId", 734517);
 
+        LoadFromDB();
         LoadRealWeatherFromApi();
+        UpdateWeatherForAllPlayer();
+
+        _events.ScheduleEvent(WEATHER_EVENT_TICK, _interval);
     }
 
     void OnUpdate(uint32 diff) override
@@ -112,8 +119,37 @@ public:
         if (grad <= 0)
             grad = 0;
 
+        WorldPackets::Misc::Weather weatherDefaultPkg(WeatherState(0), 0, false);
+        player->SendDirectMessage(weatherDefaultPkg.Write());
         WorldPackets::Misc::Weather weatherPkg(WeatherState(weatherId), grad, false);
         player->SendDirectMessage(weatherPkg.Write());
+
+        JSON data = {
+            "icon", _realWeather->icon
+        };
+
+        if (_realWeather->description)
+        {
+            data["description"] = *_realWeather->description;
+            data["descriptionColor"] = _activeGameWeather->descriptionColor;
+        }
+
+        if (_realWeather->temperature)
+            data["temperature"] = *_realWeather->temperature;
+
+        if (_realWeather->feelTemperature)
+            data["feelTemperature"] = *_realWeather->feelTemperature;
+
+        if (_realWeather->humidity)
+            data["humidity"] = *_realWeather->humidity;
+
+        if (_realWeather->pressure)
+            data["pressure"] = *_realWeather->pressure;
+
+        if (_realWeather->windSpeed)
+            data["windSpeed"] = *_realWeather->windSpeed;
+
+        sSlops->Send(SLOPS_SMSG_WEATHER_DATA, data.dump(), player);
     }
 private:
     void LoadRealWeatherFromApi()
@@ -131,39 +167,39 @@ private:
             if (!weatherData.hasKey("weather") || !weatherData["weather"][0].hasKey("id"))
                 return;
 
-            RealWeather realWeather;
-            realWeather.id = weatherData["weather"][0]["id"].ToInt();
-            realWeather.category = (uint8)std::to_string(realWeather.id).c_str()[0];
+            RealWeather* realWeather = new RealWeather();
+            realWeather->id = weatherData["weather"][0]["id"].ToInt();
+            realWeather->category = (uint8)std::to_string(realWeather->id).c_str()[0];
 
             if (weatherData.hasKey("name"))
-                realWeather.sourceCity = weatherData["name"].ToString();
+                realWeather->sourceCity = weatherData["name"].ToString();
 
             if (weatherData.hasKey("sys") && weatherData["sys"].hasKey("country"))
-                realWeather.soruceCountry = weatherData["sys"]["country"].ToString();
+                realWeather->soruceCountry = weatherData["sys"]["country"].ToString();
             
             if (weatherData["weather"][0].hasKey("icon"))
-                realWeather.icon = weatherData["weather"][0]["icon"].ToString();
+                realWeather->icon = weatherData["weather"][0]["icon"].ToString();
 
             if (weatherData["weather"][0].hasKey("description"))
-                realWeather.description = weatherData["weather"][0]["description"].ToString();
+                realWeather->description = weatherData["weather"][0]["description"].ToString();
 
             if (weatherData.hasKey("main"))
             {
                 if (weatherData["main"].hasKey("temp"))
-                    realWeather.temprature = weatherData["main"]["temp"].ToFloat();
+                    realWeather->temperature = weatherData["main"]["temp"].ToFloat();
 
                 if (weatherData["main"].hasKey("feels_like"))
-                    realWeather.feelTemprature = weatherData["main"]["feels_like"].ToFloat();
+                    realWeather->feelTemperature = weatherData["main"]["feels_like"].ToFloat();
 
                 if (weatherData["main"].hasKey("pressure"))
-                    realWeather.pressure = weatherData["main"]["pressure"].ToInt();
+                    realWeather->pressure = weatherData["main"]["pressure"].ToInt();
 
                 if (weatherData["main"].hasKey("humidity"))
-                    realWeather.humidity = weatherData["main"]["humidity"].ToInt();
+                    realWeather->humidity = weatherData["main"]["humidity"].ToInt();
             }
 
             if (weatherData.hasKey("wind") && weatherData["wind"].hasKey("speed"))
-                realWeather.windSpeed = weatherData["wind"]["speed"].ToFloat();
+                realWeather->windSpeed = weatherData["wind"]["speed"].ToFloat();
 
             _realWeather = realWeather;
 
@@ -177,7 +213,8 @@ private:
 
     void LoadFromDB()
     {
-        if (QueryResult result = WorldDatabase.Query("SELECT `id`, `category`, `game_weather_id`, `game_weather_grad`, `default_weather_for_category` FROM `game_weather_x_real_weather`"))
+        //                                                       0     1           2                  3                    4                              5
+        if (QueryResult result = WorldDatabase.Query("SELECT `id`, `category`, `game_weather_id`, `game_weather_grad`, `default_weather_for_category`, `description_color` FROM `game_weather_x_real_weather`"))
         {
             do
             {
@@ -189,6 +226,7 @@ private:
                 gameWeatherXRealWeather->gameWeatherId = fields[2].GetUInt32();
                 gameWeatherXRealWeather->gameWeatherGrad = fields[3].GetFloat();
                 gameWeatherXRealWeather->defaultWeatherForCategory = fields[4].GetBool();
+                gameWeatherXRealWeather->descriptionColor = fields[5].GetString();
 
                 _gameWeatherXRealWeatherStore[gameWeatherXRealWeather->id] = gameWeatherXRealWeather;
                 _gameWeatherXRealWeatherDefaultCategoryStore[gameWeatherXRealWeather->category] = gameWeatherXRealWeather;
@@ -198,16 +236,16 @@ private:
 
     void SetActiveGameWeather()
     {
-        if (_gameWeatherXRealWeatherStore.find(_realWeather.id) != _gameWeatherXRealWeatherStore.end())
+        if (_gameWeatherXRealWeatherStore.find(_realWeather->id) != _gameWeatherXRealWeatherStore.end())
         {
-            _activeGameWeather = _gameWeatherXRealWeatherStore[_realWeather.id];
+            _activeGameWeather = _gameWeatherXRealWeatherStore[_realWeather->id];
 
             return;
         }
 
-        if (_gameWeatherXRealWeatherDefaultCategoryStore.find(_realWeather.category) != _gameWeatherXRealWeatherDefaultCategoryStore.end())
+        if (_gameWeatherXRealWeatherDefaultCategoryStore.find(_realWeather->category) != _gameWeatherXRealWeatherDefaultCategoryStore.end())
         {
-            _activeGameWeather = _gameWeatherXRealWeatherDefaultCategoryStore[_realWeather.category];
+            _activeGameWeather = _gameWeatherXRealWeatherDefaultCategoryStore[_realWeather->category];
 
             return;
         }
@@ -227,7 +265,7 @@ private:
     }
 
     EventMap _events;
-    RealWeather _realWeather;
+    RealWeather* _realWeather;
     const GameWeatherXRealWeather* _activeGameWeather = nullptr;
     std::unordered_map<uint32, const GameWeatherXRealWeather*> _gameWeatherXRealWeatherStore;
     std::unordered_map<uint8, const GameWeatherXRealWeather*> _gameWeatherXRealWeatherDefaultCategoryStore;
@@ -235,7 +273,7 @@ private:
     // Config
     bool _active = false;
     std::chrono::seconds _interval = 300s;
-    const char* _apiKey = "";
+    std::string _apiKey = "";
     uint32 _apiCityCode = 734517;
 };
 

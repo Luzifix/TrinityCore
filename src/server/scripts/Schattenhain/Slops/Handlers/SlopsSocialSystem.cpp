@@ -6,7 +6,7 @@
 #include "Chat.h"
 #include "EndorsementsMgr.h"
 #include "Language.h"
-#include "SpellMgr.h"-
+#include "SpellMgr.h"
 #include "WorldSession.h"
 
 void SlopsHandler::HandleSocialChatTyping(SlopsPackage package)

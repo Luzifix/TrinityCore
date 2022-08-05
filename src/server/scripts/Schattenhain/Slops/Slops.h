@@ -75,6 +75,7 @@ enum SchattenhainLuaOpcodeServer : uint32
     SLOPS_SMSG_SOCIAL_SYSTEM_CHAT_RANGE                        = 0x001A,
     SLOPS_SMSG_SOCIAL_SYSTEM_ENDORSEMENTS_RESPONSE             = 0x001B,
     SLOPS_SMSG_SOCIAL_SYSTEM_ENDORSEMENTS_SHOW                 = 0x001C,
+    SLOPS_SMSG_WEATHER_DATA                                    = 0x001D,
 
     SLOPS_SMSG_MAX
 };
