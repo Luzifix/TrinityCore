@@ -867,6 +867,31 @@ typedef std::unordered_map<uint32, SceneTemplate> SceneTemplateContainer;
 
 typedef std::unordered_map<uint32, std::string> PhaseNameContainer;
 
+struct Animations
+{
+    uint32 id;
+    uint32 categoryId;
+    std::string name = "";
+    std::string slashCommand = "";
+    uint32 emoteId = 0;
+    uint32 spellId = 0;
+    uint8 spellType = 0;
+    uint32 spellVisualKitId = 0;
+    uint8 spellVisualKitType = 0;
+    uint32 spellVisualKitDuration = 0;
+    uint32 animKitId = 0;
+    uint8 animKitType = 0;
+};
+
+struct AnimationsCategory
+{
+    uint32 id;
+    std::string name = "";
+};
+
+typedef std::unordered_map<uint32, Animations*> AnimationsContainer;
+typedef std::unordered_map<uint32, AnimationsCategory*> AnimationsCategoryContainer;
+
 struct PlayerChoiceResponseRewardItem
 {
     PlayerChoiceResponseRewardItem() : Id(0), Quantity(0) { }
@@ -1427,6 +1452,8 @@ class TC_GAME_API ObjectMgr
         void LoadJumpChargeParams();
         void LoadPhaseNames();
 
+        void LoadAnimations();
+
         void InitializeQueriesData(QueryDataGroup mask);
 
         std::string GeneratePetName(uint32 entry);
@@ -1805,6 +1832,10 @@ class TC_GAME_API ObjectMgr
 
         JumpChargeParams const* GetJumpChargeParams(int32 id) const;
 
+        AnimationsCategoryContainer GetAnimationCategorys() const { return _animationsCategoryStore; };
+        std::vector<Animations*> GetAnimationsByCategory(uint32 categoryId) const;
+        Animations* GetAnimationById(uint32 animationId);
+
     private:
         // first free id for selected id type
         uint32 _auctionId;
@@ -2001,6 +2032,9 @@ class TC_GAME_API ObjectMgr
 
         std::set<uint32> _transportMaps; // Helper container storing map ids that are for transports only, loaded from gameobject_template
         VehicleSeatAddonContainer _vehicleSeatAddonStore;
+
+        AnimationsContainer _animationsStore;
+        AnimationsCategoryContainer _animationsCategoryStore;
 };
 
 #define sObjectMgr ObjectMgr::instance()

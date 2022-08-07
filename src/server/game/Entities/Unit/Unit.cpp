@@ -10524,8 +10524,8 @@ void Unit::SetAIAnimKitId(uint16 animKitId)
     if (_aiAnimKitId == animKitId)
         return;
 
-    if (animKitId && !sAnimKitStore.LookupEntry(animKitId))
-        return;
+    //if (animKitId && !sAnimKitStore.LookupEntry(animKitId))
+    //    return;
 
     _aiAnimKitId = animKitId;
 
@@ -10540,8 +10540,8 @@ void Unit::SetMovementAnimKitId(uint16 animKitId)
     if (_movementAnimKitId == animKitId)
         return;
 
-    if (animKitId && !sAnimKitStore.LookupEntry(animKitId))
-        return;
+    //if (animKitId && !sAnimKitStore.LookupEntry(animKitId))
+    //    return;
 
     _movementAnimKitId = animKitId;
 
@@ -10556,8 +10556,8 @@ void Unit::SetMeleeAnimKitId(uint16 animKitId)
     if (_meleeAnimKitId == animKitId)
         return;
 
-    if (animKitId && !sAnimKitStore.LookupEntry(animKitId))
-        return;
+    //if (animKitId && !sAnimKitStore.LookupEntry(animKitId))
+    //    return;
 
     _meleeAnimKitId = animKitId;
 

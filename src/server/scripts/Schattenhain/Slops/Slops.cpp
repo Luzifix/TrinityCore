@@ -68,6 +68,10 @@ Slops::Slops()
     AddMessageHandler(SLOPS_CMSG_ITEM_PRICE_REQUEST, SlopsHandler::HandleItemPriceRequest);
     AddMessageHandler(SLOPS_CMSG_ITEM_PRICE_CATEGORIZE_REQUEST, SlopsHandler::HandleItemPriceCategorizeRequest);
     AddMessageHandler(SLOPS_CMSG_ITEM_PRICE_CATEGORIZE_NOTIFY_REQUEST, SlopsHandler::HandleItemPriceCategorizeNotifyRequest);
+
+    // Animations
+    AddMessageHandler(SLOPS_CMSG_ANIMATIONS_LIST_REQUEST, SlopsHandler::HandleAnimationsListRequest);
+    AddMessageHandler(SLOPS_CMSG_ANIMATIONS_DO, SlopsHandler::HandleAnimationsDo);
 }
 Slops::~Slops() { }
 

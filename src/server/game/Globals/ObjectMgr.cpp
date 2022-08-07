@@ -11871,3 +11871,111 @@ std::string ObjectMgr::GetPhaseName(uint32 phaseId) const
     PhaseNameContainer::const_iterator iter = _phaseNameStore.find(phaseId);
     return iter != _phaseNameStore.end() ? iter->second : "Unknown Name";
 }
+
+void ObjectMgr::LoadAnimations()
+{
+    uint32 oldMSTime = getMSTime();
+
+    _animationsStore.clear();
+    _animationsCategoryStore.clear();
+
+    QueryResult categoryResult = WorldDatabase.Query("SELECT `id`, `name` FROM `animations_category` ORDER BY `order` ASC");
+
+    if (!categoryResult)
+    {
+        TC_LOG_INFO("server.loading", ">> Loaded 0 animations. DB table `animations_category` is empty.");
+        return;
+    }
+
+    uint32 categoryCount = 0;
+    do
+    {
+        Field* fields = categoryResult->Fetch();
+
+        uint32 categoryId = fields[0].GetUInt32();
+        std::string name = fields[1].GetString();
+
+        AnimationsCategory* animationsCategory = new AnimationsCategory();
+        animationsCategory->id = categoryId;
+        animationsCategory->name = name;
+
+        _animationsCategoryStore[categoryId] = animationsCategory;
+
+        ++categoryCount;
+    } while (categoryResult->NextRow());
+
+    QueryResult animationResult = WorldDatabase.Query("SELECT `id`, `category`, `name`, `slash_command`, `emote`, `spell`, `spell_type`, `spell_visual_kit`, `spell_visual_kit_type`, `spell_visual_kit_duration`, `anim_kit`, `anim_kit_type` FROM `animations` WHERE `active` != 0 ORDER BY `category`, `order` ASC");
+
+    if (!animationResult)
+    {
+        TC_LOG_INFO("server.loading", ">> Loaded 0 animations. DB table `animations` is empty.");
+        return;
+    }
+
+    uint32 animationCount = 0;
+    do
+    {
+        Field* fields = animationResult->Fetch();
+
+        uint32 id = fields[0].GetUInt32();
+        uint32 categoryId = fields[1].GetUInt32();
+        std::string name = fields[2].GetString();
+        std::string slashCommand = fields[3].GetString();
+        uint32 emoteId = fields[4].GetUInt32();
+        uint32 spellId = fields[5].GetUInt32();
+        uint8 spellType = fields[6].GetUInt32();
+        uint32 spellVisualKitId = fields[7].GetUInt32();
+        uint8 spellVisualKitType = fields[8].GetUInt8();
+        uint32 spellVisualKitDuration = fields[9].GetUInt32();
+        uint32 animKitId = fields[10].GetUInt32();
+        uint8 animKitType = fields[11].GetUInt8();
+
+        if (_animationsCategoryStore.find(categoryId) == _animationsCategoryStore.end())
+            continue;
+
+        Animations* animations = new Animations();
+        animations->id = id;
+        animations->categoryId = categoryId;
+        animations->name = name;
+        animations->slashCommand = slashCommand;
+        animations->emoteId = emoteId;
+        animations->spellId = spellId;
+        animations->spellType = spellType;
+        animations->spellVisualKitId = spellVisualKitId;
+        animations->spellVisualKitType = spellVisualKitType;
+        animations->spellVisualKitDuration = spellVisualKitDuration;
+        animations->animKitType = animKitType;
+        animations->animKitId = animKitId;
+        
+        _animationsStore[animations->id] = animations;
+        animationCount++;
+
+    } while (animationResult->NextRow());
+
+    TC_LOG_INFO("server.loading", ">> Loaded %u animations and %u animation categorys in %u ms.", animationCount, categoryCount, GetMSTimeDiffToNow(oldMSTime));
+}
+
+std::vector<Animations*> ObjectMgr::GetAnimationsByCategory(uint32 categoryId) const
+{
+    std::vector<Animations*> animations;
+
+    for (auto animation : _animationsStore)
+    {
+        if (animation.second->categoryId != categoryId)
+            continue;
+
+        animations.push_back(animation.second);
+    }
+
+    return animations;
+}
+
+Animations* ObjectMgr::GetAnimationById(uint32 animationId)
+{
+    if (_animationsStore.find(animationId) == _animationsStore.end())
+        return nullptr;
+
+    Animations* animation = _animationsStore[animationId];
+
+    return animation;
+}

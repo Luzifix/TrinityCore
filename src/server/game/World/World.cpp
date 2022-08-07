@@ -2548,6 +2548,9 @@ void World::SetInitialWorldSettings()
     TC_LOG_INFO("server.loading", "Loading phase names...");
     sObjectMgr->LoadPhaseNames();
 
+    TC_LOG_INFO("server.loading", "Loading animations...");
+    sObjectMgr->LoadAnimations();
+
     // Preload all cells from LoadAllGridsForMaps config
     std::vector<std::string> loadMapListString = Split(sConfigMgr->GetStringDefault("LoadAllGridsForMaps", ""), ",");
 

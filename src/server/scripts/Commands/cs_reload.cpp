@@ -87,6 +87,7 @@ public:
         };
         static std::vector<ChatCommand> reloadCommandTable =
         {
+            { "animations",                    rbac::RBAC_PERM_COMMAND_RELOAD,                                  true,  &HandleReloadAnimationsCommand,                 "" },
             { "auctions",                      rbac::RBAC_PERM_COMMAND_RELOAD_AUCTIONS,                         true,  &HandleReloadAuctionsCommand,                   "" },
             { "access_requirement",            rbac::RBAC_PERM_COMMAND_RELOAD_ACCESS_REQUIREMENT,               true,  &HandleReloadAccessRequirementCommand,          "" },
             { "achievement_reward",            rbac::RBAC_PERM_COMMAND_RELOAD_ACHIEVEMENT_REWARD,               true,  &HandleReloadAchievementRewardCommand,          "" },
@@ -1155,6 +1156,15 @@ public:
         TC_LOG_INFO("misc", "Re-Loading Player level dependent mail rewards...");
         sObjectMgr->LoadMailLevelRewards();
         handler->SendGlobalGMSysMessage("DB table `mail_level_reward` reloaded.");
+        return true;
+    }
+    
+    static bool HandleReloadAnimationsCommand(ChatHandler* handler, char const* /*args*/)
+    {
+        ///- Reload dynamic data tables from the database
+        TC_LOG_INFO("misc", "Re-Loading Animations...");
+        sObjectMgr->LoadAnimations();
+        handler->SendGlobalGMSysMessage("Animations reloaded.");
         return true;
     }
 

@@ -46,6 +46,8 @@ enum SchattenhainLuaOpcodeClient : uint32
     SLOPS_CMSG_SOCIAL_SYSTEM_ENDORSEMENTS_REQUEST              = 0x0021,
     SLOPS_CMSG_SOCIAL_SYSTEM_ENDORSEMENTS_PENDING              = 0x0022,
     SLOPS_CMSG_SOCIAL_SYSTEM_ENDORSEMENTS_SUBMIT               = 0x0023,
+    SLOPS_CMSG_ANIMATIONS_LIST_REQUEST                         = 0x0024,
+    SLOPS_CMSG_ANIMATIONS_DO                                   = 0x0025,
 
     SLOPS_CMSG_MAX
 };
@@ -76,6 +78,7 @@ enum SchattenhainLuaOpcodeServer : uint32
     SLOPS_SMSG_SOCIAL_SYSTEM_ENDORSEMENTS_RESPONSE             = 0x001B,
     SLOPS_SMSG_SOCIAL_SYSTEM_ENDORSEMENTS_SHOW                 = 0x001C,
     SLOPS_SMSG_WEATHER_DATA                                    = 0x001D,
+    SLOPS_SMSG_ANIMATIONS_LIST_RESPONSE                        = 0x001E,
 
     SLOPS_SMSG_MAX
 };

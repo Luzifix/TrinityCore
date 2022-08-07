@@ -65,6 +65,10 @@ public:
     static void HandleItemPriceCategorizeRequest(SlopsPackage package);
     static void HandleItemPriceCategorizeNotifyRequest(SlopsPackage package);
 
+    // Animations
+    static void HandleAnimationsListRequest(SlopsPackage package);
+    static void HandleAnimationsDo(SlopsPackage package);
+
 };
 
 #endif // SlopsHandler_h__
