@@ -11879,7 +11879,7 @@ void ObjectMgr::LoadAnimations()
     _animationsStore.clear();
     _animationsCategoryStore.clear();
 
-    QueryResult categoryResult = WorldDatabase.Query("SELECT `id`, `name` FROM `animations_category` ORDER BY `order` ASC");
+    QueryResult categoryResult = WorldDatabase.Query("SELECT `id`, `name`, `order` FROM `animations_category`");
 
     if (!categoryResult)
     {
@@ -11894,17 +11894,19 @@ void ObjectMgr::LoadAnimations()
 
         uint32 categoryId = fields[0].GetUInt32();
         std::string name = fields[1].GetString();
+        uint32 order = fields[2].GetUInt32();
 
         AnimationsCategory* animationsCategory = new AnimationsCategory();
         animationsCategory->id = categoryId;
         animationsCategory->name = name;
+        animationsCategory->order = order;
 
         _animationsCategoryStore[categoryId] = animationsCategory;
 
         ++categoryCount;
     } while (categoryResult->NextRow());
 
-    QueryResult animationResult = WorldDatabase.Query("SELECT `id`, `category`, `name`, `slash_command`, `emote`, `spell`, `spell_type`, `spell_visual_kit`, `spell_visual_kit_type`, `spell_visual_kit_duration`, `anim_kit`, `anim_kit_type` FROM `animations` WHERE `active` != 0 ORDER BY `category`, `order` ASC");
+    QueryResult animationResult = WorldDatabase.Query("SELECT `id`, `category`, `name`, `slash_command`, `emote`, `spell`, `spell_type`, `spell_visual_kit`, `spell_visual_kit_type`, `spell_visual_kit_duration`, `anim_kit`, `anim_kit_type`, `order` FROM `animations` WHERE `active` != 0");
 
     if (!animationResult)
     {
@@ -11929,6 +11931,7 @@ void ObjectMgr::LoadAnimations()
         uint32 spellVisualKitDuration = fields[9].GetUInt32();
         uint32 animKitId = fields[10].GetUInt32();
         uint8 animKitType = fields[11].GetUInt8();
+        uint32 order = fields[12].GetUInt8();
 
         if (_animationsCategoryStore.find(categoryId) == _animationsCategoryStore.end())
             continue;
@@ -11946,6 +11949,7 @@ void ObjectMgr::LoadAnimations()
         animations->spellVisualKitDuration = spellVisualKitDuration;
         animations->animKitType = animKitType;
         animations->animKitId = animKitId;
+        animations->order = order;
         
         _animationsStore[animations->id] = animations;
         animationCount++;

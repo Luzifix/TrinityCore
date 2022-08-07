@@ -881,12 +881,14 @@ struct Animations
     uint32 spellVisualKitDuration = 0;
     uint32 animKitId = 0;
     uint8 animKitType = 0;
+    uint32 order = 0;
 };
 
 struct AnimationsCategory
 {
     uint32 id;
     std::string name = "";
+    uint32 order = 0;
 };
 
 typedef std::unordered_map<uint32, Animations*> AnimationsContainer;

@@ -18,7 +18,8 @@ void SlopsHandler::HandleAnimationsListRequest(SlopsPackage package)
     {
         JSON categoryElement = {
             "id", category.first,
-            "name", category.second->name
+            "name", category.second->name,
+            "order", category.second->order,
         };
 
         data["categorys"].append(categoryElement);
@@ -29,7 +30,8 @@ void SlopsHandler::HandleAnimationsListRequest(SlopsPackage package)
                 "id", animations->id,
                 "categoryId", animations->categoryId,
                 "name", animations->name,
-                "slashCommand", animations->slashCommand
+                "slashCommand", animations->slashCommand,
+                "order", animations->order
             };
 
             data["animationsByCategory"][std::to_string(category.first)].append(animationsElement);
