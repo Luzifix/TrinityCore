@@ -76,6 +76,9 @@ public:
         _apiKey = sConfigMgr->GetStringDefault("Schattenhain.Weather.ApiKey", "");
         _apiCityCode = sConfigMgr->GetIntDefault("Schattenhain.Weather.CityId", 734517);
 
+        if (!_active)
+            return;
+
         LoadFromDB();
         LoadRealWeatherFromApi();
         UpdateWeatherForAllPlayer();
