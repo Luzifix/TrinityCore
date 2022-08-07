@@ -1,3 +1,27 @@
+CREATE TABLE IF NOT EXISTS `animations_category` (
+  `id` int(11) unsigned NOT NULL,
+  `name` varchar(255) NOT NULL,
+  `order` int(11) unsigned NOT NULL DEFAULT 0,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+REPLACE INTO `animations_category` (`id`, `name`, `order`) VALUES
+	(1, 'Allgemein', 1),
+	(2, 'Kampf', 4),
+	(3, 'Kampfhaltung', 5),
+	(4, 'Kanalisieren ohne Magie', 10),
+	(5, 'Feuermagie', 11),
+	(6, 'Haltung', 2),
+	(7, 'Nahrungsmittel', 3),
+	(8, 'Arkanmagie', 12),
+	(9, 'Frostmagie', 13),
+	(10, 'Lichtmagie', 14),
+	(11, 'Schattenmagie', 15),
+	(12, 'Naturnmagie', 16),
+	(13, 'Elementarmagie', 17),
+	(14, 'Gegenstände', 6);
+
+
 CREATE TABLE IF NOT EXISTS `animations` (
   `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
   `category` int(11) unsigned NOT NULL,
@@ -125,26 +149,3 @@ REPLACE INTO `animations` (`id`, `category`, `name`, `slash_command`, `emote`, `
 	(166, 14, 'Ein Korb tragen', 'objekteinkorbtragen', 0, 121210, 0, 0, 0, 0, 0, 1, 1, 43),
 	(167, 14, 'Zwei Körbe tragen', 'objektzweikoerbetragen', 0, 121211, 0, 0, 0, 0, 0, 1, 1, 44),
 	(168, 6, 'Gefesselt Hände hinter dem Rücken ', 'gefesselthaendehinterdemruecken', 0, 0, 0, 0, 0, 0, 1174, 1, 1, 20);
-
-CREATE TABLE IF NOT EXISTS `animations_category` (
-  `id` int(11) unsigned NOT NULL,
-  `name` varchar(255) NOT NULL,
-  `order` int(11) unsigned NOT NULL DEFAULT 0,
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
-REPLACE INTO `animations_category` (`id`, `name`, `order`) VALUES
-	(1, 'Allgemein', 1),
-	(2, 'Kampf', 4),
-	(3, 'Kampfhaltung', 5),
-	(4, 'Kanalisieren ohne Magie', 10),
-	(5, 'Feuermagie', 11),
-	(6, 'Haltung', 2),
-	(7, 'Nahrungsmittel', 3),
-	(8, 'Arkanmagie', 12),
-	(9, 'Frostmagie', 13),
-	(10, 'Lichtmagie', 14),
-	(11, 'Schattenmagie', 15),
-	(12, 'Naturnmagie', 16),
-	(13, 'Elementarmagie', 17),
-	(14, 'Gegenstände', 6);
