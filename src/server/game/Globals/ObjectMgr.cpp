@@ -9408,8 +9408,8 @@ void ObjectMgr::LoadCreatureOutfits()
         }
         else
         {
-            TC_LOG_ERROR("server.loading", ">> Loaded 0 customisations outfits in `creature_template_outfits_customisation` for entry %u", entry);
-            return;
+            TC_LOG_ERROR("server.loading", ">> Cant load Outfit entry %u missing `creature_template_outfits_customisation` entries!", entry);
+            continue;
         }
 
         for (EquipmentSlots slot : CreatureOutfit::item_slots)
