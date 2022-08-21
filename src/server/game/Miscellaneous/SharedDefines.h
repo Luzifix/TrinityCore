@@ -5922,6 +5922,12 @@ enum SummonSlot : int32
     SUMMON_SLOT_MINIPET             = 5,
     SUMMON_SLOT_QUEST               = 6,
 
+    SUMMON_SLOT_RIGHT               = 7,
+    SUMMON_SLOT_REAR_RIGHT          = 8,
+    SUMMON_SLOT_BACK                = 9,
+    SUMMON_SLOT_REAR_LEFT           = 10,
+    SUMMON_SLOT_LEFT                = 11,
+
     MAX_SUMMON_SLOT
 };
 

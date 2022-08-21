@@ -18,6 +18,7 @@ void AddSC_MountSystem_GameObjectScript();
 void AddSC_MountSystem_CommandScript();
 void AddSC_Endorsements_WorldScript();
 void AddSC_Endorsements_PlayerScript();
+void AddSC_Follower_CreatureScript();
 
 // The name of this function should match:
 // void Add${NameOfDirectory}Scripts()
@@ -38,4 +39,5 @@ void AddSchattenhainScripts()
     AddSC_MountSystem_CommandScript();
     //AddSC_Endorsements_WorldScript();
     //AddSC_Endorsements_PlayerScript();
+    AddSC_Follower_CreatureScript();
 }
