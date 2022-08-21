@@ -1027,6 +1027,9 @@ namespace MMAP
             case 1642:
             case 1643:
             case 2222:
+            case 5000:
+            case 5001:
+            case 5002:
                 return true;
             default:
                 return false;

@@ -24,6 +24,8 @@
 #include "MapTree.h"
 #include "Timer.h"
 #include <G3D/Quat.h>
+#include <algorithm>
+#include <execution>
 
 using G3D::Vector3;
 using G3D::Ray;
@@ -93,6 +95,18 @@ void LoadGameObjectModelList(std::string const& dataPath)
     }
 
     fclose(model_list_file);
+
+    auto vmapMgr = VMAP::VMapFactory::createOrGetVMapManager();
+    std::for_each(
+        std::execution::par,
+        model_list.begin(),
+        model_list.end(),
+        [dataPath, vmapMgr](auto&& it)
+        {
+            vmapMgr->acquireModelInstance(dataPath + "vmaps/", it.second.name);
+        }
+    );
+
     TC_LOG_INFO("server.loading", ">> Loaded %u GameObject models in %u ms", uint32(model_list.size()), GetMSTimeDiffToNow(oldMSTime));
 }
 

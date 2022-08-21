@@ -2571,6 +2571,9 @@ struct MapEntry
             case 1642:
             case 1643:
             case 2222:
+            case 5000: // SH Kitar
+            case 5001: // SH OOC Area
+            case 5002: // SH Basement
                 return true;
             default:
                 return false;

@@ -136,6 +136,12 @@ void WorldDatabaseConnection::DoPrepareStatements()
     PrepareStatement(WORLD_SEL_GAME_EVENT_CREATURE_BY_GUID, "SELECT guid FROM game_event_creature WHERE guid = ?", CONNECTION_SYNCH);
     PrepareStatement(WORLD_INS_GAME_EVENT_CREATURE, "INSERT INTO game_event_creature (eventEntry, guid) VALUES (?, ?)", CONNECTION_ASYNC);
     PrepareStatement(WORLD_UPD_GAME_EVENT_CREATURE, "UPDATE game_event_creature SET eventEntry = ? WHERE guid = ?", CONNECTION_ASYNC);
+
+    // Follower
+    PrepareStatement(WORLD_SEL_FOLLOWER_SPAWNER_BY_CREATURE_ENTRY, "SELECT `guild_id`, `minimum_guild_rank` FROM `follower_spawner` WHERE `creature_entry` = ?;", CONNECTION_SYNCH);
+    PrepareStatement(WORLD_SEL_FOLLOWER_SPAWNER_CHILDS_BY_CREATURE_ENTRY, "SELECT `creature_child_entry` FROM `follower_spawner_childs` WHERE `creature_entry` = ?;", CONNECTION_SYNCH);
+    PrepareStatement(WORLD_REP_FOLLOWER_SPAWNER, "REPLACE INTO `follower_spawner` (`creature_entry`, `guild_id`, `minimum_guild_rank`) VALUES (?, ?, ?);", CONNECTION_SYNCH);
+    PrepareStatement(WORLD_INS_FOLLOWER_SPAWNER_CHILDS, "REPLACE INTO `follower_spawner_childs` (`creature_entry`, `creature_child_entry`) VALUES (?, ?);", CONNECTION_ASYNC);
 }
 
 WorldDatabaseConnection::WorldDatabaseConnection(MySQLConnectionInfo& connInfo) : MySQLConnection(connInfo)

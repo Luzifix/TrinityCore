@@ -1764,22 +1764,14 @@ void World::SetInitialWorldSettings()
     ///- Init highest guids before any table loading to prevent using not initialized guids in some code.
     sObjectMgr->SetHighestGuids();
 
-    /*
     ///- Check the existence of the map files for all races' startup areas.
-    if (!TerrainMgr::ExistMapAndVMap(0, -6240.32f, 331.033f)
-        || !TerrainMgr::ExistMapAndVMap(0, -8949.95f, -132.493f)
-        || !TerrainMgr::ExistMapAndVMap(1, -618.518f, -4251.67f)
-        || !TerrainMgr::ExistMapAndVMap(0, 1676.35f, 1677.45f)
-        || !TerrainMgr::ExistMapAndVMap(1, 10311.3f, 832.463f)
-        || !TerrainMgr::ExistMapAndVMap(1, -2917.58f, -257.98f)
-        || (m_int_configs[CONFIG_EXPANSION] && (
-            !TerrainMgr::ExistMapAndVMap(530, 10349.6f, -6357.29f) ||
-            !TerrainMgr::ExistMapAndVMap(530, -3961.64f, -13931.2f))))
+    if (!MapManager::ExistMapAndVMap(5000, 441.798f, -334.997f)
+        || !MapManager::ExistMapAndVMap(5001, -388.406f, -61.149f)
+        || !MapManager::ExistMapAndVMap(5002, -268.876f, -260.129f))
     {
         TC_LOG_FATAL("server.loading", "Unable to load critical files - server shutting down !!!");
         exit(1);
     }
-    */
 
     ///- Initialize pool manager
     sPoolMgr->Initialize();
@@ -2561,12 +2553,14 @@ void World::SetInitialWorldSettings()
 
         for (uint32 mapId : loadMapList)
         {
-            if (!sMapStore.HasRecord(mapId))
-                continue;
-
-            TC_LOG_INFO("server.loading", "Pre-loading map data for map %u", mapId);
-            Map* map = sMapMgr->CreateBaseMap(mapId);
-            map->LoadAllCells();
+            sMapMgr->CreateBaseMap(mapId);
+            sMapMgr->DoForAllMapsWithMapId(mapId, [](Map* map)
+            {
+                TC_LOG_INFO("server.loading", "Pre-loading map data for map %u", map->GetId());
+                uint32 oldMSTime = getMSTime();
+                map->LoadAllCells();
+                TC_LOG_INFO("server.loading", ">> Map loaded in %u ms", GetMSTimeDiffToNow(oldMSTime));
+            });
         }
     }
     else if (!loadMapListString.empty())
