@@ -796,7 +796,7 @@ namespace Trinity
 
             bool operator()(GameObject* go)
             {
-                if (i_obj.GetHouseId() == go->GetHouseId() && !go->GetPhaseShift().HasPhaseShiftFlag(PhaseShiftFlags::AlwaysVisible) && i_obj.IsWithinDistInMap(go, i_range))
+                if (i_obj.GetHouseAreaId() == go->GetHouseAreaId() && !go->GetPhaseShift().HasPhaseShiftFlag(PhaseShiftFlags::AlwaysVisible) && i_obj.IsWithinDistInMap(go, i_range))
                 {
                     i_range = i_obj.GetDistance(go);        // use found GO range as new range limit for next check
                     return true;
@@ -1661,19 +1661,19 @@ namespace Trinity
     class GameObjectInRangeSameHouseAndNotAlwaysVisibleCheck
     {
         public:
-            GameObjectInRangeSameHouseAndNotAlwaysVisibleCheck(float _x, float _y, float _z, float _range, uint32 _houseId, uint32 _entry = 0) :
-                x(_x), y(_y), z(_z), range(_range), houseId(_houseId), entry(_entry) { }
+            GameObjectInRangeSameHouseAndNotAlwaysVisibleCheck(float _x, float _y, float _z, float _range, uint32 _houseAreaId, uint32 _entry = 0) :
+                x(_x), y(_y), z(_z), range(_range), houseAreaId(_houseAreaId), entry(_entry) { }
 
             bool operator()(GameObject* go) const
             {
                 if (!entry || (go->GetGOInfo() && go->GetGOInfo()->entry == entry))
-                    return !go->GetPhaseShift().HasPhaseShiftFlag(PhaseShiftFlags::AlwaysVisible) && go->InSameHouse(houseId) && go->IsWithinDist3d(x, y, z, range);
+                    return !go->GetPhaseShift().HasPhaseShiftFlag(PhaseShiftFlags::AlwaysVisible) && go->InSameHouseArea(houseAreaId) && go->IsWithinDist3d(x, y, z, range);
                 else return false;
             }
 
         private:
             float x, y, z, range;
-            uint32 houseId;
+            uint32 houseAreaId;
             uint32 entry;
     };
 

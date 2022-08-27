@@ -633,7 +633,7 @@ void GameObject::RemoveFromWorld()
     }
 }
 
-bool GameObject::Create(uint32 entry, Map* map, Position const& pos, QuaternionData const& rotation, uint32 animProgress, GOState goState, uint32 artKit, bool dynamic, ObjectGuid::LowType spawnid, float size /*= -1*/, int32 houseId /*= -1*/)
+bool GameObject::Create(uint32 entry, Map* map, Position const& pos, QuaternionData const& rotation, uint32 animProgress, GOState goState, uint32 artKit, bool dynamic, ObjectGuid::LowType spawnid, float size /*= -1*/, int32 houseAreaId /*= -1*/)
 {
     ASSERT(map);
     SetMap(map);
@@ -726,19 +726,19 @@ bool GameObject::Create(uint32 entry, Map* map, Position const& pos, QuaternionD
             _animKitId = m_goTemplateAddon->AIAnimKitID;
     }
 
-    uint32 _housingId = (uint32)(houseId >= 0 ? houseId : goInfo->houseId);
+    uint32 _housingAreaId = (uint32)(houseAreaId >= 0 ? houseAreaId : goInfo->houseAreaId);
 
-    if (_housingId > 0)
+    if (_housingAreaId > 0)
     {
-        if (Housing* housing = sHousingMgr->GetById(_housingId))
+        if (HousingArea* housingArea = sHousingMgr->GetHousingAreaById(_housingAreaId))
         {
-            bool indoor = housing->IsIndoor();
+            bool indoor = housingArea->IsIndoor();
 
             // Basemant map always phased
-            if (map->GetId() == (uint32)HOUSING_MAPID_BASEMENT)
+            if (map->GetId() == (uint32)HOUSING_AREA_MAPID_BASEMENT)
                 indoor = true;
 
-            SetHouseId(housing->GetId(), indoor, true);
+            SetHouseAreaId(housingArea->GetId(), indoor, true);
         }
     }
 
@@ -870,14 +870,14 @@ bool GameObject::Create(uint32 entry, Map* map, Position const& pos, QuaternionD
     return true;
 }
 
-GameObject* GameObject::CreateGameObject(uint32 entry, Map* map, Position const& pos, QuaternionData const& rotation, uint32 animProgress, GOState goState, uint32 artKit /*= 0*/, float scale /*=-1.0f*/, int32 houseId /*= -1*/)
+GameObject* GameObject::CreateGameObject(uint32 entry, Map* map, Position const& pos, QuaternionData const& rotation, uint32 animProgress, GOState goState, uint32 artKit /*= 0*/, float scale /*=-1.0f*/, int32 houseAreaId /*= -1*/)
 {
     GameObjectTemplate const* goInfo = sObjectMgr->GetGameObjectTemplate(entry);
     if (!goInfo)
         return nullptr;
 
     GameObject* go = new GameObject();
-    if (!go->Create(entry, map, pos, rotation, animProgress, goState, artKit, false, 0, scale, houseId))
+    if (!go->Create(entry, map, pos, rotation, animProgress, goState, artKit, false, 0, scale, houseAreaId))
     {
         delete go;
         return nullptr;
@@ -1568,7 +1568,7 @@ void GameObject::SaveToDB(uint32 mapid, std::vector<Difficulty> const& spawnDiff
     data.goState = GetGoState();
     data.spawnDifficulties = spawnDifficulties;
     data.artKit = GetGoArtKit();
-    data.houseId = GetHouseId();
+    data.houseAreaId = GetHouseAreaId();
     if (!data.spawnGroupData)
         data.spawnGroupData = sObjectMgr->GetDefaultSpawnGroup();
 
@@ -1635,7 +1635,7 @@ void GameObject::SaveToDB(uint32 mapid, std::vector<Difficulty> const& spawnDiff
     stmt->setUInt8(index++, GetGoAnimProgress());
     stmt->setUInt8(index++, uint8(GetGoState()));
     stmt->setFloat(index++, data.size);
-    stmt->setUInt32(index++, data.houseId);
+    stmt->setUInt32(index++, data.houseAreaId);
     trans->Append(stmt);
 
     WorldDatabase.CommitTransaction(trans);
@@ -1657,13 +1657,13 @@ bool GameObject::LoadFromDB(ObjectGuid::LowType spawnId, Map* map, bool addToMap
     GOState go_state = data->goState;
     uint32 artKit = data->artKit;
     float size = data->size;
-    uint32 houseId = data->houseId;
+    uint32 houseAreaId = data->houseAreaId;
     int32 phaseId = data->phaseId;
     bool alwaysVisible = false;
 
     m_spawnId = spawnId;
     m_respawnCompatibilityMode = ((data->spawnGroupData->flags & SPAWNGROUP_FLAG_COMPATIBILITY_MODE) != 0);
-    if (!Create(entry, map, data->spawnPoint, data->rotation, animprogress, go_state, artKit, !m_respawnCompatibilityMode, spawnId, size, houseId))
+    if (!Create(entry, map, data->spawnPoint, data->rotation, animprogress, go_state, artKit, !m_respawnCompatibilityMode, spawnId, size, houseAreaId))
         return false;
 
     SetDBPhase(phaseId);
@@ -3450,20 +3450,20 @@ void GameObject::SetGoState(GOState state)
     }
 }
 
-void GameObject::SetHousePhaseId(uint32 housePhaseId, bool update)
+void GameObject::SetHouseAreaPhaseId(uint32 houseAreaPhaseId, bool update)
 {
-    WorldObject::SetHousePhaseId(housePhaseId, update);
+    WorldObject::SetHouseAreaPhaseId(houseAreaPhaseId, update);
 
     if (m_model && m_model->isCollisionEnabled())
         EnableCollision(true);
 }
 
-void GameObject::SetHouseId(uint32 houseId, bool setPhase /* = true */, bool update /* = true */)
+void GameObject::SetHouseAreaId(uint32 houseAreaId, bool setPhase /* = true */, bool update /* = true */)
 {
-    WorldObject::SetHouseId(houseId, false);
+    WorldObject::SetHouseAreaId(houseAreaId, false);
 
     if (setPhase)
-        GameObject::SetHousePhaseId(houseId, update);
+        GameObject::SetHouseAreaPhaseId(houseAreaId, update);
 }
 
 uint32 GameObject::GetTransportPeriod() const

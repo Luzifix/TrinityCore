@@ -767,14 +767,17 @@ void CharacterDatabaseConnection::DoPrepareStatements()
     PrepareStatement(CHAR_INS_INSTANCE, "INSERT INTO instance (instanceId, data, completedEncountersMask, entranceWorldSafeLocId) VALUES (?, ?, ?, ?)", CONNECTION_ASYNC);
 
     // Housing
-    PrepareStatement(CHAR_REP_HOUSING, "REPLACE housing (id, type, owner, guild_id, map, height_min, height_max, name, facility_limit, motd) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", CONNECTION_ASYNC);
+    PrepareStatement(CHAR_REP_HOUSING, "REPLACE housing (id, owner, guild_id) VALUES (?, ?, ?)", CONNECTION_ASYNC);
     PrepareStatement(CHAR_DEL_HOUSING, "DELETE FROM housing WHERE id = ?", CONNECTION_ASYNC);
-    PrepareStatement(CHAR_INS_HOUSING_TRIGGER, "INSERT INTO housing_trigger (housing_id, id, position_x, position_y) VALUES (?, ?, ?, ?)", CONNECTION_ASYNC);
-    PrepareStatement(CHAR_DEL_HOUSING_TRIGGER, "DELETE FROM housing_trigger WHERE housing_id = ?", CONNECTION_ASYNC);
-    PrepareStatement(CHAR_INS_HOUSING_PERMISSION, "INSERT INTO housing_permission (housing_id, character_guid, type) VALUES (?, ?, ?)", CONNECTION_ASYNC);
-    PrepareStatement(CHAR_DEL_HOUSING_PERMISSION, "DELETE FROM housing_permission WHERE housing_id = ?", CONNECTION_ASYNC);
-    PrepareStatement(CHAR_SEL_HOUSING_BASEMENT, "SELECT houseId, mapId, posX, posY, posZ FROM housing_basement WHERE guid = ?;", CONNECTION_SYNCH);
-    PrepareStatement(CHAR_REP_HOUSING_BASEMENT, "REPLACE INTO housing_basement (guid, houseId, mapId, posX, posY, posZ) VALUES (?, ?, ?, ?, ?, ?) ", CONNECTION_ASYNC);
+    PrepareStatement(CHAR_REP_HOUSING_AREA, "REPLACE housing_area (id, housing_id, type, map, height_min, height_max, name, facility_limit, motd) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)", CONNECTION_ASYNC);
+    PrepareStatement(CHAR_DEL_HOUSING_AREA, "DELETE FROM housing_area WHERE id = ?", CONNECTION_ASYNC);
+    PrepareStatement(CHAR_DEL_HOUSING_AREA_BY_HOUSING_ID, "DELETE FROM housing_area WHERE housing_id = ?", CONNECTION_ASYNC);
+    PrepareStatement(CHAR_INS_HOUSING_AREA_TRIGGER, "INSERT INTO housing_area_trigger (housing_area_id, id, position_x, position_y) VALUES (?, ?, ?, ?)", CONNECTION_ASYNC);
+    PrepareStatement(CHAR_DEL_HOUSING_AREA_TRIGGER, "DELETE FROM housing_area_trigger WHERE housing_area_id = ?", CONNECTION_ASYNC);
+    PrepareStatement(CHAR_INS_HOUSING_AREA_PERMISSION, "INSERT INTO housing_area_permission (housing_area_id, character_guid, type) VALUES (?, ?, ?)", CONNECTION_ASYNC);
+    PrepareStatement(CHAR_DEL_HOUSING_AREA_PERMISSION, "DELETE FROM housing_area_permission WHERE housing_area_id = ?", CONNECTION_ASYNC);
+    PrepareStatement(CHAR_SEL_HOUSING_BASEMENT, "SELECT houseAreaId, mapId, posX, posY, posZ FROM housing_basement WHERE guid = ?;", CONNECTION_SYNCH);
+    PrepareStatement(CHAR_REP_HOUSING_BASEMENT, "REPLACE INTO housing_basement (guid, houseAreaId, mapId, posX, posY, posZ) VALUES (?, ?, ?, ?, ?, ?) ", CONNECTION_ASYNC);
     PrepareStatement(CHAR_DEL_HOUSING_BASEMENT, "DELETE FROM housing_basement WHERE guid = ?", CONNECTION_ASYNC);
 
     // Character Modify

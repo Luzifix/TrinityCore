@@ -85,7 +85,7 @@ void WorldDatabaseConnection::DoPrepareStatements()
     PrepareStatement(WORLD_INS_CREATURE, "INSERT INTO creature (guid, id , map, spawnDifficulties, PhaseId, PhaseGroup, modelid, equipment_id, position_x, position_y, position_z, orientation, spawntimesecs, wander_distance, currentwaypoint, curhealth, curmana, MovementType, npcflag, unit_flags, unit_flags2, unit_flags3, dynamicflags, size) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", CONNECTION_ASYNC);
     PrepareStatement(WORLD_DEL_GAME_EVENT_CREATURE, "DELETE FROM game_event_creature WHERE guid = ?", CONNECTION_ASYNC);
     PrepareStatement(WORLD_DEL_GAME_EVENT_MODEL_EQUIP, "DELETE FROM game_event_model_equip WHERE guid = ?", CONNECTION_ASYNC);
-    PrepareStatement(WORLD_INS_GAMEOBJECT, "INSERT INTO gameobject (guid, id, map, spawnDifficulties, PhaseId, PhaseGroup, position_x, position_y, position_z, orientation, rotation0, rotation1, rotation2, rotation3, spawntimesecs, animprogress, state, size, house_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", CONNECTION_ASYNC);
+    PrepareStatement(WORLD_INS_GAMEOBJECT, "INSERT INTO gameobject (guid, id, map, spawnDifficulties, PhaseId, PhaseGroup, position_x, position_y, position_z, orientation, rotation0, rotation1, rotation2, rotation3, spawntimesecs, animprogress, state, size, house_area_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", CONNECTION_ASYNC);
     PrepareStatement(WORLD_INS_DISABLES, "INSERT INTO disables (entry, sourceType, flags, comment) VALUES (?, ?, ?, ?)", CONNECTION_ASYNC);
     PrepareStatement(WORLD_SEL_DISABLES, "SELECT entry FROM disables WHERE entry = ? AND sourceType = ?", CONNECTION_SYNCH);
     PrepareStatement(WORLD_DEL_DISABLES, "DELETE FROM disables WHERE entry = ? AND sourceType = ?", CONNECTION_ASYNC);
@@ -127,8 +127,8 @@ void WorldDatabaseConnection::DoPrepareStatements()
     PrepareStatement(WORLD_UPD_ITEM_PRICE_CATEGORIZE_REQUEST_SET_CATEGORIZED_BY_DISPLAY_INFO_ID, "UPDATE `item_price_categorize_request` SET `categorized` = ? WHERE `display_info_id` = ?;", CONNECTION_ASYNC);
 
     // Housing
-    PrepareStatement(WORLD_SEL_GAMEOBJECT_COUNT_BY_HOUSEID, "SELECT CAST(COUNT(*) AS INT) FROM gameobject WHERE house_id = ?;", CONNECTION_SYNCH);
-    PrepareStatement(WORLD_SEL_GAMEOBJECT_VALUE_BY_HOUSEID, "SELECT CAST(SUM(fc.price) AS INT) FROM gameobject g LEFT JOIN furniture_catalog fc ON (g.id = fc.id) WHERE g.house_id = ?;", CONNECTION_SYNCH);
+    PrepareStatement(WORLD_SEL_GAMEOBJECT_COUNT_BY_HOUSEID, "SELECT CAST(COUNT(*) AS INT) FROM gameobject WHERE house_area_id = ?;", CONNECTION_SYNCH);
+    PrepareStatement(WORLD_SEL_GAMEOBJECT_VALUE_BY_HOUSEID, "SELECT CAST(SUM(fc.price) AS INT) FROM gameobject g LEFT JOIN furniture_catalog fc ON (g.id = fc.id) WHERE g.house_area_id = ?;", CONNECTION_SYNCH);
 
     // NPC Commands
     PrepareStatement(WORLD_INS_CREATURE_ADDON_EMOTE, "INSERT INTO creature_addon(guid, bytes2, emote) VALUES (?, 1, ?)", CONNECTION_ASYNC);

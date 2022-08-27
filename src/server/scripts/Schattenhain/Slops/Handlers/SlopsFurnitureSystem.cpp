@@ -171,9 +171,9 @@ void SlopsHandler::HandleFurnitureSpawn(SlopsPackage package)
 
     if (!player->IsGameMaster())
     {
-        Housing* housing = sHousingMgr->GetById(player->GetHouseId());
+        HousingArea* housingArea = sHousingMgr->GetHousingAreaById(player->GetHouseAreaId());
 
-        if (!housing || !housing->HasBuildingPermission(player))
+        if (!housingArea || !housingArea->HasBuildingPermission(player))
             return;
     }
 

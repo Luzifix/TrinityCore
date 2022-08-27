@@ -40,10 +40,10 @@ static void ResponseSelected(Player* player, std::list<GameObject*> objects)
     sSlops->Send(SLOPS_SMSG_HOUSING_BUILDING_SELECTED, data.dump(), player);
 }
 
-static GameObject* SpawnGameObject(Player* player, uint32 entry, Position position, G3D::Quat rotation, float scale = -1.0f, uint32 houseId = 0)
+static GameObject* SpawnGameObject(Player* player, uint32 entry, Position position, G3D::Quat rotation, float scale = -1.0f, uint32 houseAreaId = 0)
 {
     Map* map = player->GetMap();
-    GameObject* object = GameObject::CreateGameObject(entry, map, position, QuaternionData(rotation.x, rotation.y, rotation.z, rotation.w), 255, GO_STATE_READY, 0, scale, houseId);
+    GameObject* object = GameObject::CreateGameObject(entry, map, position, QuaternionData(rotation.x, rotation.y, rotation.z, rotation.w), 255, GO_STATE_READY, 0, scale, houseAreaId);
 
     if (!object)
         return nullptr;
@@ -123,7 +123,7 @@ static GameObjectSelectionInfoStore FindNearGameObjectsByGUID(Player* player, JS
 
         if (!player->IsGameMaster() || command.find("ActionGM") != 0)
         {
-            if (player->GetHouseId() != gameObjectSelectionInfo.gameObject->GetHouseId())
+            if (player->GetHouseAreaId() != gameObjectSelectionInfo.gameObject->GetHouseAreaId())
             {
                 gameObjectSelectionInfo.error = GAMEOBJECT_SELECTION_INFO_ERROR_OUT_OF_RANGE;
                 gameObjectSelectionInfoStore.push_back(gameObjectSelectionInfo);
@@ -157,8 +157,8 @@ static GameObjectSelectionInfoError MoveGameObject(Player* player, GameObject* o
         if (player->GetDistance(x, y, z) > ACTION_MAX_RANGE_PLAYER)
             return GAMEOBJECT_SELECTION_INFO_ERROR_OUT_OF_RANGE;
 
-        Housing* housing = sHousingMgr->GetById(player->GetHouseId());
-        if (!housing || !housing->IsInHouse(G3D::Vector3(x, y, z), map->GetId()))
+        HousingArea* housingArea = sHousingMgr->GetHousingAreaById(player->GetHouseAreaId());
+        if (!housingArea || !housingArea->IsInHouse(G3D::Vector3(x, y, z), map->GetId()))
             return GAMEOBJECT_SELECTION_INFO_ERROR_OUT_OF_HOUSE;
     }
 
@@ -217,13 +217,13 @@ static void CommandGlobal(Player* player, std::string command, float factor)
 
         if (!player->IsGameMaster())
         {
-            Trinity::GameObjectInRangeSameHouseAndNotAlwaysVisibleCheck check(x, y, z, range, player->GetHouseId());
+            Trinity::GameObjectInRangeSameHouseAndNotAlwaysVisibleCheck check(x, y, z, range, player->GetHouseAreaId());
             Trinity::GameObjectListSearcher<Trinity::GameObjectInRangeSameHouseAndNotAlwaysVisibleCheck> searcher(player, objects, check);
             Cell::VisitGridObjects(player, searcher, SIZE_OF_GRIDS, false);
         }
         else
         {
-            Trinity::GameObjectInRangeCheck check(x, y, z, range, player->GetHouseId());
+            Trinity::GameObjectInRangeCheck check(x, y, z, range, player->GetHouseAreaId());
             Trinity::GameObjectListSearcher<Trinity::GameObjectInRangeCheck> searcher(player, objects, check);
             Cell::VisitGridObjects(player, searcher, SIZE_OF_GRIDS, false);
         }
@@ -417,10 +417,10 @@ static bool CommandActionPlayer(Player* player, std::string command, float facto
         if (!gameObject->IsInWorld())
             return false;
 
-        Housing* housing = sHousingMgr->GetById(player->GetHouseId());
-        if (housing && housing->GetFacilityLimit() > 0 && housing->GetFacilityLimit() < (housing->GetFacilityCurrent() + 1))
+        HousingArea* housingArea = sHousingMgr->GetHousingAreaById(player->GetHouseAreaId());
+        if (housingArea && housingArea->GetFacilityLimit() > 0 && housingArea->GetFacilityLimit() < (housingArea->GetFacilityCurrent() + 1))
         {
-            ChatHandler(player->GetSession()).PSendSysMessage(LANG_HOUSING_ERR_FACILITY_LIMIT_REACHED, housing->GetFacilityLimit());
+            ChatHandler(player->GetSession()).PSendSysMessage(LANG_HOUSING_ERR_FACILITY_LIMIT_REACHED, housingArea->GetFacilityLimit());
             return true;
         }
 
@@ -434,7 +434,7 @@ static bool CommandActionPlayer(Player* player, std::string command, float facto
             sFurnitureMgr->RemoveItem(player, furnitrue->GetId());
         }
 
-        GameObject* clonedGameObject = SpawnGameObject(player, gameObject->GetEntry(), gameObject->GetPosition(), rotationQuaternion, gameObject->GetObjectScale(), gameObject->GetHouseId());
+        GameObject* clonedGameObject = SpawnGameObject(player, gameObject->GetEntry(), gameObject->GetPosition(), rotationQuaternion, gameObject->GetObjectScale(), gameObject->GetHouseAreaId());
 
         if (clonedGameObject) {
             std::list<GameObject*> objects;
@@ -502,23 +502,23 @@ static bool CommandActionGM(Player* player, std::string command, float factor, f
     }
     else if (command == "ActionGMSetHouse")
     {
-        uint32 houseId = (uint32)factor;
+        uint32 houseAreaId = (uint32)factor;
 
-        if (houseId == 0)
+        if (houseAreaId == 0)
         {
-            gameObjectSelectionInfo->gameObject->SetHouseId(houseId, true, true);
+            gameObjectSelectionInfo->gameObject->SetHouseAreaId(houseAreaId, true, true);
             if (!SaveGameobject(gameObjectSelectionInfo->gameObject))
                 return false;
 
             return true;
         }
 
-        Housing* house = sHousingMgr->GetById(houseId);
+        HousingArea* houseArea = sHousingMgr->GetHousingAreaById(houseAreaId);
 
-        if (!house)
+        if (!houseArea)
             return false;
 
-        gameObjectSelectionInfo->gameObject->SetHouseId(houseId, house->IsIndoor(), true);
+        gameObjectSelectionInfo->gameObject->SetHouseAreaId(houseAreaId, houseArea->IsIndoor(), true);
 
         if (!SaveGameobject(gameObjectSelectionInfo->gameObject))
             return false;
@@ -542,14 +542,14 @@ void SlopsHandler::HandleHousingBuildingAction(SlopsPackage package)
             "selection", JSON::Object()
         };
 
-        Housing* housing = sHousingMgr->GetById(player->GetHouseId());
+        HousingArea* housingArea = sHousingMgr->GetHousingAreaById(player->GetHouseAreaId());
 
-        if (housing && player->IsGameMaster())
+        if (housingArea && player->IsGameMaster())
             return;
 
         if (!player->IsGameMaster())
         {
-            if (!housing || !housing->HasBuildingPermission(player))
+            if (!housingArea || !housingArea->HasBuildingPermission(player))
                 return;
         }
 
@@ -634,18 +634,18 @@ void SlopsHandler::HandleHousingInformationRequest(SlopsPackage package)
         "havePermission", true
     };
 
-    Housing* housing = sHousingMgr->GetById(player->GetHouseId());
+    HousingArea* housingArea = sHousingMgr->GetHousingAreaById(player->GetHouseAreaId());
 
-    if (housing && player->IsGameMaster())
+    if (housingArea && player->IsGameMaster())
         response["havePermission"] = false;
 
     if (!player->IsGameMaster())
     {
-        if (!housing || !housing->HasBuildingPermission(player))
+        if (!housingArea || !housingArea->HasBuildingPermission(player))
             response["havePermission"] = false;
     }
 
-    if (player->GetMapId() == (uint32)HOUSING_MAPID_BASEMENT && !housing->IsInBasement(player))
+    if (player->GetMapId() == (uint32)HOUSING_AREA_MAPID_BASEMENT && !housingArea->IsInBasement(player))
         response["havePermission"] = false;
 
     sSlops->Send(SLOPS_SMSG_HOUSING_BUILDING_PERMISSION, response.dump(), player);

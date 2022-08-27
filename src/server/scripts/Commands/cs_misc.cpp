@@ -289,8 +289,8 @@ public:
             cell.GridX(), cell.GridY(), cell.CellX(), cell.CellY(), object->GetInstanceId(),
             zoneX, zoneY, groundZ, floorZ, map->GetMinHeight(object->GetPhaseShift(), object->GetPositionX(), object->GetPositionY()), haveMap, haveVMap, haveMMap);
 
-        handler->PSendSysMessage(LANG_HOUSING_ID, object->GetHouseId());
-        handler->PSendSysMessage(LANG_HOUSING_PHASE_ID, object->GetHousePhaseId());
+        handler->PSendSysMessage(LANG_HOUSING_ID, object->GetHouseAreaId());
+        handler->PSendSysMessage(LANG_HOUSING_PHASE_ID, object->GetHouseAreaPhaseId());
 
         LiquidData liquidStatus;
         ZLiquidStatus status = map->GetLiquidStatus(object->GetPhaseShift(), object->GetPositionX(), object->GetPositionY(), object->GetPositionZ(), map_liquidHeaderTypeFlags::AllLiquids, &liquidStatus);
@@ -444,7 +444,7 @@ public:
 
             _player->TeleportTo(target->GetMapId(), x, y, z, _player->GetAbsoluteAngle(target), TELE_TO_GM_MODE, target->GetInstanceId());
             PhasingHandler::InheritPhaseShift(_player, target);
-            _player->SetHousePhaseId(target->GetHousePhaseId(), false);
+            _player->SetHouseAreaPhaseId(target->GetHouseAreaPhaseId(), false);
             _player->UpdateObjectVisibility();
         }
         else
@@ -569,7 +569,7 @@ public:
             _player->GetClosePoint(x, y, z, target->GetCombatReach());
             target->TeleportTo(_player->GetMapId(), x, y, z, target->GetOrientation(), 0, map->GetInstanceId());
             PhasingHandler::InheritPhaseShift(target, _player);
-            target->SetHousePhaseId(_player->GetHousePhaseId(), false);
+            target->SetHouseAreaPhaseId(_player->GetHouseAreaPhaseId(), false);
             target->UpdateObjectVisibility();
         }
         else

@@ -153,9 +153,9 @@ class TC_GAME_API GameObject : public WorldObject, public GridObject<GameObject>
         void CleanupsBeforeDelete(bool finalCleanup = true) override;
 
     private:
-        bool Create(uint32 entry, Map* map, Position const& pos, QuaternionData const& rotation, uint32 animProgress, GOState goState, uint32 artKit, bool dynamic, ObjectGuid::LowType spawnid, float size = -1.0f, int32 houseId = -1);
+        bool Create(uint32 entry, Map* map, Position const& pos, QuaternionData const& rotation, uint32 animProgress, GOState goState, uint32 artKit, bool dynamic, ObjectGuid::LowType spawnid, float size = -1.0f, int32 houseAreaId = -1);
     public:
-        static GameObject* CreateGameObject(uint32 entry, Map* map, Position const& pos, QuaternionData const& rotation, uint32 animProgress, GOState goState, uint32 artKit = 0, float size = -1.0f, int32 houseId = -1);
+        static GameObject* CreateGameObject(uint32 entry, Map* map, Position const& pos, QuaternionData const& rotation, uint32 animProgress, GOState goState, uint32 artKit = 0, float size = -1.0f, int32 houseAreaId = -1);
         static GameObject* CreateGameObjectFromDB(ObjectGuid::LowType spawnId, Map* map, bool addToMap = true);
 
         void Update(uint32 p_time) override;
@@ -253,8 +253,8 @@ class TC_GAME_API GameObject : public WorldObject, public GridObject<GameObject>
         std::vector<uint32> const* GetPauseTimes() const;
         void SetPathProgressForClient(float progress);
 
-        void SetHousePhaseId(uint32 housePhaseId, bool update);
-        void SetHouseId(uint32 houseId, bool setPhase = true, bool update = false);
+        void SetHouseAreaPhaseId(uint32 houseAreaPhaseId, bool update);
+        void SetHouseAreaId(uint32 houseAreaId, bool setPhase = true, bool update = false);
 
         void EnableCollision(bool enable);
 

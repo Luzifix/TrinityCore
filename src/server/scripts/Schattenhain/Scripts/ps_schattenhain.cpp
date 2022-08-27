@@ -4,6 +4,7 @@
 
 #include "ScriptMgr.h"
 #include "Housing.h"
+#include "HousingArea.h"
 #include "Player.h"
 #include "CollectionMgr.h"
 #include "WorldSession.h"
@@ -105,7 +106,7 @@ public:
         selectStmt->setUInt64(0, player->GetGUID().GetCounter());
         PreparedQueryResult result = CharacterDatabase.Query(selectStmt);
 
-        if (player->GetMapId() != (uint32)HOUSING_MAPID_BASEMENT)
+        if (player->GetMapId() != (uint32)HOUSING_AREA_MAPID_BASEMENT)
         {
             if (result)
             {
@@ -124,7 +125,7 @@ public:
         }
 
         Field* field = result->Fetch();
-        player->SetHouseId(field[0].GetUInt32(), true, true);
+        player->SetHouseAreaId(field[0].GetUInt32(), true, true);
     }
 
     void DisableOOCMode(Player* player)

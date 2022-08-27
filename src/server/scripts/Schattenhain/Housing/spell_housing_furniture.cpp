@@ -56,9 +56,9 @@ public:
                 return;
             }
 
-            Housing* housing = sHousingMgr->GetById(player->GetHouseId());
+            HousingArea* housingArea = sHousingMgr->GetHousingAreaById(player->GetHouseAreaId());
 
-            if (housing && player->IsGameMaster())
+            if (housingArea && player->IsGameMaster())
             {
                 handler.SendSysMessage(LANG_HOUSING_ERR_GAMEMASTER_MODE_IN_HOUSING_NOT_ALLOWED);
                 return;
@@ -78,19 +78,19 @@ public:
                     return;
                 }
 
-                if (!housing || !housing->HasBuildingPermission(player))
+                if (!housingArea || !housingArea->HasBuildingPermission(player))
                 {
                     handler.SendSysMessage(LANG_HOUSING_NO_BUILD_PERMISSION);
                     return;
                 }
 
-                if (housing->GetFacilityLimit() > 0 && housing->GetFacilityLimit() < (housing->GetFacilityCurrent() + 1))
+                if (housingArea->GetFacilityLimit() > 0 && housingArea->GetFacilityLimit() < (housingArea->GetFacilityCurrent() + 1))
                 {
-                    handler.PSendSysMessage(LANG_HOUSING_ERR_FACILITY_LIMIT_REACHED, housing->GetFacilityLimit());
+                    handler.PSendSysMessage(LANG_HOUSING_ERR_FACILITY_LIMIT_REACHED, housingArea->GetFacilityLimit());
                     return;
                 }
 
-                if (!housing->IsInHouse(G3D::Vector3(spawnPosition.GetPositionX(), spawnPosition.GetPositionY(), spawnPosition.GetPositionZ()), player->GetMapId()))
+                if (!housingArea->IsInHouse(G3D::Vector3(spawnPosition.GetPositionX(), spawnPosition.GetPositionY(), spawnPosition.GetPositionZ()), player->GetMapId()))
                 {
                     handler.SendSysMessage(LANG_HOUSING_CANT_SPAWN_OR_MOVE_OBJECT_OUT_OF_HOUSE);
                     return;
@@ -111,7 +111,7 @@ public:
         bool SpawnFurniture(Player* player, Furniture* furniture, Position spawnPosition)
         {
             Map* map = player->GetMap();
-            GameObject* object = GameObject::CreateGameObject(furniture->GetId(), map, spawnPosition, QuaternionData::fromEulerAnglesZYX(player->GetOrientation(), 0.0f, 0.0f), 255, GO_STATE_READY, 0, -1.0f, player->GetHouseId());
+            GameObject* object = GameObject::CreateGameObject(furniture->GetId(), map, spawnPosition, QuaternionData::fromEulerAnglesZYX(player->GetOrientation(), 0.0f, 0.0f), 255, GO_STATE_READY, 0, -1.0f, player->GetHouseAreaId());
 
             if (!object)
                 return false;
@@ -192,9 +192,9 @@ public:
             Position selectPosition = GetSpell()->m_targets.GetDstPos()->GetPosition();
             ChatHandler handler = ChatHandler(player->GetSession());
 
-            Housing* housing = sHousingMgr->GetById(player->GetHouseId());
+            HousingArea* housingArea = sHousingMgr->GetHousingAreaById(player->GetHouseAreaId());
 
-            if (housing && player->IsGameMaster())
+            if (housingArea && player->IsGameMaster())
             {
                 handler.SendSysMessage(LANG_HOUSING_ERR_GAMEMASTER_MODE_IN_HOUSING_NOT_ALLOWED);
                 return;
@@ -202,7 +202,7 @@ public:
 
             if (!player->IsGameMaster())
             {
-                if (!housing || !housing->IsInHouse(G3D::Vector3(selectPosition.GetPositionX(), selectPosition.GetPositionY(), selectPosition.GetPositionZ()), player->GetMapId()))
+                if (!housingArea || !housingArea->IsInHouse(G3D::Vector3(selectPosition.GetPositionX(), selectPosition.GetPositionY(), selectPosition.GetPositionZ()), player->GetMapId()))
                 {
                     handler.SendSysMessage(LANG_HOUSING_NO_BUILD_PERMISSION);
                     return;
@@ -212,7 +212,7 @@ public:
             std::string whereHouseIdAndPhaseId = "";
 
             if (!player->IsGameMaster())
-                whereHouseIdAndPhaseId = Trinity::StringFormat("AND PhaseId != -1 AND house_id = '%u'", housing->GetId());
+                whereHouseIdAndPhaseId = Trinity::StringFormat("AND PhaseId != -1 AND house_area_id = '%u'", housingArea->GetId());
 
             // @TODO Check Object is in same house
             QueryResult result = WorldDatabase.PQuery("SELECT gameobject.guid, id, position_x, position_y, position_z, orientation, map, PhaseId, PhaseGroup, "

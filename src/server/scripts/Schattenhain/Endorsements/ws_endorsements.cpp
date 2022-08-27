@@ -86,7 +86,7 @@ public:
         if (!player->IsInWorld())
             return possiblePlayer;
 
-        if (player->GetHousePhaseId() > 0)
+        if (player->GetHouseAreaPhaseId() > 0)
             return possiblePlayer;
 
         if (player->isAFK())

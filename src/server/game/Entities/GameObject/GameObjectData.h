@@ -38,7 +38,7 @@ struct GameObjectTemplate
     std::string unk1;
     float   size;
     int32   ContentTuningId;
-    uint32  houseId;
+    uint32  houseAreaId;
     union
     {
         // 0 GAMEOBJECT_TYPE_DOOR
@@ -1273,7 +1273,7 @@ struct GameObjectData : public SpawnData
     GOState goState = GO_STATE_ACTIVE;
     uint32 artKit = 0;
     float size = 0.0f;
-    uint32 houseId = 0;
+    uint32 houseAreaId = 0;
 };
 
 enum class GameObjectActions : uint32

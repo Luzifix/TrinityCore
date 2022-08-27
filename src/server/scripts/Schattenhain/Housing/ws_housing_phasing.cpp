@@ -35,9 +35,12 @@ public:
             switch (eventId)
             {
             case HOUSING_UPDATE_EVENT:
-                for (const auto& housingEntry : sHousingMgr->GetHousingStore())
+                for (const auto& housing : sHousingMgr->GetHousingStore())
                 {
-                    housingEntry.second->UpdateVisitorList();
+                    for (const auto& housingArea : housing.second->GetHousingAreas())
+                    {
+                        housingArea.second->UpdateVisitorList();
+                    }
                 }
 
                 _events.ScheduleEvent(HOUSING_UPDATE_EVENT, HOUSING_UPDATE_INTERVAL);
@@ -49,7 +52,7 @@ public:
                 {
                     Player* player = itr->second;
 
-                    if (player && player->IsInWorld() && !player->IsBeingTeleported() && player->GetMapId() != HOUSING_MAPID_BASEMENT)
+                    if (player && player->IsInWorld() && !player->IsBeingTeleported() && player->GetMapId() != HOUSING_AREA_MAPID_BASEMENT)
                         UpdatePlayerHousing(player);
                 }
 
@@ -61,30 +64,30 @@ public:
 
     void UpdatePlayerHousing(Player* player)
     {
-        Housing* housing = sHousingMgr->GetByWorldObject(player);
+        HousingArea* housingArea = sHousingMgr->GetHousingAreaByWorldObject(player);
 
-        if (housing != nullptr)
+        if (housingArea != nullptr)
         {
-            bool isIndoor = (housing->IsIndoor() && sHousingMgr->IsIndoor(player));
+            bool isIndoor = (housingArea->IsIndoor() && sHousingMgr->IsIndoor(player));
 
-            player->SetHouseId(housing->GetId(), isIndoor, true);
+            player->SetHouseAreaId(housingArea->GetId(), isIndoor, true);
 
-            if (!isIndoor && player->GetHousePhaseId() > 0)
-                player->SetHousePhaseId(0, true);
+            if (!isIndoor && player->GetHouseAreaPhaseId() > 0)
+                player->SetHouseAreaPhaseId(0, true);
 
-            if (!housing->HasVisitor(player))
+            if (!housingArea->HasVisitor(player))
             {
-                housing->AddVisitor(player);
+                housingArea->AddVisitor(player);
 
-                if (housing->GetMotd() != "")
-                    ChatHandler(player->GetSession()).PSendSysMessage(LANG_HOUSING_MOTD, housing->GetName(), housing->GetMotd());
+                if (housingArea->GetMotd() != "")
+                    ChatHandler(player->GetSession()).PSendSysMessage(LANG_HOUSING_MOTD, housingArea->GetName(), housingArea->GetMotd());
             }
 
             return;
         }
 
-        if (player->GetHouseId() > 0 || player->GetHousePhaseId() > 0)
-            player->SetHouseId(0, true, true);
+        if (player->GetHouseAreaId() > 0 || player->GetHouseAreaPhaseId() > 0)
+            player->SetHouseAreaId(0, true, true);
     }
 
 private:

@@ -472,23 +472,23 @@ class TC_GAME_API WorldObject : public Object, public WorldLocation
             return a && b && a->IsInPhase(b);
         }
 
-        bool InSameHousePhase(uint32 h) const { return (GetHousePhaseId() == h); }
-        bool InSameHouse(uint32 houseId) const { return (GetHouseId() == houseId); }
-        bool InSameHousePhase(WorldObject const* obj) const;
-        bool InSameHouse(WorldObject const* obj) const;
+        bool InSameHouseAreaPhase(uint32 houseAreaPhaseId) const { return (GetHouseAreaPhaseId() == houseAreaPhaseId); }
+        bool InSameHouseArea(uint32 houseAreaId) const { return (GetHouseAreaId() == houseAreaId); }
+        bool InSameHouseAreaPhase(WorldObject const* obj) const;
+        bool InSameHouseArea(WorldObject const* obj) const;
 
         PhaseShift& GetPhaseShift() { return _phaseShift; }
         PhaseShift const& GetPhaseShift() const { return _phaseShift; }
         PhaseShift& GetSuppressedPhaseShift() { return _suppressedPhaseShift; }
         PhaseShift const& GetSuppressedPhaseShift() const { return _suppressedPhaseShift; }
         int32 GetDBPhase() const { return _dbPhase; }
-        uint32 GetHousePhaseId() const { return _housePhaseId; }
-        uint32 GetHouseId() const { return _houseId; }
+        uint32 GetHouseAreaPhaseId() const { return _houseAreaPhaseId; }
+        uint32 GetHouseAreaId() const { return _houseAreaId; }
 
         // if negative it is used as PhaseGroupId
         void SetDBPhase(int32 p) { _dbPhase = p; }
-        void SetHousePhaseId(uint32 housePhaseId, bool update);
-        void SetHouseId(uint32 houseId, bool setPhase = true, bool update = false);
+        void SetHouseAreaPhaseId(uint32 houseAreaPhaseId, bool update);
+        void SetHouseAreaId(uint32 houseAreaId, bool setPhase = true, bool update = false);
 
         uint32 GetZoneId() const { return m_zoneId; }
         uint32 GetAreaId() const { return m_areaId; }
@@ -774,8 +774,8 @@ class TC_GAME_API WorldObject : public Object, public WorldLocation
         PhaseShift _phaseShift;
         PhaseShift _suppressedPhaseShift;                 // contains phases for current area but not applied due to conditions
         int32 _dbPhase;
-        uint32 _housePhaseId = 0;                         // housing phase id
-        uint32 _houseId = 0;                              // housing id
+        uint32 _houseAreaPhaseId = 0;                     // housing phase id
+        uint32 _houseAreaId = 0;                          // housing id
 
         uint16 m_notifyflags;
 

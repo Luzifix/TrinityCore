@@ -952,20 +952,20 @@ void WorldObject::RemoveFromWorld()
     Object::RemoveFromWorld();
 }
 
-void WorldObject::SetHousePhaseId(uint32 housePhaseId, bool update)
+void WorldObject::SetHouseAreaPhaseId(uint32 houseAreaPhaseId, bool update)
 {
-    _housePhaseId = housePhaseId;
+    _houseAreaPhaseId = houseAreaPhaseId;
 
     if (update && IsInWorld())
         UpdateObjectVisibility();
 }
 
-void WorldObject::SetHouseId(uint32 houseId, bool setPhase /* = true */, bool update /* = true */)
+void WorldObject::SetHouseAreaId(uint32 houseAreaId, bool setPhase /* = true */, bool update /* = true */)
 {
-    _houseId = houseId;
+    _houseAreaId = houseAreaId;
 
     if (setPhase)
-        SetHousePhaseId(houseId, update);
+        SetHouseAreaPhaseId(houseAreaId, update);
 }
 
 bool WorldObject::IsInWorldPvpZone() const
@@ -1560,7 +1560,7 @@ bool WorldObject::CanSeeOrDetect(WorldObject const* obj, bool ignoreStealth, boo
 
 bool WorldObject::CanNeverSee(WorldObject const* obj) const
 {
-    return GetMap() != obj->GetMap() || !InSameHousePhase(obj) || !IsInPhase(obj);
+    return GetMap() != obj->GetMap() || !InSameHouseAreaPhase(obj) || !IsInPhase(obj);
 }
 
 bool WorldObject::CanDetect(WorldObject const* obj, bool ignoreStealth, bool checkAlert) const
@@ -3490,11 +3490,11 @@ void WorldObject::MovePositionToFirstCollision(Position &pos, float dist, float 
     }
 }
 
-bool WorldObject::InSameHousePhase(WorldObject const* obj) const
+bool WorldObject::InSameHouseAreaPhase(WorldObject const* obj) const
 {
-    uint32 houseId = obj->GetHousePhaseId();
+    uint32 houseId = obj->GetHouseAreaPhaseId();
 
-    if (InSameHousePhase(houseId))
+    if (InSameHouseAreaPhase(houseId))
         return true;
 
     if (houseId == uint32(PHASEMASK_ANYWHERE))
@@ -3509,11 +3509,11 @@ bool WorldObject::InSameHousePhase(WorldObject const* obj) const
     return false;
 }
 
-bool WorldObject::InSameHouse(WorldObject const* obj) const
+bool WorldObject::InSameHouseArea(WorldObject const* obj) const
 {
-    uint32 houseId = obj->GetHouseId();
+    uint32 houseId = obj->GetHouseAreaId();
 
-    if (InSameHouse(houseId))
+    if (InSameHouseArea(houseId))
         return true;
 
     if (houseId == uint32(PHASEMASK_ANYWHERE))

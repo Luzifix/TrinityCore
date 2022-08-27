@@ -24,15 +24,15 @@ public:
 
         bool OnGossipHello(Player* player)
         {
-            Housing* housing = sHousingMgr->GetByWorldObject(me);
+            HousingArea* housingArea = sHousingMgr->GetHousingAreaByWorldObject(me);
 
-            if (!housing)
+            if (!housingArea)
             {
                 ChatHandler(player->GetSession()).SendSysMessage(LANG_HOUSING_DOOR_ERR_NOT_IN_HOUSING_AREA);
                 return true;
             }
 
-            if (housing->HasAccessPermission(player) || player->IsGameMaster())
+            if (housingArea->HasAccessPermission(player) || player->IsGameMaster())
                 me->UseDoorOrButton(0, false, player);
             else
                 ChatHandler(player->GetSession()).SendSysMessage(LANG_HOUSING_DOOR_ERR_PERMISSION_DENIED);
@@ -54,7 +54,7 @@ public:
 
     struct go_housing_basement_doorAI : public GameObjectAI
     {
-        go_housing_basement_doorAI(GameObject* go) : GameObjectAI(go), _basementMapId(HOUSING_MAPID_BASEMENT), _basementLocation(HOUSING_MAPID_BASEMENT, -268.8766f, -260.1297f, 1.6593f, 1.5857f) { }
+        go_housing_basement_doorAI(GameObject* go) : GameObjectAI(go), _basementMapId(HOUSING_AREA_MAPID_BASEMENT), _basementLocation(HOUSING_AREA_MAPID_BASEMENT, -268.8766f, -260.1297f, 1.6593f, 1.5857f) { }
 
         bool OnGossipHello(Player* player)
         {
@@ -95,9 +95,9 @@ public:
 
         void TeleportIn(Player* player)
         {
-            Housing* housing = sHousingMgr->GetByWorldObject(me);
+            HousingArea* housingArea = sHousingMgr->GetHousingAreaByWorldObject(me);
 
-            if (!housing)
+            if (!housingArea)
             {
                 ChatHandler(player->GetSession()).SendSysMessage(LANG_HOUSING_DOOR_ERR_NOT_IN_HOUSING_AREA);
                 return;
@@ -105,7 +105,7 @@ public:
 
             CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_REP_HOUSING_BASEMENT);
             stmt->setUInt64(0, player->GetGUID().GetCounter());
-            stmt->setUInt32(1, housing->GetId());
+            stmt->setUInt32(1, housingArea->GetId());
             stmt->setUInt16(2, player->GetMapId());
             stmt->setFloat(3, player->GetPositionX());
             stmt->setFloat(4, player->GetPositionY());
@@ -113,8 +113,8 @@ public:
             CharacterDatabase.Execute(stmt);
 
             player->TeleportTo(_basementLocation);
-            player->SetHouseId(housing->GetId());
-            player->SetHousePhaseId(housing->GetId(), true);
+            player->SetHouseAreaId(housingArea->GetId());
+            player->SetHouseAreaPhaseId(housingArea->GetId(), true);
         }
 
     private:

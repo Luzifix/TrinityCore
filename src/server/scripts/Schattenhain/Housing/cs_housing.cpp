@@ -10,7 +10,7 @@
 #include "Player.h"
 #include "RBAC.h"
 #include "WorldSession.h"
-
+/*
 class cs_housing : public CommandScript
 {
 public:
@@ -426,7 +426,7 @@ public:
 
     static bool HandleInfoHousingCommand(ChatHandler* handler, char const* args)
     {
-        Housing* housing = sHousingMgr->GetById(handler->GetSession()->GetPlayer()->GetHouseId());
+        Housing* housing = sHousingMgr->GetById(handler->GetSession()->GetPlayer()->GetHouseAreaId());
 
         if (!housing)
         {
@@ -469,8 +469,8 @@ private:
         return true;
     }
 };
-
+*/
 void AddSC_Housing_CommandScript()
 {
-    new cs_housing();
+    //new cs_housing();
 }
