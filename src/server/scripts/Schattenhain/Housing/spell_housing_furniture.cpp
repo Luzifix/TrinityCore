@@ -90,7 +90,7 @@ public:
                     return;
                 }
 
-                if (!housingArea->IsInHouse(G3D::Vector3(spawnPosition.GetPositionX(), spawnPosition.GetPositionY(), spawnPosition.GetPositionZ()), player->GetMapId()))
+                if (!housingArea->IsInHouse(G3D::Vector3(spawnPosition.GetPositionX(), spawnPosition.GetPositionY(), spawnPosition.GetPositionZ()), player->GetMapId(), player->GetHouseAreaId()))
                 {
                     handler.SendSysMessage(LANG_HOUSING_CANT_SPAWN_OR_MOVE_OBJECT_OUT_OF_HOUSE);
                     return;
@@ -202,7 +202,7 @@ public:
 
             if (!player->IsGameMaster())
             {
-                if (!housingArea || !housingArea->IsInHouse(G3D::Vector3(selectPosition.GetPositionX(), selectPosition.GetPositionY(), selectPosition.GetPositionZ()), player->GetMapId()))
+                if (!housingArea || !housingArea->IsInHouse(G3D::Vector3(selectPosition.GetPositionX(), selectPosition.GetPositionY(), selectPosition.GetPositionZ()), player->GetMapId(), player->GetHouseAreaId()))
                 {
                     handler.SendSysMessage(LANG_HOUSING_NO_BUILD_PERMISSION);
                     return;

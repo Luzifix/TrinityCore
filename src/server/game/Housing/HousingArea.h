@@ -121,9 +121,9 @@ public:
 #pragma region Has & Is
     bool HasHeightInformation() { return _heightMin != _heightMax; }
     bool IsInHouse(WorldObject const* object);
-    bool IsInHouse(G3D::Vector3 currentPostion, uint32 mapId);
+    bool IsInHouse(G3D::Vector3 postion, uint32 mapId, uint32 housingAreaId);
     bool IsInBasement(WorldObject const* object);
-    bool IsInBasement(G3D::Vector3 currentPostion, uint32 mapId);
+    bool IsInBasement(G3D::Vector3 currentPostion, uint32 mapId, uint32 housingAreaId);
     bool IsIndoor() { return (_type == HOUSING_AREA_INDOOR); }
     bool IsVisitorInHouse() { return (_visitor.size() > 0); }
     bool HasAccessPermission(Player* player);

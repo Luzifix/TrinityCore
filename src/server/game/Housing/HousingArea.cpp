@@ -12,20 +12,20 @@ using namespace G3D;
 
 bool HousingArea::IsInHouse(WorldObject const* object)
 {
-    return IsInHouse(Vector3(object->GetPositionX(), object->GetPositionY(), object->GetPositionZ()), object->GetMapId());
+    return IsInHouse(Vector3(object->GetPositionX(), object->GetPositionY(), object->GetPositionZ()), object->GetMapId(), object->GetHouseAreaId());
 }
 
-bool HousingArea::IsInHouse(Vector3 currentPostion, uint32 mapId)
+bool HousingArea::IsInHouse(Vector3 postion, uint32 mapId, uint32 housingAreaId)
 {
     if (_map != mapId)
     {
-        if (IsInBasement(currentPostion, mapId))
+        if (IsInBasement(postion, mapId, housingAreaId))
             return true;
 
         return false;
     }
 
-    if (HasHeightInformation() && (_heightMin > currentPostion.z || _heightMax < currentPostion.z))
+    if (HasHeightInformation() && (_heightMin > postion.z || _heightMax < postion.z))
     {
         return false;
     }
@@ -37,7 +37,7 @@ bool HousingArea::IsInHouse(Vector3 currentPostion, uint32 mapId)
         Vector2 lineStartPoint = _trigger->at(i);
         Vector2 lineEndPoint = (i == 0 ? _trigger->at(_trigger->size() - 1) : _trigger->at(i - 1));
 
-        if (GetLineIntersection(lineStartPoint, lineEndPoint, currentPostion.xy()))
+        if (GetLineIntersection(lineStartPoint, lineEndPoint, postion.xy()))
         {
             interstectionCount++;
         }
@@ -55,12 +55,15 @@ bool HousingArea::IsInHouse(Vector3 currentPostion, uint32 mapId)
 
 bool HousingArea::IsInBasement(WorldObject const* object)
 {
-    return IsInBasement(Vector3(object->GetPositionX(), object->GetPositionY(), object->GetPositionZ()), object->GetMapId());
+    return IsInBasement(Vector3(object->GetPositionX(), object->GetPositionY(), object->GetPositionZ()), object->GetMapId(), object->GetHouseAreaId());
 }
 
-bool HousingArea::IsInBasement(Vector3 currentPostion, uint32 mapId)
+bool HousingArea::IsInBasement(Vector3 currentPostion, uint32 mapId, uint32 housingAreaId)
 {
     if (mapId != HOUSING_AREA_MAPID_BASEMENT)
+        return false;
+
+    if (_id != housingAreaId)
         return false;
 
     float minHeight = 1.f;

@@ -158,7 +158,7 @@ static GameObjectSelectionInfoError MoveGameObject(Player* player, GameObject* o
             return GAMEOBJECT_SELECTION_INFO_ERROR_OUT_OF_RANGE;
 
         HousingArea* housingArea = sHousingMgr->GetHousingAreaById(player->GetHouseAreaId());
-        if (!housingArea || !housingArea->IsInHouse(G3D::Vector3(x, y, z), map->GetId()))
+        if (!housingArea || !housingArea->IsInHouse(G3D::Vector3(x, y, z), map->GetId(), player->GetHouseAreaId()))
             return GAMEOBJECT_SELECTION_INFO_ERROR_OUT_OF_HOUSE;
     }
 
