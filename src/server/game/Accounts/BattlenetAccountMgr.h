@@ -42,6 +42,8 @@ namespace Battlenet
         [[nodiscard]] TC_GAME_API QueryCallback GetIdByGameAccountAsync(uint32 gameAccountId);
         TC_GAME_API uint8 GetMaxIndex(uint32 accountId);
 
+        TC_GAME_API bool IsBannedAccount(std::string const& email);
+
         TC_GAME_API std::string CalculateShaPassHash(std::string_view name, std::string_view password);
     }
 }

@@ -179,6 +179,18 @@ uint8 Battlenet::AccountMgr::GetMaxIndex(uint32 accountId)
     return 0;
 }
 
+bool Battlenet::AccountMgr::IsBannedAccount(std::string const& email)
+{
+    LoginDatabasePreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_SEL_BNET_AUTHENTICATION);
+    stmt->setString(0, email);
+    PreparedQueryResult result = LoginDatabase.Query(stmt);
+
+    if (!result)
+        return false;
+
+    return (*result)[5].GetBool();
+}
+
 std::string Battlenet::AccountMgr::CalculateShaPassHash(std::string_view name, std::string_view password)
 {
     Trinity::Crypto::SHA256 email;

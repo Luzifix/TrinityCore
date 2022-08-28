@@ -6087,7 +6087,8 @@ enum BanMode
 {
     BAN_ACCOUNT,
     BAN_CHARACTER,
-    BAN_IP
+    BAN_IP,
+    BAN_BNET
 };
 
 /// Ban function return codes

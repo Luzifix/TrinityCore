@@ -41,7 +41,7 @@ void Battlenet::Session::AccountInfo::LoadResult(PreparedQueryResult result)
     LastIP = fields[4].GetString();
     LoginTicketExpiry = fields[5].GetUInt32();
     IsBanned = fields[6].GetUInt64() != 0;
-    IsPermanenetlyBanned = fields[7].GetUInt64() != 0;
+    IsPermanenetlyBanned = fields[7].GetBool();
 
     static uint32 const GameAccountFieldsOffset = 8;
 
@@ -64,7 +64,7 @@ void Battlenet::Session::GameAccountInfo::LoadResult(Field* fields)
 
     std::size_t hashPos = Name.find('#');
     if (hashPos != std::string::npos)
-        DisplayName = std::string("WoW") + Name.substr(hashPos + 1);
+        DisplayName = std::string("SH#") + Name.substr(hashPos + 1);
     else
         DisplayName = Name;
 }

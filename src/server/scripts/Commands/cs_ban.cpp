@@ -55,6 +55,7 @@ public:
             { "character",      HandleUnBanCharacterCommand,            rbac::RBAC_PERM_COMMAND_UNBAN_CHARACTER,        Console::Yes },
             { "playeraccount",  HandleUnBanAccountByCharCommand,        rbac::RBAC_PERM_COMMAND_UNBAN_PLAYERACCOUNT,    Console::Yes },
             { "ip",             HandleUnBanIPCommand,                   rbac::RBAC_PERM_COMMAND_UNBAN_IP,               Console::Yes },
+            { "bnet",           HandleUnBanBnetCommand,                 rbac::RBAC_PERM_COMMAND_UNBAN_BNET,             Console::Yes },
         };
         static ChatCommandTable banlistCommandTable =
         {
@@ -74,6 +75,7 @@ public:
             { "character",      HandleBanCharacterCommand,              rbac::RBAC_PERM_COMMAND_BAN_CHARACTER,          Console::Yes },
             { "playeraccount",  HandleBanAccountByCharCommand,          rbac::RBAC_PERM_COMMAND_BAN_PLAYERACCOUNT,      Console::Yes },
             { "ip",             HandleBanIPCommand,                     rbac::RBAC_PERM_COMMAND_BAN_IP,                 Console::Yes },
+            { "bnet",           HandleBanBnetCommand,                   rbac::RBAC_PERM_COMMAND_BAN_BNET,               Console::Yes },
         };
         static ChatCommandTable commandTable =
         {
@@ -161,6 +163,11 @@ public:
         return HandleBanHelper(BAN_IP, args, handler);
     }
 
+    static bool HandleBanBnetCommand(ChatHandler* handler, char const* args)
+    {
+        return HandleBanHelper(BAN_BNET, args, handler);
+    }
+
     static bool HandleBanHelper(BanMode mode, char const* args, ChatHandler* handler)
     {
         if (!*args)
@@ -183,6 +190,7 @@ public:
         switch (mode)
         {
             case BAN_ACCOUNT:
+            case BAN_BNET:
                 if (!Utf8ToUpperOnlyLatin(nameOrIP))
                 {
                     handler->PSendSysMessage(LANG_ACCOUNT_NOT_EXIST, nameOrIP.c_str());
@@ -715,6 +723,11 @@ public:
         return HandleUnBanHelper(BAN_IP, args, handler);
     }
 
+    static bool HandleUnBanBnetCommand(ChatHandler* handler, char const* args)
+    {
+        return HandleUnBanHelper(BAN_BNET, args, handler);
+    }
+
     static bool HandleUnBanHelper(BanMode mode, char const* args, ChatHandler* handler)
     {
         if (!*args)
@@ -729,6 +742,7 @@ public:
         switch (mode)
         {
             case BAN_ACCOUNT:
+            case BAN_BNET:
                 if (!Utf8ToUpperOnlyLatin(nameOrIP))
                 {
                     handler->PSendSysMessage(LANG_ACCOUNT_NOT_EXIST, nameOrIP.c_str());

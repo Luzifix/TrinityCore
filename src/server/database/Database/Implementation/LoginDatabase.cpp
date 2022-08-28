@@ -23,6 +23,9 @@ void LoginDatabaseConnection::DoPrepareStatements()
     if (!m_reconnecting)
         m_stmts.resize(MAX_LOGINDATABASE_STATEMENTS);
 
+#define HardwareBanInfo "hwHardware.unbandate > UNIX_TIMESTAMP() OR hwHardware.unbandate = hwHardware.bandate OR hwMachine.unbandate > UNIX_TIMESTAMP() OR hwMachine.unbandate = hwMachine.bandate"
+#define HardwarePermaBanInfo "hwHardware.unbandate = hwHardware.bandate OR hwMachine.unbandate = hwMachine.bandate"
+
     PrepareStatement(LOGIN_SEL_REALMLIST, "SELECT id, name, address, localAddress, localSubnetMask, port, icon, flag, timezone, allowedSecurityLevel, population, gamebuild, Region, Battlegroup FROM realmlist WHERE flag <> 3 ORDER BY name", CONNECTION_SYNCH);
     PrepareStatement(LOGIN_DEL_EXPIRED_IP_BANS, "DELETE FROM ip_banned WHERE unbandate<>bandate AND unbandate<=UNIX_TIMESTAMP()", CONNECTION_ASYNC);
     PrepareStatement(LOGIN_UPD_EXPIRED_ACCOUNT_BANS, "UPDATE account_banned SET active = 0 WHERE active = 1 AND unbandate<>bandate AND unbandate<=UNIX_TIMESTAMP()", CONNECTION_ASYNC);
@@ -40,9 +43,10 @@ void LoginDatabaseConnection::DoPrepareStatements()
     PrepareStatement(LOGIN_SEL_ACCOUNT_ID_BY_NAME, "SELECT id FROM account WHERE username = ?", CONNECTION_SYNCH);
     PrepareStatement(LOGIN_SEL_ACCOUNT_LIST_BY_NAME, "SELECT id, username FROM account WHERE username = ?", CONNECTION_SYNCH);
     PrepareStatement(LOGIN_SEL_ACCOUNT_INFO_BY_NAME, "SELECT a.id, a.session_key_bnet, ba.last_ip, ba.locked, ba.lock_country, a.expansion, a.mutetime, ba.locale, a.recruiter, a.os, ba.id, aa.SecurityLevel, "
-        "bab.unbandate > UNIX_TIMESTAMP() OR bab.unbandate = bab.bandate, ab.unbandate > UNIX_TIMESTAMP() OR ab.unbandate = ab.bandate, r.id "
+        "bab.unbandate > UNIX_TIMESTAMP() OR bab.unbandate = bab.bandate OR " HardwareBanInfo ", ab.unbandate > UNIX_TIMESTAMP() OR ab.unbandate = ab.bandate, r.id "
         "FROM account a LEFT JOIN account r ON a.id = r.recruiter LEFT JOIN battlenet_accounts ba ON a.battlenet_account = ba.id "
         "LEFT JOIN account_access aa ON a.id = aa.AccountID AND aa.RealmID IN (-1, ?) LEFT JOIN battlenet_account_bans bab ON ba.id = bab.id LEFT JOIN account_banned ab ON a.id = ab.id AND ab.active = 1 "
+        "LEFT JOIN hardware_bans hwHardware ON (ba.hardwareHash = hwHardware.hardwareHash) LEFT JOIN hardware_bans hwMachine ON (ba.machineHash = hwMachine.machineHash) "
         "WHERE a.username = ? AND LENGTH(a.session_key_bnet) = 64 ORDER BY aa.RealmID DESC LIMIT 1", CONNECTION_ASYNC);
 
     PrepareStatement(LOGIN_SEL_ACCOUNT_LIST_BY_EMAIL, "SELECT id, username FROM account WHERE email = ?", CONNECTION_SYNCH);
@@ -117,19 +121,21 @@ void LoginDatabaseConnection::DoPrepareStatements()
     PrepareStatement(LOGIN_SEL_ACCOUNT_TOTP_SECRET, "SELECT totp_secret FROM account WHERE id = ?", CONNECTION_SYNCH);
     PrepareStatement(LOGIN_UPD_ACCOUNT_TOTP_SECRET, "UPDATE account SET totp_secret = ? WHERE id = ?", CONNECTION_ASYNC);
 
-#define BnetAccountInfo "ba.id, UPPER(ba.email), ba.locked, ba.lock_country, ba.last_ip, ba.LoginTicketExpiry, bab.unbandate > UNIX_TIMESTAMP() OR bab.unbandate = bab.bandate, bab.unbandate = bab.bandate"
+#define BnetAccountInfo "ba.id, UPPER(ba.email), ba.locked, ba.lock_country, ba.last_ip, ba.LoginTicketExpiry, bab.unbandate > UNIX_TIMESTAMP() OR bab.unbandate = bab.bandate OR " HardwareBanInfo ", bab.unbandate = bab.bandate OR " HardwarePermaBanInfo ""
 #define BnetGameAccountInfo "a.id, a.username, ab.unbandate, ab.unbandate = ab.bandate, aa.SecurityLevel"
 
-    PrepareStatement(LOGIN_SEL_BNET_AUTHENTICATION, "SELECT ba.id, ba.sha_pass_hash, ba.failed_logins, ba.LoginTicket, ba.LoginTicketExpiry, bab.unbandate > UNIX_TIMESTAMP() OR bab.unbandate = bab.bandate FROM battlenet_accounts ba LEFT JOIN battlenet_account_bans bab ON ba.id = bab.id WHERE email = ?", CONNECTION_ASYNC);
+    PrepareStatement(LOGIN_SEL_BNET_AUTHENTICATION, "SELECT ba.id, ba.sha_pass_hash, ba.failed_logins, ba.LoginTicket, ba.LoginTicketExpiry, bab.unbandate > UNIX_TIMESTAMP() OR bab.unbandate = bab.bandate OR " HardwareBanInfo " FROM battlenet_accounts ba"
+        " LEFT JOIN battlenet_account_bans bab ON ba.id = bab.id LEFT JOIN hardware_bans hwHardware ON (ba.hardwareHash = hwHardware.hardwareHash) LEFT JOIN hardware_bans hwMachine ON (ba.machineHash = hwMachine.machineHash) WHERE email = ?", CONNECTION_BOTH);
     PrepareStatement(LOGIN_UPD_BNET_AUTHENTICATION, "UPDATE battlenet_accounts SET LoginTicket = ?, LoginTicketExpiry = ? WHERE id = ?", CONNECTION_ASYNC);
-    PrepareStatement(LOGIN_UPD_BNET_AUTHENTICATION_WITH_HARDWARE_INFORMATION, "UPDATE battlenet_accounts SET LoginTicket = ?, LoginTicketExpiry = ?, hardwareHash = ?, gatewayMac = ?, cpuId = ?, volumeIds = ? WHERE id = ?", CONNECTION_ASYNC);
+    PrepareStatement(LOGIN_UPD_BNET_AUTHENTICATION_WITH_HARDWARE_INFORMATION, "UPDATE battlenet_accounts SET LoginTicket = ?, LoginTicketExpiry = ?, overallHash = ?, macHash = ?, gatewayMacHash = ?, hardwareHash = ?, machineHash = ? WHERE id = ?", CONNECTION_ASYNC);
     PrepareStatement(LOGIN_SEL_BNET_EXISTING_AUTHENTICATION, "SELECT LoginTicketExpiry, id FROM battlenet_accounts WHERE LoginTicket = ?", CONNECTION_ASYNC);
     PrepareStatement(LOGIN_SEL_BNET_EXISTING_AUTHENTICATION_BY_ID, "SELECT LoginTicket FROM battlenet_accounts WHERE id = ?", CONNECTION_ASYNC);
     PrepareStatement(LOGIN_UPD_BNET_EXISTING_AUTHENTICATION, "UPDATE battlenet_accounts SET LoginTicketExpiry = ? WHERE LoginTicket = ?", CONNECTION_ASYNC);
-    PrepareStatement(LOGIN_UPD_BNET_EXISTING_AUTHENTICATION_WITH_HARDWARE_INFORMATION, "UPDATE battlenet_accounts SET LoginTicketExpiry = ?, hardwareHash = ?, gatewayMac = ?, cpuId = ?, volumeIds = ? WHERE LoginTicket = ?", CONNECTION_ASYNC);
+    PrepareStatement(LOGIN_UPD_BNET_EXISTING_AUTHENTICATION_WITH_HARDWARE_INFORMATION, "UPDATE battlenet_accounts SET LoginTicketExpiry = ?, overallHash = ?, macHash = ?, gatewayMacHash = ?, hardwareHash = ?, machineHash = ? WHERE LoginTicket = ?", CONNECTION_ASYNC);
     PrepareStatement(LOGIN_SEL_BNET_ACCOUNT_INFO, "SELECT " BnetAccountInfo ", " BnetGameAccountInfo ""
         " FROM battlenet_accounts ba LEFT JOIN battlenet_account_bans bab ON ba.id = bab.id LEFT JOIN account a ON ba.id = a.battlenet_account"
-        " LEFT JOIN account_banned ab ON a.id = ab.id AND ab.active = 1 LEFT JOIN account_access aa ON a.id = aa.AccountID AND aa.RealmID = -1 WHERE ba.LoginTicket = ? ORDER BY a.id", CONNECTION_ASYNC);
+        " LEFT JOIN account_banned ab ON a.id = ab.id AND ab.active = 1 LEFT JOIN account_access aa ON a.id = aa.AccountID AND aa.RealmID = -1"
+        " LEFT JOIN hardware_bans hwHardware ON (ba.hardwareHash = hwHardware.hardwareHash) LEFT JOIN hardware_bans hwMachine ON (ba.machineHash = hwMachine.machineHash) WHERE ba.LoginTicket = ? ORDER BY a.id", CONNECTION_ASYNC);
     PrepareStatement(LOGIN_UPD_BNET_LAST_LOGIN_INFO, "UPDATE battlenet_accounts SET last_ip = ?, last_login = NOW(), locale = ?, failed_logins = 0, os = ? WHERE id = ?", CONNECTION_ASYNC);
     PrepareStatement(LOGIN_UPD_BNET_GAME_ACCOUNT_LOGIN_INFO, "UPDATE account SET session_key_bnet = ?, last_ip = ?, last_login = NOW(), locale = ?, failed_logins = 0, os = ? WHERE username = ?", CONNECTION_SYNCH);
     PrepareStatement(LOGIN_SEL_BNET_CHARACTER_COUNTS_BY_ACCOUNT_ID, "SELECT rc.acctid, rc.numchars, r.id, r.Region, r.Battlegroup FROM realmcharacters rc INNER JOIN realmlist r ON rc.realmid = r.id WHERE rc.acctid = ?", CONNECTION_ASYNC);
@@ -151,6 +157,7 @@ void LoginDatabaseConnection::DoPrepareStatements()
     PrepareStatement(LOGIN_SEL_BNET_GAME_ACCOUNT_LIST, "SELECT a.username, a.expansion, ab.bandate, ab.unbandate, ab.banreason FROM account AS a LEFT JOIN account_banned AS ab ON a.id = ab.id AND ab.active = 1 INNER JOIN battlenet_accounts AS ba ON a.battlenet_account = ba.id WHERE ba.LoginTicket = ? ORDER BY a.id", CONNECTION_ASYNC);
 
     PrepareStatement(LOGIN_UPD_BNET_FAILED_LOGINS, "UPDATE battlenet_accounts SET failed_logins = failed_logins + 1 WHERE id = ?", CONNECTION_ASYNC);
+    PrepareStatement(LOGIN_INS_BNET_ACCOUNT_BANNED, "INSERT INTO battlenet_account_bans (id, bandate, unbandate, bannedby, banreason) VALUES (?, UNIX_TIMESTAMP(), UNIX_TIMESTAMP()+?, ?, ?)", CONNECTION_ASYNC);
     PrepareStatement(LOGIN_INS_BNET_ACCOUNT_AUTO_BANNED, "INSERT INTO battlenet_account_bans(id, bandate, unbandate, bannedby, banreason) VALUES(?, UNIX_TIMESTAMP(), UNIX_TIMESTAMP()+?, 'Trinity Auth', 'Failed login autoban')", CONNECTION_ASYNC);
     PrepareStatement(LOGIN_DEL_BNET_EXPIRED_ACCOUNT_BANNED, "DELETE FROM battlenet_account_bans WHERE unbandate<>bandate AND unbandate<=UNIX_TIMESTAMP()", CONNECTION_ASYNC);
     PrepareStatement(LOGIN_UPD_BNET_RESET_FAILED_LOGINS, "UPDATE battlenet_accounts SET failed_logins = 0 WHERE id = ?", CONNECTION_ASYNC);
@@ -206,7 +213,7 @@ void LoginDatabaseConnection::DoPrepareStatements()
     PrepareStatement(LOGIN_INS_BPAY_PURCHASE, "INSERT INTO battlepay_purchases (battlenetAccountId, realm, characterGuid, productID, productName, CurrentPrice, RemoteAddress) VALUES (?, ?, ?, ?, ?, ?, ?)", CONNECTION_ASYNC);
 
     // Hardware Info
-    PrepareStatement(LOGIN_REP_BNET_HARDWARE_HISTORY, "REPLACE INTO battlenet_accounts_hardware_history (id, hash, gatewayMac, cpuId, volumeIds) VALUES (?, ?, ?, ?, ?)", CONNECTION_ASYNC);
+    PrepareStatement(LOGIN_REP_BNET_HARDWARE_HISTORY, "REPLACE INTO battlenet_accounts_hardware_history (id, overallHash, macHash, gatewayMacHash, hardwareHash, machineHash) VALUES (?, ?, ?, ?, ?, ?)", CONNECTION_ASYNC);
 
     // Endorsements
     PrepareStatement(LOGIN_REP_ENDORSEMENT_REQUEST, "REPLACE INTO endorsements_request (senderBnetId, receiverBnetId, receiverCharacterName, createdAt) VALUES (?, ?, ?, ?)", CONNECTION_ASYNC);
@@ -216,6 +223,15 @@ void LoginDatabaseConnection::DoPrepareStatements()
     // Conditional Appearance
     PrepareStatement(LOGIN_SEL_BNET_CONDITIONAL_APPEARANCE, "SELECT battlenetAccountId, conditional_appearance_id FROM battlenet_account_conditional_appearance WHERE battlenetAccountId = ?", CONNECTION_ASYNC);
     PrepareStatement(LOGIN_REP_BNET_CONDITIONAL_APPEARANCE, "REPLACE INTO battlenet_account_conditional_appearance (battlenetAccountId, conditional_appearance_id) VALUES (?, ?)", CONNECTION_ASYNC);
+
+    // Hardware Information
+    PrepareStatement(LOGIN_DEL_BNET_ACCOUNT_BANNED, "DELETE FROM battlenet_account_bans WHERE id = ?", CONNECTION_ASYNC);
+    PrepareStatement(LOGIN_SEL_ACCOUNT_ID_BY_BNET_ACCOUNT, "SELECT id FROM account WHERE battlenet_account = ?", CONNECTION_SYNCH);
+    PrepareStatement(LOGIN_SEL_BNET_ACCOUNT_HARDWARE_BY_EMAIL, "SELECT id, overallHash, macHash, gatewayMacHash, hardwareHash, machineHash FROM battlenet_accounts WHERE email = ?", CONNECTION_SYNCH);
+    PrepareStatement(LOGIN_INS_HARDWARE_BANNED, "INSERT INTO hardware_bans (hardwareHash, machineHash, bandate, unbandate, bannedby, banreason) VALUES (?, ?, UNIX_TIMESTAMP(), UNIX_TIMESTAMP()+?, ?, ?)", CONNECTION_ASYNC);
+    PrepareStatement(LOGIN_DEL_EXPIRED_HARDWARE_BANS, "DELETE FROM hardware_bans WHERE unbandate<>bandate AND unbandate<=UNIX_TIMESTAMP()", CONNECTION_ASYNC);
+    PrepareStatement(LOGIN_DEL_HARDWARE_BANS, "DELETE FROM hardware_bans WHERE hardwareHash=? OR machineHash=?", CONNECTION_ASYNC);
+
 }
 
 LoginDatabaseConnection::LoginDatabaseConnection(MySQLConnectionInfo& connInfo) : MySQLConnection(connInfo)

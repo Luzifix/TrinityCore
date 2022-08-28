@@ -30,6 +30,7 @@
 #include "AuthenticationPackets.h"
 #include "BattlefieldMgr.h"
 #include "BattlegroundMgr.h"
+#include "BattlenetAccountMgr.h"
 #include "BattlenetRpcErrorCodes.h"
 #include "BattlePayData.h"
 #include "BattlePetMgr.h"
@@ -3171,6 +3172,8 @@ BanReturn World::BanAccount(BanMode mode, std::string const& nameOrIP, uint32 du
     // Prevent banning an already banned account
     if (mode == BAN_ACCOUNT && AccountMgr::IsBannedAccount(nameOrIP))
         return BAN_EXISTS;
+    else if (mode == BAN_BNET && Battlenet::AccountMgr::IsBannedAccount(nameOrIP))
+        return BAN_EXISTS;
 
     ///- Update the database with ban information
     switch (mode)
@@ -3205,6 +3208,14 @@ BanReturn World::BanAccount(BanMode mode, std::string const& nameOrIP, uint32 du
             resultAccounts = CharacterDatabase.Query(stmt);
             break;
         }
+        case BAN_BNET:
+        {
+            // No SQL injection with prepared statements
+            LoginDatabasePreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_SEL_BNET_ACCOUNT_HARDWARE_BY_EMAIL);
+            stmt->setString(0, nameOrIP);
+            resultAccounts = LoginDatabase.Query(stmt);
+            break;
+        }
         default:
             return BAN_SYNTAX_ERROR;
     }
@@ -3224,7 +3235,7 @@ BanReturn World::BanAccount(BanMode mode, std::string const& nameOrIP, uint32 du
         Field* fieldsAccount = resultAccounts->Fetch();
         uint32 account = fieldsAccount[0].GetUInt32();
 
-        if (mode != BAN_IP)
+        if (mode == BAN_ACCOUNT)
         {
             // make sure there is only one active ban
             LoginDatabasePreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_UPD_ACCOUNT_NOT_BANNED);
@@ -3237,11 +3248,50 @@ BanReturn World::BanAccount(BanMode mode, std::string const& nameOrIP, uint32 du
             stmt->setString(2, author);
             stmt->setString(3, reason);
             trans->Append(stmt);
-        }
 
-        if (WorldSession* sess = FindSession(account))
-            if (std::string(sess->GetPlayerName()) != author)
-                sess->KickPlayer("World::BanAccount Banning account");
+            if (WorldSession* sess = FindSession(account))
+                if (std::string(sess->GetPlayerName()) != author)
+                    sess->KickPlayer("World::BanAccount Banning account");
+        }
+        else if (mode == BAN_BNET)
+        {
+            // No SQL injection with prepared statements
+            LoginDatabasePreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_INS_BNET_ACCOUNT_BANNED);
+            stmt->setUInt32(0, account);
+            stmt->setUInt32(1, duration_secs);
+            stmt->setString(2, author);
+            stmt->setString(3, reason);
+            trans->Append(stmt);
+
+            std::string hardwareHash = fieldsAccount[4].GetString();
+            std::string machineHash = fieldsAccount[5].GetString();
+
+            if (hardwareHash != "" && machineHash != "")
+            {
+                // Ban Hardware
+                stmt = LoginDatabase.GetPreparedStatement(LOGIN_INS_HARDWARE_BANNED);
+                stmt->setString(0, hardwareHash);
+                stmt->setString(1, machineHash);
+                stmt->setUInt32(2, duration_secs);
+                stmt->setString(3, author);
+                stmt->setString(4, reason);
+                trans->Append(stmt);
+
+                LoginDatabasePreparedStatement* accountIdStmt = LoginDatabase.GetPreparedStatement(LOGIN_SEL_ACCOUNT_ID_BY_BNET_ACCOUNT);
+                accountIdStmt->setUInt32(0, account);
+                PreparedQueryResult resultAccountsId = LoginDatabase.Query(accountIdStmt);
+                if (resultAccountsId)
+                {
+                    do {
+                        Field* fieldsAccountId = resultAccountsId->Fetch();
+                        if (WorldSession* sess = FindSession(fieldsAccountId[0].GetUInt32()))
+                            if (std::string(sess->GetPlayerName()) != author)
+                                sess->KickPlayer("World::BanAccount Banning bnet");
+
+                    } while (resultAccountsId->NextRow());
+                }
+            }
+        }
     } while (resultAccounts->NextRow());
 
     LoginDatabase.CommitTransaction(trans);
@@ -3259,7 +3309,38 @@ bool World::RemoveBanAccount(BanMode mode, std::string const& nameOrIP)
         stmt->setString(0, nameOrIP);
         LoginDatabase.Execute(stmt);
     }
-    else
+    else if (mode == BAN_BNET)
+    {
+        uint32 account = Battlenet::AccountMgr::GetId(nameOrIP);
+        if (!account)
+            return false;
+
+        stmt = LoginDatabase.GetPreparedStatement(LOGIN_DEL_BNET_ACCOUNT_BANNED);
+        stmt->setUInt32(0, account);
+        LoginDatabase.Execute(stmt);
+
+        stmt = LoginDatabase.GetPreparedStatement(LOGIN_SEL_BNET_ACCOUNT_HARDWARE_BY_EMAIL);
+        stmt->setString(0, nameOrIP);
+        PreparedQueryResult resultAccounts = LoginDatabase.Query(stmt);
+        if (resultAccounts)
+        {
+            do
+            {
+                Field* fieldsAccount = resultAccounts->Fetch();
+                std::string hardwareHash = fieldsAccount[4].GetString();
+                std::string machineHash = fieldsAccount[5].GetString();
+
+                if (hardwareHash == "" || machineHash == "")
+                    continue;
+
+                stmt = LoginDatabase.GetPreparedStatement(LOGIN_DEL_HARDWARE_BANS);
+                stmt->setString(0, hardwareHash);
+                stmt->setString(1, machineHash);
+                LoginDatabase.Execute(stmt);
+            } while (resultAccounts->NextRow());
+        }
+    }
+    else if (mode == BAN_ACCOUNT || mode == BAN_CHARACTER)
     {
         uint32 account = 0;
         if (mode == BAN_ACCOUNT)
@@ -3275,6 +3356,7 @@ bool World::RemoveBanAccount(BanMode mode, std::string const& nameOrIP)
         stmt->setUInt32(0, account);
         LoginDatabase.Execute(stmt);
     }
+
     return true;
 }
 
