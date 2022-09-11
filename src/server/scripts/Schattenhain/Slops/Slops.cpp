@@ -158,7 +158,7 @@ void Slops::Receive(std::string data, Player* sender)
         std::vector<std::string> package = Split(data, SlopsSeparator);
 
         // Valid package format
-        if (package.size() != 6)
+        if (package.size() != 7)
         {
             return;
         }
@@ -167,7 +167,8 @@ void Slops::Receive(std::string data, Player* sender)
         uint32 opcode = atoi(package[2].c_str());
         uint32 packageId = atoi(package[3].c_str());
         uint32 packageSize = atoi(package[4].c_str());
-        std::string message = Trinity::Encoding::Base64::DecodeString(package[5]);
+        bool compresed = (atoi(package[5].c_str()) == 1);
+        std::string message = package[6];
 
 #pragma region Valid package content
         // Check opcode
@@ -210,7 +211,18 @@ void Slops::Receive(std::string data, Player* sender)
 
         if (packageId == slopsPackage->packageSize)
         {
-            slopsPackage->message = slopsPackage->message;
+            slopsPackage->message = Trinity::Encoding::Base64::DecodeString(slopsPackage->message);
+            if (compresed)
+            {
+                std::stringstream compressed;
+                std::stringstream decompressed;
+                compressed << slopsPackage->message;
+                boost::iostreams::filtering_streambuf<boost::iostreams::input> in;
+                in.push(boost::iostreams::zlib_decompressor());
+                in.push(compressed);
+                boost::iostreams::copy(in, decompressed);
+                slopsPackage->message = decompressed.str();
+            }
 
             auto slopsHandlers = SlopsHandlerStore[slopsPackage->opcode];
 
