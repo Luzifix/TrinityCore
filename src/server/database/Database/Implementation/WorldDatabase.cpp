@@ -143,6 +143,11 @@ void WorldDatabaseConnection::DoPrepareStatements()
     PrepareStatement(WORLD_SEL_FOLLOWER_SPAWNER_CHILDS_BY_CREATURE_ENTRY, "SELECT `creature_child_entry` FROM `follower_spawner_childs` WHERE `creature_entry` = ?;", CONNECTION_SYNCH);
     PrepareStatement(WORLD_REP_FOLLOWER_SPAWNER, "REPLACE INTO `follower_spawner` (`creature_entry`, `guild_id`, `minimum_guild_rank`) VALUES (?, ?, ?);", CONNECTION_SYNCH);
     PrepareStatement(WORLD_INS_FOLLOWER_SPAWNER_CHILDS, "REPLACE INTO `follower_spawner_childs` (`creature_entry`, `creature_child_entry`) VALUES (?, ?);", CONNECTION_ASYNC);
+
+    // Sign
+    PrepareStatement(WORLD_INS_SIGN, "INSERT INTO `sign` (`creature_guid`, `sign_display_id`, `owner_guild_id`, `name`, `content`) VALUES (?, ?, ?, ?, ?) ON DUPLICATE KEY UPDATE `sign_display_id` = VALUES (`sign_display_id`), `owner_guild_id` = VALUES (`owner_guild_id`), `name` = VALUES (`name`), `content` = VALUES (`content`);", CONNECTION_ASYNC);
+    PrepareStatement(WORLD_REP_SIGN_HISTROY, "REPLACE INTO `sign_history` (`sign_creature_guid`, `character_name`, `timestamp`) VALUES (?, ?, ?);", CONNECTION_ASYNC);
+    PrepareStatement(WORLD_DEL_SIGN, "DELETE FROM `sign` WHERE `creature_guid` = ?;", CONNECTION_ASYNC);
 }
 
 WorldDatabaseConnection::WorldDatabaseConnection(MySQLConnectionInfo& connInfo) : MySQLConnection(connInfo)

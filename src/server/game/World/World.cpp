@@ -92,6 +92,7 @@
 #include "ScenarioMgr.h"
 #include "ScriptMgr.h"
 #include "ScriptReloadMgr.h"
+#include "SignMgr.h"
 #include "SkillDiscovery.h"
 #include "SkillExtraItems.h"
 #include "SpellMgr.h"
@@ -1865,6 +1866,9 @@ void World::SetInitialWorldSettings()
 
     TC_LOG_INFO("server.loading", "Loading Furniture data...");
     sFurnitureMgr->LoadFromDB();
+
+    TC_LOG_INFO("server.loading", "Loading Sign data...");
+    sSignMgr->LoadFromDB();
 
     TC_LOG_INFO("server.loading", "Loading SpellInfo store...");
     sSpellMgr->LoadSpellInfoStore();

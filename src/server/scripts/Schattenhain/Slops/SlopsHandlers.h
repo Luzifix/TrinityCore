@@ -70,6 +70,11 @@ public:
     static void HandleAnimationsListRequest(SlopsPackage package);
     static void HandleAnimationsDo(SlopsPackage package);
 
+    // Sign
+    static void HandleSignContentRequest(SlopsPackage package);
+    static void HandleSignSubmit(SlopsPackage package);
+    static void HandleSignHistoryRequest(SlopsPackage package);
+
 };
 
 #endif // SlopsHandler_h__

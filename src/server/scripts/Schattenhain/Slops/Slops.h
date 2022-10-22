@@ -10,7 +10,7 @@
 enum SchattenhainLuaOpcodeClient : uint32
 {
     SLOPS_CMSG_NULL                                            = 0x0000,
-                                                               
+
     SLOPS_CMSG_HOUSING_REQUEST_LIST                            = 0x0001,
     SLOPS_CMSG_HOUSING_REQUEST_DATA                            = 0x0002,
     SLOPS_CMSG_HOUSING_PERMISSION_ADD                          = 0x0003,
@@ -48,6 +48,9 @@ enum SchattenhainLuaOpcodeClient : uint32
     SLOPS_CMSG_SOCIAL_SYSTEM_ENDORSEMENTS_SUBMIT               = 0x0023,
     SLOPS_CMSG_ANIMATIONS_LIST_REQUEST                         = 0x0024,
     SLOPS_CMSG_ANIMATIONS_DO                                   = 0x0025,
+    SLOPS_CMSG_SIGN_CONTENT_REQUEST                            = 0x0026,
+    SLOPS_CMSG_SIGN_SUBMIT                                     = 0x0027,
+    SLOPS_CMSG_SIGN_HISTORY_REQUEST                            = 0x0028,
     SLOPS_CMSG_HOUSING_TRANSFER_OWNERSHIP                      = 0x0029,
 
     SLOPS_CMSG_MAX
@@ -56,7 +59,7 @@ enum SchattenhainLuaOpcodeClient : uint32
 enum SchattenhainLuaOpcodeServer : uint32
 {
     SLOPS_SMSG_NULL                                            = 0x0000,
-                                                               
+
     SLOPS_SMSG_HOUSING_LIST                                    = 0x0001,
     SLOPS_SMSG_HOUSING_DATA                                    = 0x0002,
     SLOPS_SMSG_CHARACTER_MODIFY                                = 0x0003,
@@ -80,6 +83,8 @@ enum SchattenhainLuaOpcodeServer : uint32
     SLOPS_SMSG_SOCIAL_SYSTEM_ENDORSEMENTS_SHOW                 = 0x001C,
     SLOPS_SMSG_WEATHER_DATA                                    = 0x001D,
     SLOPS_SMSG_ANIMATIONS_LIST_RESPONSE                        = 0x001E,
+    SLOPS_SMSG_SIGN_CONTENT_RESPONSE                           = 0x001F,
+    SLOPS_SMSG_SIGN_HISTORY_RESPONSE                           = 0x0020,
 
     SLOPS_SMSG_MAX
 };
@@ -112,7 +117,7 @@ public:
     Slops& operator= (Slops&&) = delete;
 
     static Slops* instance();
-    
+
     void Send(SchattenhainLuaOpcodeServer opcode, std::string data, Player* sender);
     void Receive(std::string data, Player* sender);
     void ClearStore();
