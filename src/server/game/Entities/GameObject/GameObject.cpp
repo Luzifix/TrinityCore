@@ -3466,39 +3466,6 @@ void GameObject::SetHouseAreaId(uint32 houseAreaId, bool setPhase /* = true */, 
         GameObject::SetHouseAreaPhaseId(houseAreaId, update);
 }
 
-uint32 GameObject::GetTransportPeriod() const
-{
-    ASSERT(GetGOInfo()->type == GAMEOBJECT_TYPE_TRANSPORT);
-    if (m_goValue.Transport.AnimationInfo)
-        return m_goValue.Transport.AnimationInfo->TotalTime;
-
-    return 0;
-}
-
-void GameObject::SetTransportState(GOState state, uint32 stopFrame /*= 0*/)
-{
-    if (GetGoState() == state)
-        return;
-
-    ASSERT(GetGOInfo()->type == GAMEOBJECT_TYPE_TRANSPORT);
-    ASSERT(state >= GO_STATE_TRANSPORT_ACTIVE);
-    if (state == GO_STATE_TRANSPORT_ACTIVE)
-    {
-        m_goValue.Transport.StateUpdateTimer = 0;
-        m_goValue.Transport.PathProgress = getMSTime();
-        if (GetGoState() >= GO_STATE_TRANSPORT_STOPPED)
-            m_goValue.Transport.PathProgress += m_goValue.Transport.StopFrames->at(GetGoState() - GO_STATE_TRANSPORT_STOPPED);
-        SetGoState(GO_STATE_TRANSPORT_ACTIVE);
-    }
-    else
-    {
-        ASSERT(state < GOState(GO_STATE_TRANSPORT_STOPPED + MAX_GO_STATE_TRANSPORT_STOP_FRAMES));
-        ASSERT(stopFrame < m_goValue.Transport.StopFrames->size());
-        m_goValue.Transport.PathProgress = getMSTime() + m_goValue.Transport.StopFrames->at(stopFrame);
-        SetGoState(GOState(GO_STATE_TRANSPORT_STOPPED + stopFrame));
-    }
-}
-
 GOState GameObject::GetGoStateFor(ObjectGuid const& viewer) const
 {
     if (m_perPlayerState)

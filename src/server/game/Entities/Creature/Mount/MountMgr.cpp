@@ -294,7 +294,7 @@ void MountMgr::SpawnCharacterMount(CharacterMount* characterMount, bool reload)
         return;
     }
 
-    Map* map = sMapMgr->CreateBaseMap(characterMount->GetPosition().GetMapId());
+    Map* map = sMapMgr->CreateMap(characterMount->GetPosition().GetMapId(), 0U);
     mount = map->SummonCreature(MOUNTSYSTEM_CREATURE_ENTRY, characterMount->GetPosition(), nullptr, 0, nullptr, 0, MOUNTSYSTEM_VEHICLE_ID_SINGLE_SEAT);
 
     if (!mount)

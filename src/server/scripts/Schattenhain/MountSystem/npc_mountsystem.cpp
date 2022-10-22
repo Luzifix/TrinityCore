@@ -147,7 +147,7 @@ public:
             for (auto dirtinessSteps : sMountMgr->GetDirtinessSteps())
                 data["stats"]["dirtinessSteps"][dirtinessSteps.first] = dirtinessSteps.second;
 
-            AddGossipItemFor(player, GossipOptionIcon::Auctioneer, data.dump(), GOSSIP_SENDER_MAIN, 0);
+            AddGossipItemFor(player, GossipOptionNpc::Auctioneer, data.dump(), GOSSIP_SENDER_MAIN, 0);
             AddGossipItemFor(player, menuId, 0, GOSSIP_SENDER_MAIN, MountSystemGossipAction::Broom);
             AddGossipItemFor(player, menuId, 1, GOSSIP_SENDER_MAIN, MountSystemGossipAction::Follow);
             AddGossipItemFor(player, menuId, 2, GOSSIP_SENDER_MAIN, MountSystemGossipAction::Mount, characterMount->GetFuel() > 0 && characterMount->GetCondition() > 0 ? GossipOptionStatus::Available : GossipOptionStatus::Locked);

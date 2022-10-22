@@ -51,6 +51,7 @@ class TC_GAME_API MapManager
         static MapManager* instance();
 
         Map* CreateMap(uint32 mapId, Player* player);
+        Map* CreateMap(uint32 mapId, uint32 instanceId = 0);
         Map* FindMap(uint32 mapId, uint32 instanceId) const;
         uint32 FindInstanceIdForPlayer(uint32 mapId, Player const* player) const;
 

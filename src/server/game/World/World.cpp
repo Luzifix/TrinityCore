@@ -1766,9 +1766,9 @@ void World::SetInitialWorldSettings()
     sObjectMgr->SetHighestGuids();
 
     ///- Check the existence of the map files for all races' startup areas.
-    if (!MapManager::ExistMapAndVMap(5000, 441.798f, -334.997f)
-        || !MapManager::ExistMapAndVMap(5001, -388.406f, -61.149f)
-        || !MapManager::ExistMapAndVMap(5002, -268.876f, -260.129f))
+    if (!TerrainMgr::ExistMapAndVMap(5000, 441.798f, -334.997f)
+        || !TerrainMgr::ExistMapAndVMap(5001, -388.406f, -61.149f)
+        || !TerrainMgr::ExistMapAndVMap(5002, -268.876f, -260.129f))
     {
         TC_LOG_FATAL("server.loading", "Unable to load critical files - server shutting down !!!");
         exit(1);
@@ -2554,7 +2554,7 @@ void World::SetInitialWorldSettings()
 
         for (uint32 mapId : loadMapList)
         {
-            sMapMgr->CreateBaseMap(mapId);
+            sMapMgr->CreateMap(mapId, 0U);
             sMapMgr->DoForAllMapsWithMapId(mapId, [](Map* map)
             {
                 TC_LOG_INFO("server.loading", "Pre-loading map data for map %u", map->GetId());

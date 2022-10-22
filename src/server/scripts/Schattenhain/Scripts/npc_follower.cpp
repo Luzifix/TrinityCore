@@ -272,7 +272,7 @@ public:
                     {
                        AddGossipItemFor(
                             player,
-                            GossipOptionIcon::GarrisonShipment,
+                            GossipOptionNpc::ShipmentCrafter,
                             Trinity::StringFormat(sObjectMgr->GetTrinityString(LANG_FOLLOWER_GOSSIP_RESET_CURRENT_GUILD, locale), guild->GetName()),
                             GOSSIP_SENDER_MAIN,
                             GossipAction::ResetGuild
@@ -287,7 +287,7 @@ public:
                         std::string optionText = Trinity::StringFormat(sObjectMgr->GetTrinityString(LANG_FOLLOWER_GOSSIP_REMOVE_OPTION, locale), creatureChildEntry);
                         std::string popupText = Trinity::StringFormat(sObjectMgr->GetTrinityString(LANG_FOLLOWER_GOSSIP_REMOVE_OPTION_POPUP, locale), creatureChildEntry);
 
-                        AddGossipItemFor(player, GossipOptionIcon::BattleMaster, optionText, GOSSIP_SENDER_MAIN, creatureChildEntry + GossipAction::GMDeleteNpc, popupText, 0, false);
+                        AddGossipItemFor(player, GossipOptionNpc::BattleMaster, optionText, GOSSIP_SENDER_MAIN, creatureChildEntry + GossipAction::GMDeleteNpc, popupText, 0, false);
                     }
 
                     AddGossipItemFor(player, GossipMenuId::GM, 100, GOSSIP_SENDER_MAIN, GossipAction::Back);

@@ -133,7 +133,7 @@ public:
             MorphCategoryContainer::iterator it;
             for (it = _morphCategoryContainer.begin(); it != _morphCategoryContainer.end(); it++)
             {
-                AddGossipItemFor(player, GossipOptionIcon(it->second.icon), it->second.name, GOSSIP_SENDER_MAIN, GOSSIP_NPC_MORPH_MENU_MORPH_ACTION + it->second.id);
+                AddGossipItemFor(player, GossipOptionNpc(it->second.icon), it->second.name, GOSSIP_SENDER_MAIN, GOSSIP_NPC_MORPH_MENU_MORPH_ACTION + it->second.id);
             }
 
             player->PlayerTalkClass->GetGossipMenu().SetMenuId(menuId);
@@ -172,7 +172,7 @@ public:
                         MorphEntryContainer::iterator ite;
                         for (ite = itc->second.entrys.begin(); ite != itc->second.entrys.end(); ite++)
                         {
-                            AddGossipItemFor(player, GossipOptionIcon::Trainer, ite->second.name, GOSSIP_SENDER_MAIN, GOSSIP_NPC_MORPH_MENU_MORPH_ACTION_CLASS + ite->second.id);
+                            AddGossipItemFor(player, GossipOptionNpc::Trainer, ite->second.name, GOSSIP_SENDER_MAIN, GOSSIP_NPC_MORPH_MENU_MORPH_ACTION_CLASS + ite->second.id);
                         }
 
                         AddGossipItemFor(player, GOSSIP_NPC_MORPH_MENU_BACK, 0, GOSSIP_SENDER_MAIN, GOSSIP_NPC_MORPH_MENU_WARNING_ACTION);

@@ -3905,7 +3905,7 @@ void ObjectMgr::LoadPlayerInfo()
                 }
 
                 // accept DB data only for valid position (and non instanceable)
-                if (!MapManager::IsValidMAP(mapId, false))
+                if (!sMapMgr->IsValidMAP(mapId))
                 {
                     TC_LOG_ERROR("sql.sql", "Wrong home position for class %u race %u pair in `playercreateinfo` table, ignoring.", current_class, current_race);
                     continue;
@@ -8569,6 +8569,7 @@ void ObjectMgr::LoadQuestPOI()
         bool alwaysAllowMergingBlobs = fields[14].GetBool();
 
         if (!GetQuestTemplate(questID))
+        {
             TC_LOG_ERROR("sql.sql", "`quest_poi` quest id (%u) Idx1 (%u) does not exist in `quest_template`", questID, idx1);
             TC_LOG_INFO("sql.fixes", "DELETE FROM `quest_poi` WHERE `QuestID`=%u;", questID);
             TC_LOG_INFO("sql.fixes", "DELETE FROM `quest_poi_points` WHERE `QuestID`=%u;", questID);

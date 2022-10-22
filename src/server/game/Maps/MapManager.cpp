@@ -243,6 +243,24 @@ Map* MapManager::CreateMap(uint32 mapId, Player* player)
     return map;
 }
 
+Map* MapManager::CreateMap(uint32 mapId, uint32 instanceId /* = 0*/)
+{
+    MapEntry const* entry = sMapStore.LookupEntry(mapId);
+    if (!entry)
+        return nullptr;
+
+    std::unique_lock<std::shared_mutex> lock(_mapsLock);
+
+    Map* map = FindMap_i(mapId, instanceId);
+    if (!map)
+        map = CreateWorldMap(mapId, instanceId);
+
+    if (map)
+        i_maps[{ map->GetId(), map->GetInstanceId() }] = map;
+
+    return map;
+}
+
 Map* MapManager::FindMap(uint32 mapId, uint32 instanceId) const
 {
     std::shared_lock<std::shared_mutex> lock(_mapsLock);
