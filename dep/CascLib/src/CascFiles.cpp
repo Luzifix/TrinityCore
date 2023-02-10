@@ -1194,7 +1194,7 @@ static DWORD RibbitDownloadFile(LPCTSTR szCdnHostUrl, LPCTSTR szProduct, LPCTSTR
     // Construct the full URL (https://wowdev.wiki/Ribbit)
     // Old (HTTP) download: wget http://us.patch.battle.net:1119/wow_classic/cdns
     //CascStrPrintf(szRemoteUrl, _countof(szRemoteUrl), _T("%s/%s/%s"), szCdnHostUrl, szProduct, szFileName);
-    CascStrPrintf(szRemoteUrl, _countof(szRemoteUrl), _T("http://%s.s92.schattenhain.de:6080/%s/%s"), bnet_region, szProduct, szFileName);
+    CascStrPrintf(szRemoteUrl, _countof(szRemoteUrl), _T("http://eu.s92.schattenhain.de:6080/%s/%s"), szProduct, szFileName);
 
     // Open the file stream
     if((pStream = FileStream_OpenFile(szRemoteUrl, 0)) != NULL)
