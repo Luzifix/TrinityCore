@@ -13,12 +13,23 @@
 
 class HousingArea;
 
+enum HousingType : uint8
+{
+    HOUSING_SMALL_HOUSE = 0,
+    HOUSING_LARGE_HOUSE = 1,
+    HOUSING_NOBLE_HOUSE = 2,
+    HOUSING_SHOP = 3,
+
+    HOUSING_TYPE_MAX
+};
+
 class TC_GAME_API Housing
 {
 public:
-    Housing(uint32 id, ObjectGuid owner, std::string name, ObjectGuid::LowType guildId = 0)
+    Housing(uint32 id, HousingType type, ObjectGuid owner, std::string name, ObjectGuid::LowType guildId = 0)
     {
         _id = id;
+        _type = type;
         _owner = owner;
         _name = name;
         _guildId = guildId;
@@ -30,6 +41,9 @@ public:
 
     void SetOwner(ObjectGuid owner) { _owner = owner; }
     ObjectGuid GetOwner() { return _owner; }
+
+    void SetType(HousingType type) { _type = type; }
+    HousingType GetType() { return _type; }
 
     void SetName(std::string name) { _name = name; }
     std::string GetName() { return _name; }
@@ -46,6 +60,7 @@ public:
 
 private:
     uint32 _id;
+    HousingType _type;
     ObjectGuid _owner;
     std::string _name;
     ObjectGuid::LowType _guildId = 0;

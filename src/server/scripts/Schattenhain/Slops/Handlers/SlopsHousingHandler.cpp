@@ -32,9 +32,12 @@ inline void SendHousingInformation(Player* sender, uint32 housingId, uint32 hous
 {
     if (HousingArea* housingArea = HousingValidateOwner(housingId, housingAreaId, sender))
     {
+        Housing* housing = housingArea->GetHousing();
         JSON entry = {
             "housingId", housingId,
             "housingAreaId", housingAreaId,
+            "housingName", housing->GetName(),
+            "housingType", (uint8)housing->GetType(),
             "type", (uint8)housingArea->GetType(),
             "name", housingArea->GetName(),
             "motd", housingArea->GetMotd(),

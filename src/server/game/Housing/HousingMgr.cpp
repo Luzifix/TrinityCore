@@ -23,19 +23,20 @@ void HousingMgr::LoadFromDB()
     uint32 housingAreaTriggerCount = 0;
     uint32 housingAreaPermissionCount = 0;
 
-    // Load Housing                                          0     1        2           3
-    if (QueryResult result = CharacterDatabase.Query("SELECT `id`, `owner`, `guild_id`, `name` FROM `housing`"))
+    // Load Housing                                          0     1       2        3           4
+    if (QueryResult result = CharacterDatabase.Query("SELECT `id`, `type`, `owner`, `guild_id`, `name` FROM `housing`"))
     {
         do
         {
             Field* fields = result->Fetch();
 
             uint32 id = fields[0].GetUInt32();
-            ObjectGuid owner = ObjectGuid::Create<HighGuid::BNetAccount>(fields[1].GetUInt32());
-            ObjectGuid::LowType guildId = fields[2].GetUInt64();
-            std::string name = fields[3].GetString();
+            HousingType type = (HousingType)fields[1].GetUInt8();
+            ObjectGuid owner = ObjectGuid::Create<HighGuid::BNetAccount>(fields[2].GetUInt32());
+            ObjectGuid::LowType guildId = fields[3].GetUInt64();
+            std::string name = fields[4].GetString();
 
-            Housing* housing = new Housing(id, owner, name, guildId);
+            Housing* housing = new Housing(id, type, owner, name, guildId);
 
             _housingStore[id] = housing;
             ++housingCount;
