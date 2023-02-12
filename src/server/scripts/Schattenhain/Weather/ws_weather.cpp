@@ -162,7 +162,7 @@ private:
 
         try
         {
-            std::string responseBody = Trinity::HttpClient::Get(API_HOST, Trinity::StringFormat(API_PATH, _apiCityCode, _apiKey).c_str());
+            std::string responseBody = Trinity::HttpClient::HttpGet(API_HOST, Trinity::StringFormat(API_PATH, _apiCityCode, _apiKey).c_str());
             if (responseBody == "")
                 return;
 
