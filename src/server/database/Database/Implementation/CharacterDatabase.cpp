@@ -767,7 +767,7 @@ void CharacterDatabaseConnection::DoPrepareStatements()
     PrepareStatement(CHAR_INS_INSTANCE, "INSERT INTO instance (instanceId, data, completedEncountersMask, entranceWorldSafeLocId) VALUES (?, ?, ?, ?)", CONNECTION_ASYNC);
 
     // Housing
-    PrepareStatement(CHAR_REP_HOUSING, "REPLACE housing (id, owner, guild_id) VALUES (?, ?, ?)", CONNECTION_ASYNC);
+    PrepareStatement(CHAR_REP_HOUSING, "REPLACE housing (`id`, `type`, `owner`, `guild_id`, `name`) VALUES (?, ?, ?, ?, ?)", CONNECTION_ASYNC);
     PrepareStatement(CHAR_DEL_HOUSING, "DELETE FROM housing WHERE id = ?", CONNECTION_ASYNC);
     PrepareStatement(CHAR_REP_HOUSING_AREA, "REPLACE housing_area (id, housing_id, type, map, height_min, height_max, name, facility_limit, motd) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)", CONNECTION_ASYNC);
     PrepareStatement(CHAR_DEL_HOUSING_AREA, "DELETE FROM housing_area WHERE id = ?", CONNECTION_ASYNC);

@@ -20,6 +20,7 @@ public:
     static void HandleHousingPermissionAdd(SlopsPackage package);
     static void HandleHousingPermissionRemove(SlopsPackage package);
     static void HandleHousingSetMotd(SlopsPackage package);
+    static void HandleHousingTransferOwnership(SlopsPackage package);
 
     // Character Modify
     static void HandleCharacterModifyRequest(SlopsPackage package);

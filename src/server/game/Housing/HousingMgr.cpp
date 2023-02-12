@@ -173,8 +173,10 @@ Housing* HousingMgr::Save(Housing* housing)
     // Save Housing
     CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_REP_HOUSING);
     stmt->setUInt32(0, housing->GetId());
-    stmt->setUInt64(1, housing->GetOwner().GetCounter());
-    stmt->setUInt64(2, housing->GetGuildId());
+    stmt->setUInt8(1, (uint8)housing->GetType());
+    stmt->setUInt64(2, housing->GetOwner().GetCounter());
+    stmt->setUInt64(3, housing->GetGuildId());
+    stmt->setString(4, housing->GetName());
     trans->Append(stmt);
 
     for (auto housingArea : housing->GetHousingAreas())
@@ -185,7 +187,6 @@ Housing* HousingMgr::Save(Housing* housing)
 
     return housing;
 }
-
 
 HousingArea* HousingMgr::SaveHousingArea(HousingArea* housingArea, Optional<CharacterDatabaseTransaction> externTrans /* = {}*/)
 {

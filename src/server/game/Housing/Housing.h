@@ -6,6 +6,7 @@
 #define Housing_h__
 
 #include "Common.h"
+#include "CharacterCache.h"
 #include "Object.h"
 #include "GuildMgr.h"
 #include <map>
@@ -57,6 +58,9 @@ public:
     HousingArea* GetHousingAreaById(uint32 housingAreaId);
     void ClearHousingArea() { _housingAreas.clear(); }
 #pragma endregion
+
+    bool AllowedForOwnershipTransfer() { return (_type == HOUSING_SMALL_HOUSE || _type == HOUSING_LARGE_HOUSE); }
+    bool TransferOwnership(const CharacterCacheEntry* newOwner, Player* reportTo = nullptr);
 
 private:
     uint32 _id;

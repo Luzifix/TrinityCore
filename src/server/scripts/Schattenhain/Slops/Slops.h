@@ -48,6 +48,7 @@ enum SchattenhainLuaOpcodeClient : uint32
     SLOPS_CMSG_SOCIAL_SYSTEM_ENDORSEMENTS_SUBMIT               = 0x0023,
     SLOPS_CMSG_ANIMATIONS_LIST_REQUEST                         = 0x0024,
     SLOPS_CMSG_ANIMATIONS_DO                                   = 0x0025,
+    SLOPS_CMSG_HOUSING_TRANSFER_OWNERSHIP                      = 0x0029,
 
     SLOPS_CMSG_MAX
 };
