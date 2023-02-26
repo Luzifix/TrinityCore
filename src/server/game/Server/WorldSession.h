@@ -891,7 +891,6 @@ struct ActivityData
     int InactivityPausedWeeks = 0;
     bool InactivityPauseCurrentWeek = false;
     bool InactivityPauseChangeAllowed = true;
-    bool InactivityLocked = false;
 };
 
 enum PartyOperation
@@ -1111,7 +1110,6 @@ class TC_GAME_API WorldSession
         void SetActivityInactivityPausedWeeks(int inactivityPausedWeeks) { _activityData.InactivityPausedWeeks = inactivityPausedWeeks; };
         void SetActivityInactivityPauseCurrentWeek(bool inactivityPauseCurrentWeek) { _activityData.InactivityPauseCurrentWeek = inactivityPauseCurrentWeek; };
         void SetActivityInactivityPauseChangeAllowed(bool inactivityPauseChangeAllowed) { _activityData.InactivityPauseChangeAllowed = inactivityPauseChangeAllowed; };
-        void SetActivityInactivityLocked(bool inactivityLocked) { _activityData.InactivityLocked = inactivityLocked; };
         bool IsActivityInactivityPauseCurrentWeek() { return _activityData.InactivityPauseCurrentWeek; };
         bool IsActivityInactivityPauseChangeAllowed() { return _activityData.InactivityPauseChangeAllowed; };
         void LoadActivityData();

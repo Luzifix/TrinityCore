@@ -18,6 +18,7 @@
 #include "Language.h"
 #include "RBAC.h"
 #include "Chat.h"
+#include "HousingMgr.h"
 
 enum WorldScriptActivity
 {
@@ -66,6 +67,12 @@ public:
     {
         sActivityMgr->LoadConfig(reload);
         _senderGuid = sConfigMgr->GetIntDefault("Schattenhain.Activity.CharacterGuid", 1);
+
+        int32 returnHouseBnetId = sConfigMgr->GetIntDefault("Schattenhain.Activity.ReturnHouseBnetId", 0);
+        _returnHouseBnetGuid = ObjectGuid::Empty;
+        if (returnHouseBnetId >= 0)
+            _returnHouseBnetGuid = ObjectGuid::Create<HighGuid::BNetAccount>(returnHouseBnetId);
+        
         GenerateNextPaymentTime();
     }
 
@@ -232,10 +239,9 @@ public:
                 uint8 inactivity = fields[3].GetUInt8();
                 uint8 inactivityPausedWeeks = fields[4].GetUInt8();
                 bool inactivityPausedCurrentWeek = fields[5].GetBool();
-                bool inactivityLocked = fields[6].GetBool();
-                uint32 minCoin = fields[7].GetUInt32();
-                bool disableInactivityPoints = fields[8].GetBool();
-                bool disableSystem = fields[9].GetBool();
+                uint32 minCoin = fields[6].GetUInt32();
+                bool disableInactivityPoints = fields[7].GetBool();
+                bool disableSystem = fields[8].GetBool();
 
                 _battlenetAccountLastCharacterCache[bnetId] = playedLastCharacter;
 
@@ -260,7 +266,7 @@ public:
                         inactivityPausedCurrentWeek = false;
                     }
 
-                    UpdatePlayerActivtyData(bnetId, playedLastCharacter, inactivity, inactivityPausedWeeks, inactivityPausedCurrentWeek, inactivityLocked);
+                    UpdatePlayerActivtyData(bnetId, playedLastCharacter, inactivity, inactivityPausedWeeks, inactivityPausedCurrentWeek);
                     continue;
                 }
 #pragma endregion
@@ -279,15 +285,21 @@ public:
                 else
                 {
                     // Remove Inactivty point if player reached the avg played time
-                    if (!inactivityLocked && inactivity > 0)
+                    if (inactivity > 0)
                         inactivity--;
                 }
 
-                inactivityLocked = (inactivity >= sActivityMgr->getMaxInactivityPoints() && !disableInactivityPoints);
+                if (inactivity >= sActivityMgr->getMaxInactivityPoints() && !disableInactivityPoints)
+                {
+                    RemoveHousingOwnership(bnetId);
+                    SendMailToPlayer(LANG_ACTIVITY_MAIL_SUBJECT, LANG_ACTIVITY_MAIL_TEXT_REMOVE_HOUSE, rewardInCopper, playedLastCharacter, bnetId);
+                    UpdatePlayerActivtyData(bnetId, playedLastCharacter, inactivity, inactivityPausedWeeks, inactivityPausedCurrentWeek);
+                    return;
+                }
 #pragma endregion
 
                 SendMailToPlayer(LANG_ACTIVITY_MAIL_SUBJECT, (reachedMinimumActivity ? LANG_ACTIVITY_MAIL_TEXT_REACHED_ACTIVITY : LANG_ACTIVITY_MAIL_TEXT_NOT_REACHED_ACTIVITY), rewardInCopper, playedLastCharacter, bnetId);
-                UpdatePlayerActivtyData(bnetId, playedLastCharacter, inactivity, inactivityPausedWeeks, inactivityPausedCurrentWeek, inactivityLocked);
+                UpdatePlayerActivtyData(bnetId, playedLastCharacter, inactivity, inactivityPausedWeeks, inactivityPausedCurrentWeek);
             } while (result->NextRow());
         }
     }
@@ -345,7 +357,7 @@ public:
         }
     }
 
-    void UpdatePlayerActivtyData(uint32 bnetId, ObjectGuid playedLastCharacter, uint8 inactivity, uint8 inactivityPausedWeeks, bool inactivityPausedCurrentWeek, bool inactivityLocked)
+    void UpdatePlayerActivtyData(uint32 bnetId, ObjectGuid playedLastCharacter, uint8 inactivity, uint8 inactivityPausedWeeks, bool inactivityPausedCurrentWeek)
     {
         HashMapHolder<Player>::MapType activePlayersForBnetAccount = ObjectAccessor::FindPlayerByBnetId(bnetId);
 
@@ -359,7 +371,6 @@ public:
                 session->SetActivityInactivityPausedWeeks(inactivityPausedWeeks);
                 session->SetActivityInactivityPauseCurrentWeek(inactivityPausedCurrentWeek);
                 session->SetActivityInactivityPauseChangeAllowed(true);
-                session->SetActivityInactivityLocked(inactivityLocked);
                 session->SaveActivityData();
 
                 break;
@@ -374,7 +385,6 @@ public:
             stmt->setUInt32(2, inactivityPausedWeeks);
             stmt->setBool(3, inactivityPausedCurrentWeek);
             stmt->setBool(4, true);
-            stmt->setBool(5, inactivityLocked);
             LoginDatabase.Execute(stmt);
         }
 
@@ -422,6 +432,23 @@ public:
 
         CharacterDatabase.CommitTransaction(trans);
     }
+
+    void RemoveHousingOwnership(uint32 bnetId)
+    {
+        for (Housing* housing : sHousingMgr->GetOwnerHousingByBnetId(bnetId))
+        {
+            for (auto& housingArea : housing->GetHousingAreas())
+            {
+                std::vector<HousingAreaPermission> permissionList;
+                housingArea.second->SetAccessPermissionList(permissionList);
+                housingArea.second->SetBuildingPermissionList(permissionList);
+            }
+
+            housing->SetOwner(_returnHouseBnetGuid);
+
+            sHousingMgr->Save(housing);
+        }
+    }
 private:
     const CharacterCacheEntry* GetFallbackCharacterCacheEntry(uint32 bnetId)
     {
@@ -446,6 +473,7 @@ private:
     BattlenetAccountLockStore _battlenetAccountPlayerLock;
     BattlenetAccountLockStore _battlenetAccountGuildLock;
     ObjectGuid::LowType _senderGuid = 1;
+    ObjectGuid _returnHouseBnetGuid = ObjectGuid::Empty;
     std::map<uint32, ObjectGuid> _battlenetAccountLastCharacterCache;
 };
 

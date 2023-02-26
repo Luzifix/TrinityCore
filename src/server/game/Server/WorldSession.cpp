@@ -932,7 +932,6 @@ void WorldSession::SaveActivityData()
     stmt->setUInt32(2, _activityData.InactivityPausedWeeks);
     stmt->setBool(3, _activityData.InactivityPauseCurrentWeek);
     stmt->setBool(4, _activityData.InactivityPauseChangeAllowed);
-    stmt->setBool(5, _activityData.InactivityLocked);
     LoginDatabase.Execute(stmt);
 }
 

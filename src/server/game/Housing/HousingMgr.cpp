@@ -342,6 +342,24 @@ std::list<Housing*> HousingMgr::GetOwnerHousing(Player const* player)
     return ownerHousing;
 }
 
+std::list<Housing*> HousingMgr::GetOwnerHousingByBnetId(uint64 bnetAccountId)
+{
+    ObjectGuid newOwnerBnetGuid = ObjectGuid::Create<HighGuid::BNetAccount>(bnetAccountId);
+    return GetOwnerHousingByBnetId(newOwnerBnetGuid);
+}
+
+std::list<Housing*> HousingMgr::GetOwnerHousingByBnetId(ObjectGuid bnetAccountGuid)
+{
+    std::list<Housing*> ownerHousing;
+
+    for (const auto& housingEntry : _housingStore)
+    {
+        if (housingEntry.second->GetOwner() == bnetAccountGuid)
+            ownerHousing.push_back(housingEntry.second);
+    }
+
+    return ownerHousing;
+}
 HousingArea* HousingMgr::GetHousingAreaByWorldObject(WorldObject const* object)
 {
     for (const auto& housingEntry : _housingStore)

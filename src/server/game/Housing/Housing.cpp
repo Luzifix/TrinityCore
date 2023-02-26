@@ -38,8 +38,6 @@ bool Housing::TransferOwnership(const CharacterCacheEntry* newOwner, Player* rep
     if (reportTo != nullptr)
         reportToChatHandler = ChatHandler(reportTo->GetSession());
 
-
-
     Player* newOwnerPlayer = ObjectAccessor::FindPlayerByName(newOwner->Name);
     bool skipChecks = false;
 

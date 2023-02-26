@@ -4473,6 +4473,13 @@ Schattenhain.Activity.Enable = 1
 Schattenhain.Activity.CharacterGuid = 1
 
 #
+#    Schattenhain.Activity.ReturnHouseBnetId
+#        Description: The Battlenet account that the house gets back when the player is inactive
+#        Default:     2 - Leoly
+
+Schattenhain.Activity.ReturnHouseBnetId = 2
+
+#
 #    Schattenhain.Activity.Interval
 #        Description: Tick interval
 #        Default:     30 second

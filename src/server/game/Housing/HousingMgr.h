@@ -47,6 +47,8 @@ public:
     bool IsIndoor(Player const* player) { return (IsIndoorStore.find(player->GetGUID()) != IsIndoorStore.end() && IsIndoorStore[player->GetGUID()]); };
 
     std::list<Housing*> GetOwnerHousing(Player const* player);
+    std::list<Housing*> GetOwnerHousingByBnetId(uint64 bnetAccountId);
+    std::list<Housing*> GetOwnerHousingByBnetId(ObjectGuid bnetAccountGuid);
 };
 
 #define sHousingMgr HousingMgr::instance()
