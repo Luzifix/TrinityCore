@@ -763,6 +763,7 @@ enum RBACPermissions
     RBAC_PERM_COMMAND_NPC_SET_SCALE                         = 2007,
     RBAC_PERM_COMMAND_PRICE_CURD                            = 2008,
     RBAC_PERM_COMMAND_ACTIVITY                              = 2009,
+    RBAC_PERM_COMMAND_HOUSING_TRANSFER_OWNERSHIP_SKIP_CHECKS = 2010,
     RBAC_PERM_COMMAND_BAN_BNET                              = 2050,
     RBAC_PERM_COMMAND_UNBAN_BNET                            = 2051,
     RBAC_PERM_COMMAND_MOUNTSYSTEM                           = 2100,

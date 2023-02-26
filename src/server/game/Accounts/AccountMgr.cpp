@@ -543,7 +543,7 @@ void AccountMgr::UpdateAccountAccess(rbac::RBACData* rbac, uint32 accountId, uin
     LoginDatabase.CommitTransaction(trans);
 }
 
-rbac::RBACPermission const* AccountMgr::GetRBACPermission(uint32 permissionId) const
+rbac::RBACPermission const* AccountMgr::GetRBACPermission(int32 permissionId) const
 {
     TC_LOG_TRACE("rbac", "AccountMgr::GetRBACPermission: %u", permissionId);
     rbac::RBACPermissionsContainer::const_iterator it = _permissions.find(permissionId);

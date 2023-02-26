@@ -779,6 +779,9 @@ void CharacterDatabaseConnection::DoPrepareStatements()
     PrepareStatement(CHAR_SEL_HOUSING_BASEMENT, "SELECT houseAreaId, mapId, posX, posY, posZ FROM housing_basement WHERE guid = ?;", CONNECTION_SYNCH);
     PrepareStatement(CHAR_REP_HOUSING_BASEMENT, "REPLACE INTO housing_basement (guid, houseAreaId, mapId, posX, posY, posZ) VALUES (?, ?, ?, ?, ?, ?) ", CONNECTION_ASYNC);
     PrepareStatement(CHAR_DEL_HOUSING_BASEMENT, "DELETE FROM housing_basement WHERE guid = ?", CONNECTION_ASYNC);
+    PrepareStatement(CHAR_INS_HOUSING_TRANSFER_HISTORY, "REPLACE `housing_transfer_history` (`housing_id`, `from`, `to`) VALUES (?, ?, ?)", CONNECTION_ASYNC);
+    PrepareStatement(CHAR_SEL_HOUSING_TRANSFER_HISTORY_CHECK_LAST_MONTH_BY_HOUSE_ID, "SELECT 1 FROM `housing_transfer_history` WHERE `housing_id` = ? AND `transferd_at` >= CURRENT_TIMESTAMP() - INTERVAL 1 MONTH;", CONNECTION_SYNCH);
+    PrepareStatement(CHAR_SEL_HOUSING_TRANSFER_HISTORY_CHECK_LAST_MONTH_BY_BNET_ID, "SELECT 1 FROM `housing_transfer_history` WHERE (`from` = ? OR `to` = ?) AND `transferd_at` >= CURRENT_TIMESTAMP() - INTERVAL 1 MONTH;", CONNECTION_SYNCH);
 
     // Character Modify
     PrepareStatement(CHAR_SEL_CHARACTER_MODIFY, "SELECT scale, speed, morph FROM character_modify WHERE guid = ?", CONNECTION_SYNCH);

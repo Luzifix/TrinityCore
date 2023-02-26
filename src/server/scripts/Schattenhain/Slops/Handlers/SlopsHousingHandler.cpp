@@ -190,6 +190,8 @@ void SlopsHandler::HandleHousingSetMotd(SlopsPackage package)
     }
 }
 
+#include "DiscordLogging.h"
+
 void SlopsHandler::HandleHousingTransferOwnership(SlopsPackage package)
 {
     JSON data = JSON::Load(package.message);
@@ -198,7 +200,6 @@ void SlopsHandler::HandleHousingTransferOwnership(SlopsPackage package)
         return;
 
     uint32 housingId = data["housingId"].ToInt();
-
 
     if (Housing* housing = HousingValidateOwner(housingId, package.sender))
     {

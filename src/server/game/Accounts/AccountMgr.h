@@ -83,7 +83,7 @@ class TC_GAME_API AccountMgr
         void UpdateAccountAccess(rbac::RBACData* rbac, uint32 accountId, uint8 securityLevel, int32 realmId);
 
         void LoadRBAC();
-        rbac::RBACPermission const* GetRBACPermission(uint32 permission) const;
+        rbac::RBACPermission const* GetRBACPermission(int32 permission) const;
 
         rbac::RBACPermissionsContainer const& GetRBACPermissionList() const { return _permissions; }
         rbac::RBACPermissionContainer const& GetRBACDefaultPermissions(uint8 secLevel);
