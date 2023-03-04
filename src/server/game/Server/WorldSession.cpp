@@ -932,7 +932,7 @@ void WorldSession::SaveActivityData()
     stmt->setUInt32(2, _activityData.InactivityPausedWeeks);
     stmt->setBool(3, _activityData.InactivityPauseCurrentWeek);
     stmt->setBool(4, _activityData.InactivityPauseChangeAllowed);
-    LoginDatabase.Execute(stmt);
+    LoginDatabase.DirectExecute(stmt);
 }
 
 void WorldSession::SendAccountDataTimes(ObjectGuid playerGuid, uint32 mask)

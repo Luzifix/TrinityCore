@@ -385,7 +385,7 @@ public:
             stmt->setUInt32(2, inactivityPausedWeeks);
             stmt->setBool(3, inactivityPausedCurrentWeek);
             stmt->setBool(4, true);
-            LoginDatabase.Execute(stmt);
+            LoginDatabase.DirectExecute(stmt);
         }
 
         // Reset player played time
