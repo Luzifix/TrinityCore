@@ -782,6 +782,7 @@ void CharacterDatabaseConnection::DoPrepareStatements()
     PrepareStatement(CHAR_INS_HOUSING_TRANSFER_HISTORY, "REPLACE `housing_transfer_history` (`housing_id`, `from`, `to`) VALUES (?, ?, ?)", CONNECTION_ASYNC);
     PrepareStatement(CHAR_SEL_HOUSING_TRANSFER_HISTORY_CHECK_LAST_MONTH_BY_HOUSE_ID, "SELECT 1 FROM `housing_transfer_history` WHERE `housing_id` = ? AND `transferd_at` >= CURRENT_TIMESTAMP() - INTERVAL 1 MONTH;", CONNECTION_SYNCH);
     PrepareStatement(CHAR_SEL_HOUSING_TRANSFER_HISTORY_CHECK_LAST_MONTH_BY_BNET_ID, "SELECT 1 FROM `housing_transfer_history` WHERE (`from` = ? OR `to` = ?) AND `transferd_at` >= CURRENT_TIMESTAMP() - INTERVAL 1 MONTH;", CONNECTION_SYNCH);
+    PrepareStatement(CHAR_INS_HOUSING_AREA_ADDON_COORDINATES, "INSERT INTO `housing_area_addon_coordinates` (`housing_area_id`, `type`, `position_x`, `position_y`, `position_z`) VALUES (?, ?, ?, ?, ?)", CONNECTION_ASYNC);
 
     // Character Modify
     PrepareStatement(CHAR_SEL_CHARACTER_MODIFY, "SELECT scale, speed, morph FROM character_modify WHERE guid = ?", CONNECTION_SYNCH);

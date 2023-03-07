@@ -5,6 +5,7 @@
 #include "ScriptMgr.h"
 #include "Log.h"
 #include "HousingMgr.h"
+#include "PhasingHandler.h"
 #include <Chat.h>
 #include <Language.h>
 
@@ -39,7 +40,7 @@ public:
                 {
                     for (const auto& housingArea : housing.second->GetHousingAreas())
                     {
-                        housingArea.second->UpdateVisitorList();
+                        housingArea.second->Update();
                     }
                 }
 
@@ -72,8 +73,13 @@ public:
 
             player->SetHouseAreaId(housingArea->GetId(), isIndoor, true);
 
-            if (!isIndoor && player->GetHouseAreaPhaseId() > 0)
-                player->SetHouseAreaPhaseId(0, true);
+            if (housingArea->IsIndoor() && !isIndoor)
+            {
+                if (player->GetHouseAreaPhaseId() > 0)
+                    player->SetHouseAreaPhaseId(0, true);
+
+                return;
+            }
 
             if (!housingArea->HasVisitor(player))
             {

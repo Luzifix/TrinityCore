@@ -7,6 +7,9 @@
 #include "HousingArea.h"
 #include "HousingMgr.h"
 #include "Guild.h"
+#include "GameObject.h"
+#include "PhasingHandler.h"
+#include "MapManager.h"
 
 using namespace G3D;
 
@@ -261,6 +264,12 @@ bool HousingArea::ClearPermission(HousingAreaPermissionType type)
     return true;
 }
 
+void HousingArea::Update()
+{
+    UpdateVisitorList();
+    UpdateChimneySmoke();
+}
+
 void HousingArea::UpdateVisitorList()
 {
     for (auto visitor : _visitor)
@@ -268,6 +277,49 @@ void HousingArea::UpdateVisitorList()
         if (visitor == nullptr || !visitor->IsInWorld() || !IsInHouse(visitor))
             RemoveVisitor(visitor);
     }
+}
+
+void HousingArea::UpdateChimneySmoke()
+{
+    bool chimenySmokeSpawned = (_chimneySmoke.size() > 0);
+    if (!IsVisitorInHouse())
+    {
+        if (chimenySmokeSpawned)
+        {
+            for (GameObject* chimneySmoke : _chimneySmoke)
+            {
+                if (chimneySmoke->IsInWorld())
+                    chimneySmoke->DespawnOrUnsummon();
+            }
+
+            _chimneySmoke.clear();
+        }
+
+        return;
+    }
+
+    if (IsVisitorInHouse() && chimenySmokeSpawned)
+        return;
+
+    sMapMgr->DoForAllMapsWithMapId(_map, [this](Map* map)
+    {
+        for (HousingAreaAddonCoordinates chimneySmokeCoordinates : GetAddonCoordinatesByType(HOUSING_AREA_ADDON_COORDINATES_CHIMNEY))
+        {
+            if (!map->IsGridLoaded(chimneySmokeCoordinates.position))
+                continue;
+
+            GameObject* go = GameObject::CreateGameObject(HOUSING_CHIMNEY_SMOKE_GAMEOBJECT_ID, map, chimneySmokeCoordinates.position, QuaternionData::fromEulerAnglesZYX(0, 0, 0), 255, GO_STATE_READY);
+            if (!go)
+                continue;
+
+            PhasingHandler::ResetPhaseShift(go);
+
+            go->SetRespawnTime(300);
+            go->SetSpawnedByDefault(false);
+            map->AddToMap(go);
+            _chimneySmoke.insert(go);
+        }
+    });
 }
 
 uint32 HousingArea::GetFacilityCurrent()
@@ -296,4 +348,21 @@ uint32 HousingArea::GetFacilityValue()
     Field* fields = result->Fetch();
 
     return fields[0].GetUInt64();
+}
+
+std::vector<HousingAreaAddonCoordinates> HousingArea::GetAddonCoordinatesByType(HousingAreaAddonCoordinatesType type)
+{
+    std::vector<HousingAreaAddonCoordinates> store;
+
+    for (uint8 i = 0; i < _addonCoordinates->size(); i++)
+    {
+        HousingAreaAddonCoordinates addonCoordinates = _addonCoordinates->at(i);
+
+        if (addonCoordinates.type != type)
+            continue;
+
+        store.push_back(addonCoordinates);
+    }
+
+    return store;
 }

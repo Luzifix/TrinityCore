@@ -5,6 +5,7 @@
 #include "HousingMgr.h"
 #include "Guild.h"
 #include "Log.h"
+#include "Position.h"
 #include <iostream>
 
 using namespace G3D;
@@ -22,6 +23,7 @@ void HousingMgr::LoadFromDB()
     uint32 housingAreaCount = 0;
     uint32 housingAreaTriggerCount = 0;
     uint32 housingAreaPermissionCount = 0;
+    uint32 housingAreaAddonCoordinatesCount = 0;
 
     // Load Housing                                          0     1       2        3           4
     if (QueryResult result = CharacterDatabase.Query("SELECT `id`, `type`, `owner`, `guild_id`, `name` FROM `housing`"))
@@ -130,7 +132,6 @@ void HousingMgr::LoadFromDB()
                 continue;
             }
 
-
             HousingArea* housingArea = housing->GetHousingAreaById(housingAreaId);
             if (housingArea == nullptr)
             {
@@ -161,7 +162,29 @@ void HousingMgr::LoadFromDB()
         } while (result->NextRow());
     }
 
-    TC_LOG_INFO("server.loading", ">> Loaded %u Houses with %u housing areas %u trigger and %u permissions", housingCount, housingAreaCount, housingAreaTriggerCount, housingAreaPermissionCount);
+    // Load Housing Addon Permission                         0                  1       2             3             4
+    if (QueryResult result = CharacterDatabase.Query("SELECT `housing_area_id`, `type`, `position_x`, `position_y`, `position_z` FROM `housing_area_addon_coordinates`;"))
+    {
+        do
+        {
+            Field* fields = result->Fetch();
+
+            uint32 housingAreaId = fields[0].GetUInt32();
+
+            HousingArea* housingArea = HousingMgr::GetHousingAreaById(housingAreaId);
+            if (housingArea == nullptr)
+            {
+                TC_LOG_ERROR("server.loading", "Housing Area Id %u for addon coordinates not found!", housingAreaId);
+                continue;
+            }
+
+            HousingAreaAddonCoordinatesType type = (HousingAreaAddonCoordinatesType)fields[1].GetUInt8();
+            housingArea->AddAddonCoordinates(HousingAreaAddonCoordinates(type, Position(fields[2].GetFloat(), fields[3].GetFloat(), fields[4].GetFloat())));
+            ++housingAreaAddonCoordinatesCount;
+        } while (result->NextRow());
+    }
+
+    TC_LOG_INFO("server.loading", ">> Loaded %u Houses with %u housing areas %u trigger and %u permissions and %u addon coordinates", housingCount, housingAreaCount, housingAreaTriggerCount, housingAreaPermissionCount, housingAreaAddonCoordinatesCount);
 }
 
 Housing* HousingMgr::Save(Housing* housing)
@@ -252,6 +275,23 @@ HousingArea* HousingMgr::SaveHousingArea(HousingArea* housingArea, Optional<Char
         stmt->setUInt32(0, housingAreaId);
         stmt->setUInt64(1, it->guid.GetCounter());
         stmt->setUInt8(2, (uint8)HOUSING_AREA_PERMISSION_BUILDING);
+
+        trans->Append(stmt);
+    }
+#pragma endregion
+
+#pragma region Update addon coordinates
+    std::vector<HousingAreaAddonCoordinates>* addonCoordinates = housingArea->GetAddonCoordinatesList();
+    for (uint16 i = 0; i < addonCoordinates->size(); i++)
+    {
+        HousingAreaAddonCoordinates addonCoordinate = addonCoordinates->at(i);
+
+        CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_HOUSING_AREA_ADDON_COORDINATES);
+        stmt->setUInt32(0, housingAreaId);
+        stmt->setUInt8(1, addonCoordinate.type);
+        stmt->setFloat(2, addonCoordinate.position.GetPositionX());
+        stmt->setFloat(3, addonCoordinate.position.GetPositionY());
+        stmt->setFloat(4, addonCoordinate.position.GetPositionZ());
 
         trans->Append(stmt);
     }

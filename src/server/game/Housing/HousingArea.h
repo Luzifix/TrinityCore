@@ -7,11 +7,14 @@
 
 #include "Common.h"
 #include "G3D/Vector3.h"
+#include "Position.h"
 #include "Object.h"
 #include "Player.h"
 #include "Util.h"
 
 class Housing;
+
+inline constexpr uint32 HOUSING_CHIMNEY_SMOKE_GAMEOBJECT_ID = 619680;
 
 enum HousingAreaMapIds : uint32
 {
@@ -42,10 +45,29 @@ enum HousingAreaPermissionType : uint8
     HOUSING_AREA_PERMISSION_MAX
 };
 
+enum HousingAreaAddonCoordinatesType : uint8
+{
+    HOUSING_AREA_ADDON_COORDINATES_CHIMNEY = 0,
+
+    HOUSING_AREA_ADDON_COORDINATES_MAX
+};
+
 struct HousingAreaPermission
 {
     ObjectGuid guid;
     std::string name;
+};
+
+struct HousingAreaAddonCoordinates
+{
+    HousingAreaAddonCoordinates(HousingAreaAddonCoordinatesType _type, Position _position)
+    {
+        type = _type;
+        position = _position;
+    }
+
+    HousingAreaAddonCoordinatesType type;
+    Position position;
 };
 
 class TC_GAME_API HousingArea
@@ -114,6 +136,12 @@ public:
     std::vector<G3D::Vector2>* GetTriggerList() { return _trigger; }
     G3D::Vector2 GetTrigger(uint32 index) { return _trigger->at(index); }
 
+    void SetAddonCoordinatesList(std::vector<HousingAreaAddonCoordinates>* addonCoordinatesList) { _addonCoordinates = addonCoordinatesList; }
+    void AddAddonCoordinates(HousingAreaAddonCoordinates addonCoordinates) { _addonCoordinates->push_back(addonCoordinates); }
+    std::vector<HousingAreaAddonCoordinates>* GetAddonCoordinatesList() { return _addonCoordinates; }
+    HousingAreaAddonCoordinates GetAddonCoordinates(uint32 index) { return _addonCoordinates->at(index); }
+    std::vector<HousingAreaAddonCoordinates> GetAddonCoordinatesByType(HousingAreaAddonCoordinatesType type);
+
     uint32 GetFacilityCurrent();
     uint32 GetFacilityValue();
 #pragma endregion
@@ -151,10 +179,12 @@ public:
     bool ClearPermission(HousingAreaPermissionType type);
 #pragma endregion
 
-    void UpdateVisitorList();
+    void Update();
 
 private:
     bool GetLineIntersection(G3D::Vector2 lineStartPoint, G3D::Vector2 lineEndPoint, G3D::Vector2 currentPoint, G3D::Vector2 originPoint = G3D::Vector2::zero());
+    void UpdateVisitorList();
+    void UpdateChimneySmoke();
 
 private:
     uint32 _id;
@@ -168,9 +198,11 @@ private:
     int32 _facilityLimit = -1;
     std::string _motd = "";
     std::vector<G3D::Vector2>* _trigger = new std::vector<G3D::Vector2>();
+    std::vector<HousingAreaAddonCoordinates>* _addonCoordinates = new std::vector<HousingAreaAddonCoordinates>();
     std::vector<HousingAreaPermission> _access;
     std::vector<HousingAreaPermission> _building;
     std::set<Player*> _visitor;
+    std::set<GameObject*> _chimneySmoke;
 };
 
 #endif // HousingArea_h__
