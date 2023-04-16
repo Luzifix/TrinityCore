@@ -19,7 +19,7 @@ enum HousingType : uint8
     HOUSING_SMALL_HOUSE = 0,
     HOUSING_LARGE_HOUSE = 1,
     HOUSING_NOBLE_HOUSE = 2,
-    HOUSING_SHOP = 3,
+    HOUSING_SHOP_OR_GUILD = 3,
 
     HOUSING_TYPE_MAX
 };
@@ -61,6 +61,7 @@ public:
 
     bool AllowedForOwnershipTransfer() { return (_type == HOUSING_SMALL_HOUSE || _type == HOUSING_LARGE_HOUSE); }
     bool TransferOwnership(const CharacterCacheEntry* newOwner, Player* reportTo = nullptr);
+    std::string GetTypeName();
 
 private:
     uint32 _id;

@@ -7,6 +7,8 @@
 #include "Log.h"
 #include "Position.h"
 #include <iostream>
+#include <ChuckedForEach.h>
+#include <numeric>
 
 using namespace G3D;
 
@@ -300,9 +302,42 @@ HousingArea* HousingMgr::SaveHousingArea(HousingArea* housingArea, Optional<Char
     if (!externTrans.has_value())
         CharacterDatabase.CommitTransaction(trans);
 
-    _housingStore[housingId]->AddHousingArea(housingArea);
+    if (_housingStore.find(housingId) != _housingStore.end())
+        _housingStore[housingId]->AddHousingArea(housingArea);
 
     return housingArea;
+}
+
+// WIP
+void HousingMgr::DeleteFurniture(HousingArea* housingArea)
+{
+    std::vector<uint64> housingGameObjectSpawnIds;
+    WorldDatabasePreparedStatement* worldStmt = WorldDatabase.GetPreparedStatement(WORLD_SEL_GAMEOBJECT_BY_HOUSING_AREA_ID);
+    worldStmt->setUInt32(0, housingArea->GetId());
+
+    if (PreparedQueryResult result = WorldDatabase.Query(worldStmt))
+    {
+        do
+        {
+            Field* fields = result->Fetch();
+            housingGameObjectSpawnIds.push_back(fields[0].GetUInt64());
+        } while (result->NextRow());
+    }
+
+    if (housingGameObjectSpawnIds.empty())
+        return;
+
+    typedef decltype(housingGameObjectSpawnIds.begin()) uint64Iterator;
+
+
+    Trinity::chuncked_for_earch<uint64Iterator>(housingGameObjectSpawnIds.begin(), housingGameObjectSpawnIds.end(), 1000, [](uint64Iterator from, uint64Iterator to) {
+
+        std::string guidChunk = std::accumulate(std::next(from), to, std::to_string(*from), [](std::string a, uint64 b) {
+            return std::move(a) + ',' + std::to_string(b);
+        });
+
+        TC_LOG_INFO("server.loading", "DELETE: %s", guidChunk);
+    });
 }
 
 void HousingMgr::Delete(Housing* housing)

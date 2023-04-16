@@ -127,8 +127,9 @@ void WorldDatabaseConnection::DoPrepareStatements()
     PrepareStatement(WORLD_UPD_ITEM_PRICE_CATEGORIZE_REQUEST_SET_CATEGORIZED_BY_DISPLAY_INFO_ID, "UPDATE `item_price_categorize_request` SET `categorized` = ? WHERE `display_info_id` = ?;", CONNECTION_ASYNC);
 
     // Housing
-    PrepareStatement(WORLD_SEL_GAMEOBJECT_COUNT_BY_HOUSEID, "SELECT CAST(COUNT(*) AS INT) FROM gameobject WHERE house_area_id = ?;", CONNECTION_SYNCH);
-    PrepareStatement(WORLD_SEL_GAMEOBJECT_VALUE_BY_HOUSEID, "SELECT CAST(SUM(fc.price) AS INT) FROM gameobject g LEFT JOIN furniture_catalog fc ON (g.id = fc.id) WHERE g.house_area_id = ?;", CONNECTION_SYNCH);
+    PrepareStatement(WORLD_SEL_GAMEOBJECT_COUNT_BY_HOUSING_AREA_ID, "SELECT CAST(COUNT(*) AS INT) FROM gameobject WHERE house_area_id = ?;", CONNECTION_SYNCH);
+    PrepareStatement(WORLD_SEL_GAMEOBJECT_VALUE_BY_HOUSING_AREA_ID, "SELECT CAST(SUM(fc.price) AS INT) FROM gameobject g LEFT JOIN furniture_catalog fc ON (g.id = fc.id) WHERE g.house_area_id = ?;", CONNECTION_SYNCH);
+    PrepareStatement(WORLD_SEL_GAMEOBJECT_BY_HOUSING_AREA_ID, "SELECT guid FROM gameobject WHERE house_area_id = ?;", CONNECTION_SYNCH);
 
     // NPC Commands
     PrepareStatement(WORLD_INS_CREATURE_ADDON_EMOTE, "INSERT INTO creature_addon(guid, bytes2, emote) VALUES (?, 1, ?)", CONNECTION_ASYNC);

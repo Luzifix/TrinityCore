@@ -32,11 +32,13 @@ private:
 public:
     static HousingMgr* instance();
     std::map<ObjectGuid, Housing*> TempHousingModifyStore;
+    std::map<ObjectGuid, HousingArea*> TempHousingAreaModifyStore;
     std::map<ObjectGuid, bool> IsIndoorStore;
 
     void LoadFromDB();
     Housing* Save(Housing* housing);
     HousingArea* SaveHousingArea(HousingArea* housingArea, Optional<CharacterDatabaseTransaction> externTrans = {});
+    void DeleteFurniture(HousingArea* housingArea);
     void Delete(Housing* housing);
     void Validate(Housing* housing);
     void Validate(HousingArea* housingArea);

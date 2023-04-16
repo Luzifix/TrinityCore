@@ -198,3 +198,20 @@ bool Housing::TransferOwnership(const CharacterCacheEntry* newOwner, Player* rep
 
     return true;
 }
+
+std::string Housing::GetTypeName()
+{
+    switch (_type)
+    {
+    case HOUSING_SMALL_HOUSE:
+        return sObjectMgr->GetTrinityStringForDBCLocale(LANG_HOUSING_TYPE_SMALL_HOUSE);
+    case HOUSING_LARGE_HOUSE:
+        return sObjectMgr->GetTrinityStringForDBCLocale(LANG_HOUSING_TYPE_LARGE_HOUSE);
+    case HOUSING_NOBLE_HOUSE:
+        return sObjectMgr->GetTrinityStringForDBCLocale(LANG_HOUSING_TYPE_NOBLE_HOUSE);
+    case HOUSING_SHOP_OR_GUILD:
+        return sObjectMgr->GetTrinityStringForDBCLocale(LANG_HOUSING_TYPE_SHOP_OR_GUILD);
+    default:
+        return "Unknown";
+    }
+}

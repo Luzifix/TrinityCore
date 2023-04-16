@@ -324,7 +324,7 @@ void HousingArea::UpdateChimneySmoke()
 
 uint32 HousingArea::GetFacilityCurrent()
 {
-    WorldDatabasePreparedStatement* stmt = WorldDatabase.GetPreparedStatement(WORLD_SEL_GAMEOBJECT_COUNT_BY_HOUSEID);
+    WorldDatabasePreparedStatement* stmt = WorldDatabase.GetPreparedStatement(WORLD_SEL_GAMEOBJECT_COUNT_BY_HOUSING_AREA_ID);
     stmt->setUInt32(0, _id);
     PreparedQueryResult result = WorldDatabase.Query(stmt);
 
@@ -338,7 +338,7 @@ uint32 HousingArea::GetFacilityCurrent()
 
 uint32 HousingArea::GetFacilityValue()
 {
-    WorldDatabasePreparedStatement* stmt = WorldDatabase.GetPreparedStatement(WORLD_SEL_GAMEOBJECT_VALUE_BY_HOUSEID);
+    WorldDatabasePreparedStatement* stmt = WorldDatabase.GetPreparedStatement(WORLD_SEL_GAMEOBJECT_VALUE_BY_HOUSING_AREA_ID);
     stmt->setUInt32(0, _id);
     PreparedQueryResult result = WorldDatabase.Query(stmt);
 
