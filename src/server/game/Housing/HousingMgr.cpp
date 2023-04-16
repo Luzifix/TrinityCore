@@ -336,7 +336,7 @@ void HousingMgr::DeleteFurniture(HousingArea* housingArea)
             return std::move(a) + ',' + std::to_string(b);
         });
 
-        TC_LOG_INFO("server.loading", "DELETE: %s", guidChunk);
+        //TC_LOG_INFO("server.loading", "DELETE: %s", guidChunk);
     });
 }
 
