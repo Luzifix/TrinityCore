@@ -793,7 +793,7 @@ void CharacterDatabaseConnection::DoPrepareStatements()
     PrepareStatement(CHAR_INS_CHARACTER_MODIFY_MORPH, "INSERT INTO character_modify (guid, morph) VALUES (?, ?) ON DUPLICATE KEY UPDATE morph = ?", CONNECTION_ASYNC);
 
     // Activity
-    PrepareStatement(CHAR_SEL_GUILD_ACTIVITY_ALL, "SELECT g.guildid, CAST(IFNULL(gai.minCoins, 10) AS INT), CAST(IFNULL(gai.maxCoins, 40) AS INT), CAST(IFNULL(ga.played, 0) AS INT), gai.disableSystem FROM guild g LEFT JOIN guild_activity_info gai ON (g.guildid = gai.guildId) LEFT JOIN guild_activity ga ON (g.guildid = ga.guildId)", CONNECTION_SYNCH);
+    PrepareStatement(CHAR_SEL_GUILD_ACTIVITY_ALL, "SELECT g.guildid, IFNULL(gai.minCoins, 10), IFNULL(gai.maxCoins, 40), IFNULL(ga.played, 0), gai.disableSystem FROM guild g LEFT JOIN guild_activity_info gai ON (g.guildid = gai.guildId) LEFT JOIN guild_activity ga ON (g.guildid = ga.guildId)", CONNECTION_SYNCH);
     PrepareStatement(CHAR_INS_GUILD_ACTIVITY_HISTORY, "INSERT INTO `guild_activity_history` (`guildId`, `played`, `minCoins`, `maxCoins`, `disableSystem`) SELECT ga.`guildId`, ga.`played`, gai.minCoins, gai.maxCoins, gai.disableSystem FROM `guild_activity` ga LEFT JOIN `guild_activity_info` gai ON (ga.guildId = gai.guildId)", CONNECTION_SYNCH);
     PrepareStatement(CHAR_DEL_GUILD_ACTIVITY_HISTORY, "DELETE FROM `guild_activity_history` WHERE `date` <= CURRENT_TIMESTAMP - INTERVAL 3 MONTH; ", CONNECTION_SYNCH);
     PrepareStatement(CHAR_INS_GUILD_ACTIVITY_PLAYTIME, "INSERT INTO guild_activity (guildId, played) VALUES (?, ?) ON DUPLICATE KEY UPDATE played = played + VALUES(played)", CONNECTION_ASYNC);
