@@ -31,7 +31,7 @@ void FurnitureMgr::LoadFromDB()
     uint32 furnitureInventoryCount = 0;
 
     // Load Furniture                                    0          1              2         3                                                 4                                5                               6                                   7
-    if (QueryResult result = WorldDatabase.Query("SELECT g.`entry`, g.`displayId`, g.`name`, IFNULL(fc.`categorization_date`, 0), IFNULL(fc.`categorized_by`, ''), IFNULL(fc.`authorised_by`, ''), IFNULL(fc.`price`, 0), IFNULL(fc.`updated`, UNIX_TIMESTAMP(g.`updated`)) FROM `gameobject_template` g LEFT JOIN `furniture_catalog` fc ON (g.entry = fc.id) WHERE g.`entry` > 600000 AND g.`displayId` > 0 ORDER BY g.`entry` ASC;"))
+    if (QueryResult result = WorldDatabase.Query("SELECT g.`entry`, g.`displayId`, g.`name`, CAST(IFNULL(fc.`categorization_date`, 0) AS INT), IFNULL(fc.`categorized_by`, ''), IFNULL(fc.`authorised_by`, ''), CAST(IFNULL(fc.`price`, 0) AS INT), CAST(IFNULL(fc.`updated`, UNIX_TIMESTAMP(g.`updated`)) AS INT) FROM `gameobject_template` g LEFT JOIN `furniture_catalog` fc ON (g.entry = fc.id) WHERE g.`entry` > 600000 AND g.`displayId` > 0 ORDER BY g.`entry` ASC;"))
     {
         do
         {
