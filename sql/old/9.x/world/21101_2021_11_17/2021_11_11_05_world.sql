@@ -45,5 +45,5 @@ UPDATE `gameobject` SET `spawnDifficulties`='0' WHERE `map`=1220; -- Broken Isle
 UPDATE `gameobject` SET `spawnDifficulties`='0' WHERE `map`=1464; -- Tanaan Jungle
 
 -- Wrong phases from cherry-picks
-UPDATE `creature` SET `PhaseId`=0 WHERE `PhaseId`=1;
-UPDATE `gameobject` SET `PhaseId`=0 WHERE `PhaseId`=1;
+UPDATE `creature` SET `PhaseId`=0 WHERE `PhaseId`=1 WHERE `map` < 5000;
+UPDATE `gameobject` SET `PhaseId`=0 WHERE `PhaseId`=1 WHERE `map` < 5000;
