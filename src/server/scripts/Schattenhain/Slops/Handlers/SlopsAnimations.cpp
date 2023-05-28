@@ -58,7 +58,7 @@ void SlopsHandler::HandleAnimationsDo(SlopsPackage package)
     player->SetAIAnimKitId(0);
     player->SetMeleeAnimKitId(0);
     player->SetMovementAnimKitId(0);
-    player->RemoveAllAuras();
+    player->RemoveAllAurasExceptType(AuraType::SPELL_AURA_WORGEN_ALTERED_FORM);
     player->HandleEmoteCommand(Emote(411), nullptr);
 
     if (animation->emoteId != 0)
