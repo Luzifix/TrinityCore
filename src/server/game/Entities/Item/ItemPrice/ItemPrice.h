@@ -48,6 +48,8 @@ public:
     uint32 GetCategorizationDate() { return _categorizationDate; }
 
     bool IsUnsaleable() { return _priceCategory->IsUnsaleable(); }
+
+    uint64 GetPriceInCooper() { return GetPriceCategory()->GetPrice() * GetPriceMultiplier(); }
 #pragma endregion
 
 

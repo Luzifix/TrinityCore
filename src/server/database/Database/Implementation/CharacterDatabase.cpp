@@ -805,6 +805,9 @@ void CharacterDatabaseConnection::DoPrepareStatements()
     PrepareStatement(CHAR_UPD_CHARACTER_MOUNT_POSITION_BY_GUID_AND_TEMPLATE_ID, "UPDATE `character_mount` SET `positionX` = ?, `positionY` = ?, `positionZ` = ?, `orientation` = ?, `map` = ? WHERE `guid` = ? AND `mountTemplateId` = ?;", CONNECTION_BOTH);
     PrepareStatement(CHAR_DEL_CHARACTER_MOUNT, "DELETE FROM `character_mount` WHERE `id` = ?;", CONNECTION_ASYNC);
 
+    // Item Seller
+    PrepareStatement(CHAR_SEL_ITEM_SELLER_PERMISSION, "SELECT `character_guid` FROM `item_seller_permission`", CONNECTION_SYNCH);
+    PrepareStatement(CHAR_INS_ITEM_SELLER_HISTORY, "INSERT INTO `item_seller_history` (`character_guid`, `item_id`, `bonus_id`, `buy_for_character_guid`) VALUES (?, ?, ?, ?);", CONNECTION_ASYNC);
 }
 
 CharacterDatabaseConnection::CharacterDatabaseConnection(MySQLConnectionInfo& connInfo) : MySQLConnection(connInfo)
