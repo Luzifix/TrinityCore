@@ -42,7 +42,7 @@ CREATE TABLE IF NOT EXISTS `housing_area_trigger` (
 --- Convert Data to new house area struct
 -- house_area
 INSERT INTO `housing_area` (`id`, `housing_id`, `type`, `map`, `height_min`, `height_max`, `name`, `facility_limit`, `motd`)
-SELECT h.`id`, h.`id` AS `house_id`, h.`type`, h.`map`, h.`height_min`, h.`height_max`, IF(h.`type`=0,"Wohnfläche","Gewerbefläche") AS `name`, h.`facility_limit`, h.`motd` 
+SELECT h.`id`, h.`id` AS `house_id`, IF(h.`type`!=3,0,1) AS `type`, h.`map`, h.`height_min`, h.`height_max`, IF(h.`type`!=3,"Wohnfläche","Gewerbefläche") AS `name`, h.`facility_limit`, h.`motd` 
 FROM housing `h` 
 INNER JOIN housing_trigger `ht` ON (`h`.`id` = `ht`.`housing_id`)
 GROUP BY `h`.`id`;
