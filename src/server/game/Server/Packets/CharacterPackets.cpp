@@ -140,10 +140,11 @@ EnumCharactersResult::CharacterInfo::CharacterInfo(Field* fields)
         SpecID = spec->ID;
 
     LastLoginVersion = fields[22].GetUInt32();
+    constexpr std::size_t equipmentFieldsPerSlot = 5;
 
-    for (uint8 slot = 0; slot < INVENTORY_SLOT_BAG_END; ++slot)
+    for (std::size_t slot = 0; slot < VisualItems.size() && (slot + 1) * equipmentFieldsPerSlot <= equipment.size(); ++slot)
     {
-        uint32 visualBase = slot * 5;
+        std::size_t visualBase = slot * equipmentFieldsPerSlot;
         VisualItems[slot].InvType = Trinity::StringTo<uint8>(equipment[visualBase + 0]).value_or(0);
         VisualItems[slot].DisplayID = Trinity::StringTo<uint32>(equipment[visualBase + 1]).value_or(0);
         VisualItems[slot].DisplayEnchantID = Trinity::StringTo<uint32>(equipment[visualBase + 2]).value_or(0);
