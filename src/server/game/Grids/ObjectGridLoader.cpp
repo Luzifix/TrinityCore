@@ -105,6 +105,7 @@ void AddObjectHelper(CellCoord &cell, GridRefManager<T> &m, uint32 &count, Map* 
 template <class T>
 void LoadHelper(CellGuidSet const& guid_set, CellCoord& cell, GridRefManager<T>& m, uint32& count, Map* map, uint32 phaseId = 0, Optional<ObjectGuid> phaseOwner = {})
 {
+    bool loadAsync = true;
     std::set<T*> collectedObjs;
 
     for (CellGuidSet::const_iterator i_guid = guid_set.begin(); i_guid != guid_set.end(); ++i_guid)
@@ -128,7 +129,25 @@ void LoadHelper(CellGuidSet const& guid_set, CellCoord& cell, GridRefManager<T>&
             map->GetMultiPersonalPhaseTracker().RegisterTrackedObject(phaseId, *phaseOwner, obj);
         }
 
-        AddObjectHelper(cell, m, count, map, obj);
+        if (loadAsync)
+            collectedObjs.insert(obj);
+        else
+            AddObjectHelper(cell, m, count, map, obj);
+    }
+
+    if (loadAsync)
+    {
+        std::for_each(
+            std::execution::seq,
+            collectedObjs.begin(),
+            collectedObjs.end(),
+            [&](T* obj)
+            {
+                AddObjectHelper(cell, m, count, map, obj);
+            }
+        );
+
+        collectedObjs.clear();
     }
 }
 
