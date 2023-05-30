@@ -73,7 +73,7 @@ public:
 
             player->SetHouseAreaId(housingArea->GetId(), isIndoor, true);
 
-            if (housingArea->IsIndoor() && !isIndoor)
+            if ((housingArea->IsIndoor() && !isIndoor))
             {
                 if (player->GetHouseAreaPhaseId() > 0)
                     player->SetHouseAreaPhaseId(0, true);
@@ -88,6 +88,9 @@ public:
                 if (housingArea->GetMotd() != "")
                     ChatHandler(player->GetSession()).PSendSysMessage(LANG_HOUSING_MOTD, housingArea->GetName(), housingArea->GetMotd());
             }
+
+            if (!housingArea->IsIndoor() && player->GetHouseAreaPhaseId() > 0)
+                player->SetHouseAreaPhaseId(0, true);
 
             return;
         }
