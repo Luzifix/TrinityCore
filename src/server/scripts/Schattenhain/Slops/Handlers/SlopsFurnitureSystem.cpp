@@ -158,7 +158,13 @@ void SlopsHandler::HandleFurnitureSpawn(SlopsPackage package)
     uint32 id = data["id"].ToInt();
     Furniture* furniture = sFurnitureMgr->GetById(id);
 
-    if (!furniture || (!furniture->IsCategorized() && !player->IsGameMaster()))
+    if (!furniture)
+    {
+        ChatHandler(player->GetSession()).PSendSysMessage(LANG_HOUSING_FURNITURE_ERR_SPAWN, std::string("#" + std::to_string(id)));
+        return;
+    }
+
+    if (!furniture->IsCategorized() && !player->IsGameMaster())
     {
         ChatHandler(player->GetSession()).PSendSysMessage(LANG_HOUSING_FURNITURE_ERR_SPAWN, furniture->GetName());
         return;
