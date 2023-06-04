@@ -99,7 +99,7 @@ void WorldDatabaseConnection::DoPrepareStatements()
     PrepareStatement(WORLD_SEL_OUTFIT_CUSTOMIZATIONS, "SELECT chrCustomizationOptionID, chrCustomizationChoiceID from creature_template_outfits_customizations WHERE outfitID = ?", CONNECTION_SYNCH);
 
     // Furniture
-    PrepareStatement(WORLD_INS_FURNITURE_CATALOG_ENTRY, "INSERT INTO `furniture_catalog` (`id`, `categorization_date`, `categorized_by`, `authorised_by`, `price`, `updated`) VALUES (?, ?, ?, ?, ?, ?) ON DUPLICATE KEY UPDATE `categorization_date` = VALUES(`categorization_date`), `categorized_by` = VALUES(`categorized_by`), `authorised_by` = VALUES(`authorised_by`), `price` = VALUES(`price`), `updated` = VALUES(`updated`);", CONNECTION_ASYNC);
+    PrepareStatement(WORLD_INS_FURNITURE_CATALOG_ENTRY, "INSERT INTO `furniture_catalog` (`id`, `categorization_date`, `categorized_by`, `authorised_by`, `price`, `updated`, `client_flag`) VALUES (?, ?, ?, ?, ?, ?, ?) ON DUPLICATE KEY UPDATE `categorization_date` = VALUES(`categorization_date`), `categorized_by` = VALUES(`categorized_by`), `authorised_by` = VALUES(`authorised_by`), `price` = VALUES(`price`), `updated` = VALUES(`updated`), `client_flag` = VALUES(`client_flag`);", CONNECTION_ASYNC);
     PrepareStatement(WORLD_DEL_FURNITURE_CATALOG_CATEGORY_BY_FURNITURE_ID, "DELETE FROM `furniture_catalog_category` WHERE `furniture_id` = ?;", CONNECTION_ASYNC);
     PrepareStatement(WORLD_INS_FURNITURE_CATALOG_CATEGORY, "INSERT INTO `furniture_catalog_category` (`furniture_id`, `category_id`) VALUES (?, ?);", CONNECTION_ASYNC);
 

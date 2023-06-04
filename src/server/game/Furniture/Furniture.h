@@ -8,10 +8,22 @@
 #include <map>
 #include <ctime>
 
+enum FurnitureClientFlag : uint32
+{
+    Nothing = 0,
+    Door = 1,
+    Usable = 2,
+    Chair = 3,
+    MailBox = 4,
+    GuildChest = 5,
+    BarberShop = 6,
+    PlayerBank = 7,
+};
+
 class TC_GAME_API Furniture
 {
 public:
-    Furniture(uint32 id, uint32 gameObjectId, std::string name, uint32 categorizationDate, std::string categorizedBy, std::string authorisedBy, int32 price = 0, uint32 updated = 0)
+    Furniture(uint32 id, uint32 gameObjectId, std::string name, uint32 categorizationDate, std::string categorizedBy, std::string authorisedBy, int32 price = 0, uint32 updated = 0, FurnitureClientFlag clientFlag = FurnitureClientFlag::Nothing)
     {
         _id = id;
         _fileDataId = gameObjectId;
@@ -21,6 +33,7 @@ public:
         _authorisedBy = authorisedBy;
         _price = price;
         _updated = updated;
+        _clientFlag = clientFlag;
     }
 
 #pragma region Getter & Setter
@@ -52,6 +65,10 @@ public:
     void SetUpdated(uint32 updated) { _updated = updated; }
     uint32 GetUpdated() { return _updated; }
 
+    void SetClientFlag(FurnitureClientFlag clientFlag) { _clientFlag = clientFlag; }
+    uint32 GetClientFlag() { return _clientFlag; }
+    bool IsClientFlag(FurnitureClientFlag clientFlag) { return _clientFlag == clientFlag; }
+
     bool IsCategorized() { return _price > 0; }
 #pragma endregion
 
@@ -65,6 +82,7 @@ private:
     int32 _price;
     std::list<uint32> _catgeorys;
     uint32 _updated;
+    FurnitureClientFlag _clientFlag;
 };
 
 #endif // Furniture_h__

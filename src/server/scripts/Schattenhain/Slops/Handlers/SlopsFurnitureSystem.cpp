@@ -15,7 +15,7 @@
 
 void SlopsHandler::HandleFurnitureListRequest(SlopsPackage package)
 {
-    const uint32 FURNITURE_LIST_FORMAT_VERSION = 1;
+    const uint32 FURNITURE_LIST_FORMAT_VERSION = 2;
     Player* player = package.sender;
     JSON requestData = JSON::Load(package.message);
 
@@ -44,7 +44,8 @@ void SlopsHandler::HandleFurnitureListRequest(SlopsPackage package)
             "p", furnitureEntry->GetPrice(),
             "c", JSON::Array(),
             "cb", furnitureEntry->GetCategorizedBy(),
-            "cd", furnitureEntry->GetCategorizationDate()
+            "cd", furnitureEntry->GetCategorizationDate(),
+            "cf", furnitureEntry->GetClientFlag(),
         };
 
         for (uint32 categoryId : furnitureEntry->GetCategorys())

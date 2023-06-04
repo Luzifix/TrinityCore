@@ -30,8 +30,8 @@ void FurnitureMgr::LoadFromDB()
     uint32 furnitureCategoryCount = 0;
     uint32 furnitureInventoryCount = 0;
 
-    // Load Furniture                                    0          1              2         3                                                 4                                5                               6                                   7
-    if (QueryResult result = WorldDatabase.Query("SELECT g.`entry`, g.`displayId`, g.`name`, CAST(IFNULL(fc.`categorization_date`, 0) AS INT), IFNULL(fc.`categorized_by`, ''), IFNULL(fc.`authorised_by`, ''), CAST(IFNULL(fc.`price`, 0) AS INT), CAST(IFNULL(fc.`updated`, UNIX_TIMESTAMP(g.`updated`)) AS INT) FROM `gameobject_template` g LEFT JOIN `furniture_catalog` fc ON (g.entry = fc.id) WHERE g.`entry` > 600000 AND g.`displayId` > 0 ORDER BY g.`entry` ASC;"))
+    // Load Furniture                                    0          1              2                             3                                                 4                                5                               6                                   7                                                               8       
+    if (QueryResult result = WorldDatabase.Query("SELECT g.`entry`, g.`displayId`, IFNULL(gtl.`name`, g.`name`), CAST(IFNULL(fc.`categorization_date`, 0) AS INT), IFNULL(fc.`categorized_by`, ''), IFNULL(fc.`authorised_by`, ''), CAST(IFNULL(fc.`price`, 0) AS INT), CAST(IFNULL(fc.`updated`, UNIX_TIMESTAMP(g.`updated`)) AS INT), CAST(IFNULL(fc.`client_flag`, 0) AS INT) FROM `gameobject_template` g LEFT JOIN `gameobject_template_locale` gtl ON (g.entry = gtl.entry AND gtl.locale = 'deDE') LEFT JOIN `furniture_catalog` fc ON (g.entry = fc.id) WHERE g.`entry` > 600000 AND g.`displayId` > 0 ORDER BY g.`entry` ASC;"))
     {
         do
         {
@@ -45,15 +45,14 @@ void FurnitureMgr::LoadFromDB()
             std::string authorisedBy = fields[5].GetString();
             int32 price = fields[6].GetInt64();
             uint32 updated = fields[7].GetUInt64();
+            FurnitureClientFlag clientFlag = (FurnitureClientFlag)fields[8].GetUInt32();
 
             GameObjectDisplayInfoEntry const* info = sGameObjectDisplayInfoStore.LookupEntry(displayId);
 
             if (!info)
                 continue;
 
-            uint32 fileDataId = info->FileDataID;
-
-            Furniture* furniture = new Furniture(id, fileDataId, name, categorizationDate, categorizedBy, authorisedBy, price, updated);
+            Furniture* furniture = new Furniture(id, info->FileDataID, name, categorizationDate, categorizedBy, authorisedBy, price, updated, clientFlag);
             _furnitureStore.insert(std::pair<uint32, Furniture*>(id, furniture));
 
             ++furnitureCount;
@@ -125,6 +124,7 @@ Furniture* FurnitureMgr::Save(Furniture* furniture)
     stmt->setString(3, furniture->GetAuthorisedBy());
     stmt->setInt32(4, furniture->GetPrice());
     stmt->setUInt32(5, furniture->GetUpdated());
+    stmt->setUInt32(6, (uint32)furniture->GetClientFlag());
     trans->Append(stmt);
 
     stmt = WorldDatabase.GetPreparedStatement(WORLD_DEL_FURNITURE_CATALOG_CATEGORY_BY_FURNITURE_ID);
