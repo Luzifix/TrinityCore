@@ -1504,6 +1504,9 @@ void Guild::HandleSetEmblem(WorldSession* session, EmblemInfo const& emblemInfo)
 
 void Guild::HandleSetNewGuildMaster(WorldSession* session, std::string_view name, bool isSelfPromote)
 {
+    SendCommandResult(session, GUILD_COMMAND_CHANGE_LEADER, ERR_GUILD_PERMISSIONS);
+    return;
+
     Player* player = session->GetPlayer();
 
     Member* oldGuildMaster = GetMember(GetLeaderGUID());
