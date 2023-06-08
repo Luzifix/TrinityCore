@@ -127,6 +127,7 @@ public:
             { "gossip_menu",                   rbac::RBAC_PERM_COMMAND_RELOAD_GOSSIP_MENU,                      true,  &HandleReloadGossipMenuCommand,                 "" },
             { "gossip_menu_option",            rbac::RBAC_PERM_COMMAND_RELOAD_GOSSIP_MENU_OPTION,               true,  &HandleReloadGossipMenuOptionCommand,           "" },
             { "housing",                       rbac::RBAC_PERM_COMMAND_HOUSING_RELOAD,                          true,  &HandleReloadHousing,                           "" },
+            { "furniture",                     rbac::RBAC_PERM_COMMAND_HOUSING_RELOAD,                          true,  &HandleReloadFurnitureCommand,                  "" },
             { "item_random_bonus_list_template", rbac::RBAC_PERM_COMMAND_RELOAD_ITEM_RANDOM_BONUS_LIST_TEMPLATE, true, &HandleReloadItemRandomBonusListTemplatesCommand, "" },
             { "item_loot_template",            rbac::RBAC_PERM_COMMAND_RELOAD_ITEM_LOOT_TEMPLATE,               true,  &HandleReloadLootTemplatesItemCommand,          "" },
             { "item_price",                    rbac::RBAC_PERM_COMMAND_RELOAD,                                  true,  &HandleReloadItemPriceCommand,                  "" },
