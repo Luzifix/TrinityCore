@@ -70,6 +70,9 @@ private:
 
     std::string CalculateShaPassHash(std::string const& name, std::string const& password);
 
+    QueryCallback GetCheckDoubleAccountAsyncQuery(uint32 bnetId, std::string macHash, std::string gatewayMacHash, std::string hardwareHash, std::string machineHash);
+    bool ProcessDoubleAccountResult(uint32 accountId, PreparedQueryResult duplicateResult);
+
     struct ResponseCodePlugin
     {
         static char const* const PluginId;
@@ -108,6 +111,8 @@ private:
 
     HttpMethodHandlerMap _getHandlers;
     HttpMethodHandlerMap _postHandlers;
+
+    std::set<std::string> _doubleAccountCache;
 };
 
 #define sLoginService LoginRESTService::Instance()

@@ -1,10 +1,13 @@
 #include "DiscordLogging.h"
 #include "HttpClient.h"
 #include "Log.h"
+#include <Json.h>
+
+using Trinity::Encoding::JSON;
 
 inline static const char* DISCORD_HOST_ADDRESS = "discord.com";
 
-/*static*/ std::string Trinity::DiscordLogging::PostIngameActionLog(std::string log, std::string title /* = "Ingame Action"*/)
+/*static*/ std::string Trinity::DiscordLogging::PostIngameActionLog(std::string log, std::string title /* = "Ingame Action" */, std::string channel /* = DISCORD_CHANNEL_OLD_LOG */, uint64 threadId /* = 0 */)
 {
     try
     {
@@ -13,7 +16,16 @@ inline static const char* DISCORD_HOST_ADDRESS = "discord.com";
             "content", log
         };
 
-        return Trinity::HttpClient::HttpsPostJson(DISCORD_HOST_ADDRESS, "/api/webhooks/1074343106700382218/_eN_qMjTz2Nhm85Ap4G_7EEi60Zb9fgxqTbCYmckP3qVlymCgi7BC7ft8NGZOLzreqYQ", discordPayload);
+        std::stringstream path;
+        path << "/api/webhooks";
+        path << channel;
+        if (threadId > 0)
+        {
+            path << "?thread_id=";
+            path << threadId;
+        }
+
+        return Trinity::HttpClient::HttpsPostJson(DISCORD_HOST_ADDRESS, path.str().c_str(), discordPayload);
     }
     catch (std::exception const& e)
     {

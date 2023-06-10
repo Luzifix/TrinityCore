@@ -3276,20 +3276,20 @@ BanReturn World::BanAccount(BanMode mode, std::string const& nameOrIP, uint32 du
                 stmt->setString(3, author);
                 stmt->setString(4, reason);
                 trans->Append(stmt);
+            }
 
-                LoginDatabasePreparedStatement* accountIdStmt = LoginDatabase.GetPreparedStatement(LOGIN_SEL_ACCOUNT_ID_BY_BNET_ACCOUNT);
-                accountIdStmt->setUInt32(0, account);
-                PreparedQueryResult resultAccountsId = LoginDatabase.Query(accountIdStmt);
-                if (resultAccountsId)
-                {
-                    do {
-                        Field* fieldsAccountId = resultAccountsId->Fetch();
-                        if (WorldSession* sess = FindSession(fieldsAccountId[0].GetUInt32()))
-                            if (std::string(sess->GetPlayerName()) != author)
-                                sess->KickPlayer("World::BanAccount Banning bnet");
+            LoginDatabasePreparedStatement* accountIdStmt = LoginDatabase.GetPreparedStatement(LOGIN_SEL_ACCOUNT_ID_BY_BNET_ACCOUNT);
+            accountIdStmt->setUInt32(0, account);
+            PreparedQueryResult resultAccountsId = LoginDatabase.Query(accountIdStmt);
+            if (resultAccountsId)
+            {
+                do {
+                    Field* fieldsAccountId = resultAccountsId->Fetch();
+                    if (WorldSession* sess = FindSession(fieldsAccountId[0].GetUInt32()))
+                        if (std::string(sess->GetPlayerName()) != author)
+                            sess->KickPlayer("World::BanAccount Banning bnet");
 
-                    } while (resultAccountsId->NextRow());
-                }
+                } while (resultAccountsId->NextRow());
             }
         }
     } while (resultAccounts->NextRow());
