@@ -455,7 +455,7 @@ int32 LoginRESTService::HandlePostLogin(std::shared_ptr<AsyncRequest> request)
                         loginResult.set_login_ticket(loginTicket);
                         sLoginService.SendResponse(request->GetClient(), loginResult);
                     }).SetNextQuery(LoginDatabase.AsyncQuery(stmt));
-                }).SetNextQuery(GetCheckDoubleAccountAsyncQuery(accountId, macHash, gatewayMacHash, hardwareHash, machineHash));
+                }).SetNextQuery(LoginDatabase.AsyncQuery(GetCheckDoubleAccountPreparedStatement(accountId, macHash, gatewayMacHash, hardwareHash, machineHash)));
 
                 return;
             }
@@ -524,100 +524,113 @@ int32 LoginRESTService::HandlePostRefreshLoginTicket(std::shared_ptr<AsyncReques
     if (!request->GetClient()->userid)
         return 401;
 
-        char* buf = nullptr;
-        size_t len = 0;
-        soap_http_body(request->GetClient(), &buf, &len);
-        Battlenet::JSON::Login::LoginForm loginForm;
+    char* buf = nullptr;
+    size_t len = 0;
+    soap_http_body(request->GetClient(), &buf, &len);
+    Battlenet::JSON::Login::LoginForm loginForm;
 
-        std::string macHash;
-        std::string gatewayMacHash;
-        std::string hardwareHash;
-        std::string machineHash;
+    std::string macHash;
+    std::string gatewayMacHash;
+    std::string hardwareHash;
+    std::string machineHash;
 
-        if (buf && JSON::Deserialize(buf, &loginForm))
-        {
-            for (int32 i = 0; i < loginForm.inputs_size(); ++i)
-            {
-                if (loginForm.inputs(i).input_id() == "key1")
-                    macHash = loginForm.inputs(i).value();
-                else if (loginForm.inputs(i).input_id() == "key2")
-                    gatewayMacHash = loginForm.inputs(i).value();
-                else if (loginForm.inputs(i).input_id() == "key3")
-                    hardwareHash = loginForm.inputs(i).value();
-                else if (loginForm.inputs(i).input_id() == "key4")
-                    machineHash = loginForm.inputs(i).value();
-            }
-        }
-
-        Utf8ToUpperOnlyLatin(macHash);
-        Utf8ToUpperOnlyLatin(gatewayMacHash);
-        Utf8ToUpperOnlyLatin(hardwareHash);
-        Utf8ToUpperOnlyLatin(machineHash);
-
-    request->SetCallback(std::make_unique<QueryCallback>(LoginDatabase.AsyncQuery([&] {
-        LoginDatabasePreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_SEL_BNET_EXISTING_AUTHENTICATION);
-        stmt->setString(0, request->GetClient()->userid);
-        return stmt;
-    }())
-        .WithPreparedCallback([this, request, macHash, gatewayMacHash, hardwareHash, machineHash](PreparedQueryResult result)
+    if (buf && JSON::Deserialize(buf, &loginForm))
     {
-        Battlenet::JSON::Login::LoginRefreshResult loginRefreshResult;
+        for (int32 i = 0; i < loginForm.inputs_size(); ++i)
+        {
+            if (loginForm.inputs(i).input_id() == "key1")
+                macHash = loginForm.inputs(i).value();
+            else if (loginForm.inputs(i).input_id() == "key2")
+                gatewayMacHash = loginForm.inputs(i).value();
+            else if (loginForm.inputs(i).input_id() == "key3")
+                hardwareHash = loginForm.inputs(i).value();
+            else if (loginForm.inputs(i).input_id() == "key4")
+                machineHash = loginForm.inputs(i).value();
+        }
+    }
+
+    Utf8ToUpperOnlyLatin(macHash);
+    Utf8ToUpperOnlyLatin(gatewayMacHash);
+    Utf8ToUpperOnlyLatin(hardwareHash);
+    Utf8ToUpperOnlyLatin(machineHash);
+
+    LoginDatabasePreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_SEL_BNET_EXISTING_AUTHENTICATION);
+    stmt->setString(0, request->GetClient()->userid);
+
+    request->SetCallback(std::make_unique<QueryCallback>(LoginDatabase.AsyncQuery(stmt).WithChainingPreparedCallback([this, request, macHash, gatewayMacHash, hardwareHash, machineHash](QueryCallback& callback, PreparedQueryResult result)
+    {
         if (result)
         {
             uint32 loginTicketExpiry = (*result)[0].GetUInt32();
             uint32 accountId = (*result)[1].GetUInt32();
+            bool isBanned = (*result)[2].GetUInt64() != 0;
             time_t now = time(nullptr);
-            if (loginTicketExpiry > now)
+
+            if (!isBanned && loginTicketExpiry > now)
             {
-                loginRefreshResult.set_login_ticket_expiry(now + _loginTicketDuration);
-
-                std::string token = request->GetClient()->userid;
-                bool hasHardwareInformation = (macHash.size() == 32 && gatewayMacHash.size() == 32 && hardwareHash.size() == 32 && machineHash.size() == 32);
-
-                LoginDatabasePreparedStatement* stmt = LoginDatabase.GetPreparedStatement(hasHardwareInformation ? LOGIN_UPD_BNET_EXISTING_AUTHENTICATION_WITH_HARDWARE_INFORMATION : LOGIN_UPD_BNET_EXISTING_AUTHENTICATION);
-                stmt->setUInt32(0, uint32(now + _loginTicketDuration));
-
-                if (hasHardwareInformation)
+                callback.WithPreparedCallback([request, &callback, now, accountId, macHash, gatewayMacHash, hardwareHash, machineHash, this](PreparedQueryResult duplicateResult)
                 {
-                    Trinity::Crypto::SHA256 overallHash;
-                    overallHash.UpdateData(macHash);
-                    overallHash.UpdateData(gatewayMacHash);
-                    overallHash.UpdateData(hardwareHash);
-                    overallHash.UpdateData(machineHash);
-                    overallHash.Finalize();
-                    std::string overallHashString = ByteArrayToHexStr(overallHash.GetDigest(), true);
+                    std::string token = request->GetClient()->userid;
+                    bool hasHardwareInformation = (macHash.size() == 32 && gatewayMacHash.size() == 32 && hardwareHash.size() == 32 && machineHash.size() == 32);
 
-                    stmt->setString(1, overallHashString);
-                    stmt->setString(2, macHash);
-                    stmt->setString(3, gatewayMacHash);
-                    stmt->setString(4, hardwareHash);
-                    stmt->setString(5, machineHash);
-                    stmt->setString(6, token);
+                    LoginDatabasePreparedStatement* stmt = LoginDatabase.GetPreparedStatement(hasHardwareInformation ? LOGIN_UPD_BNET_EXISTING_AUTHENTICATION_WITH_HARDWARE_INFORMATION : LOGIN_UPD_BNET_EXISTING_AUTHENTICATION);
+                    stmt->setUInt32(0, uint32(now + _loginTicketDuration));
 
-                    LoginDatabasePreparedStatement* stmtHardware = LoginDatabase.GetPreparedStatement(LOGIN_REP_BNET_HARDWARE_HISTORY);
-                    stmtHardware->setUInt32(0, accountId);
-                    stmtHardware->setString(1, overallHashString);
-                    stmtHardware->setString(2, macHash);
-                    stmtHardware->setString(3, gatewayMacHash);
-                    stmtHardware->setString(4, hardwareHash);
-                    stmtHardware->setString(5, machineHash);
-                    LoginDatabase.AsyncQuery(stmtHardware);
-                }
-                else
-                {
-                    stmt->setString(1, token);
-                }
+                    if (hasHardwareInformation)
+                    {
+                        if (ProcessDoubleAccountResult(accountId, duplicateResult))
+                        {
+                            Battlenet::JSON::Login::LoginRefreshResult loginRefreshResult;
+                            loginRefreshResult.set_login_ticket_expiry(now - 1);
+                            loginRefreshResult.set_is_expired(true);
+                            sLoginService.SendResponse(request->GetClient(), loginRefreshResult);
+                            return;
+                        }
 
+                        Trinity::Crypto::SHA256 overallHash;
+                        overallHash.UpdateData(macHash);
+                        overallHash.UpdateData(gatewayMacHash);
+                        overallHash.UpdateData(hardwareHash);
+                        overallHash.UpdateData(machineHash);
+                        overallHash.Finalize();
+                        std::string overallHashString = ByteArrayToHexStr(overallHash.GetDigest(), true);
 
-                LoginDatabase.Execute(stmt);
+                        stmt->setString(1, overallHashString);
+                        stmt->setString(2, macHash);
+                        stmt->setString(3, gatewayMacHash);
+                        stmt->setString(4, hardwareHash);
+                        stmt->setString(5, machineHash);
+                        stmt->setString(6, token);
+
+                        LoginDatabasePreparedStatement* stmtHardware = LoginDatabase.GetPreparedStatement(LOGIN_REP_BNET_HARDWARE_HISTORY);
+                        stmtHardware->setUInt32(0, accountId);
+                        stmtHardware->setString(1, overallHashString);
+                        stmtHardware->setString(2, macHash);
+                        stmtHardware->setString(3, gatewayMacHash);
+                        stmtHardware->setString(4, hardwareHash);
+                        stmtHardware->setString(5, machineHash);
+                        LoginDatabase.AsyncQuery(stmtHardware);
+                    }
+                    else
+                    {
+                        stmt->setString(1, token);
+                    }
+
+                    LoginDatabase.Execute(stmt);
+
+                    Battlenet::JSON::Login::LoginRefreshResult loginRefreshResult;
+                    loginRefreshResult.set_login_ticket_expiry(now + _loginTicketDuration);
+                    loginRefreshResult.set_is_expired(false);
+                    sLoginService.SendResponse(request->GetClient(), loginRefreshResult);
+                }).SetNextQuery(LoginDatabase.AsyncQuery(GetCheckDoubleAccountPreparedStatement(accountId, macHash, gatewayMacHash, hardwareHash, machineHash)));
+
+                return;
             }
-            else
-                loginRefreshResult.set_is_expired(true);
         }
-        else
-            loginRefreshResult.set_is_expired(true);
 
-        SendResponse(request->GetClient(), loginRefreshResult);
+        Battlenet::JSON::Login::LoginRefreshResult loginRefreshResult;
+        loginRefreshResult.set_is_expired(true);
+        sLoginService.SendResponse(request->GetClient(), loginRefreshResult);
     })));
 
     Trinity::Asio::post(*_ioContext, [this, request]() { HandleAsyncRequest(request); });
@@ -662,7 +675,7 @@ std::string LoginRESTService::CalculateShaPassHash(std::string const& name, std:
     return ByteArrayToHexStr(sha.GetDigest(), true);
 }
 
-QueryCallback LoginRESTService::GetCheckDoubleAccountAsyncQuery(uint32 bnetId, std::string macHash, std::string gatewayMacHash, std::string hardwareHash, std::string machineHash)
+LoginDatabasePreparedStatement* LoginRESTService::GetCheckDoubleAccountPreparedStatement(uint32 bnetId, std::string macHash, std::string gatewayMacHash, std::string hardwareHash, std::string machineHash)
 {
     LoginDatabasePreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_SEL_BNET_SIMILAR_HARDWARE_HISTORY_ENTRIES);
     stmt->setString(0, macHash);
@@ -676,7 +689,8 @@ QueryCallback LoginRESTService::GetCheckDoubleAccountAsyncQuery(uint32 bnetId, s
     stmt->setString(6, gatewayMacHash);
     stmt->setString(7, hardwareHash);
     stmt->setString(8, machineHash);
-    return LoginDatabase.AsyncQuery(stmt);
+
+    return stmt;
 }
 
 bool LoginRESTService::ProcessDoubleAccountResult(uint32 accountId, PreparedQueryResult duplicateResult)

@@ -70,6 +70,7 @@ private:
 
     std::string CalculateShaPassHash(std::string const& name, std::string const& password);
 
+    LoginDatabasePreparedStatement* GetCheckDoubleAccountPreparedStatement(uint32 bnetId, std::string macHash, std::string gatewayMacHash, std::string hardwareHash, std::string machineHash);
     QueryCallback GetCheckDoubleAccountAsyncQuery(uint32 bnetId, std::string macHash, std::string gatewayMacHash, std::string hardwareHash, std::string machineHash);
     bool ProcessDoubleAccountResult(uint32 accountId, PreparedQueryResult duplicateResult);
 
