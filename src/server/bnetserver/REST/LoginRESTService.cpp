@@ -624,7 +624,7 @@ int32 LoginRESTService::HandlePostRefreshLoginTicket(std::shared_ptr<AsyncReques
                     sLoginService.SendResponse(request->GetClient(), loginRefreshResult);
                 }).SetNextQuery(LoginDatabase.AsyncQuery(GetCheckDoubleAccountPreparedStatement(accountId, macHash, gatewayMacHash, hardwareHash, machineHash)));
 
-                return;
+                return SOAP_OK;
             }
         }
 
