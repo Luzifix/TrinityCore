@@ -401,61 +401,59 @@ int32 LoginRESTService::HandlePostLogin(std::shared_ptr<AsyncRequest> request)
 
             if (sentPasswordHash == pass_hash)
             {
-                callback.WithPreparedCallback([request, &callback, &loginTicket, loginTicketExpiry, accountId, macHash, gatewayMacHash, hardwareHash, machineHash, this](PreparedQueryResult duplicateResult)
+                PreparedQueryResult duplicateResult = LoginDatabase.Query(GetCheckDoubleAccountPreparedStatement(accountId, macHash, gatewayMacHash, hardwareHash, machineHash));
+                if (ProcessDoubleAccountResult(accountId, duplicateResult))
                 {
-                    if (ProcessDoubleAccountResult(accountId, duplicateResult))
-                    {
-                        Battlenet::JSON::Login::LoginResult loginResult;
-                        loginResult.set_authentication_state(Battlenet::JSON::Login::LOGIN);
-                        loginResult.set_error_code("DOUBLE_ACCOUNT");
-                        loginResult.set_error_message("Duplicate account found!");
-                        sLoginService.SendResponse(request->GetClient(), loginResult);
-                        return;
-                    }
+                    Battlenet::JSON::Login::LoginResult loginResult;
+                    loginResult.set_authentication_state(Battlenet::JSON::Login::LOGIN);
+                    loginResult.set_error_code("DOUBLE_ACCOUNT");
+                    loginResult.set_error_message("Duplicate account found!");
+                    sLoginService.SendResponse(request->GetClient(), loginResult);
+                    return;
+                }
 
-                    if (loginTicket.empty() || loginTicketExpiry < time(nullptr))
-                    {
-                        std::array<uint8, 20> ticket = Trinity::Crypto::GetRandomBytes<20>();
+                if (loginTicket.empty() || loginTicketExpiry < time(nullptr))
+                {
+                    std::array<uint8, 20> ticket = Trinity::Crypto::GetRandomBytes<20>();
 
-                        loginTicket = "TC-" + ByteArrayToHexStr(ticket);
-                    }
+                    loginTicket = "TC-" + ByteArrayToHexStr(ticket);
+                }
 
-                    LoginDatabasePreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_UPD_BNET_AUTHENTICATION_WITH_HARDWARE_INFORMATION);
-                    stmt->setString(0, loginTicket);
-                    stmt->setUInt32(1, time(nullptr) + _loginTicketDuration);
+                LoginDatabasePreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_UPD_BNET_AUTHENTICATION_WITH_HARDWARE_INFORMATION);
+                stmt->setString(0, loginTicket);
+                stmt->setUInt32(1, time(nullptr) + _loginTicketDuration);
 
-                    Trinity::Crypto::SHA256 overallHash;
-                    overallHash.UpdateData(macHash);
-                    overallHash.UpdateData(gatewayMacHash);
-                    overallHash.UpdateData(hardwareHash);
-                    overallHash.UpdateData(machineHash);
-                    overallHash.Finalize();
-                    std::string overallHashString = ByteArrayToHexStr(overallHash.GetDigest(), true);
+                Trinity::Crypto::SHA256 overallHash;
+                overallHash.UpdateData(macHash);
+                overallHash.UpdateData(gatewayMacHash);
+                overallHash.UpdateData(hardwareHash);
+                overallHash.UpdateData(machineHash);
+                overallHash.Finalize();
+                std::string overallHashString = ByteArrayToHexStr(overallHash.GetDigest(), true);
 
-                    stmt->setString(2, overallHashString);
-                    stmt->setString(3, macHash);
-                    stmt->setString(4, gatewayMacHash);
-                    stmt->setString(5, hardwareHash);
-                    stmt->setString(6, machineHash);
-                    stmt->setUInt32(7, accountId);
+                stmt->setString(2, overallHashString);
+                stmt->setString(3, macHash);
+                stmt->setString(4, gatewayMacHash);
+                stmt->setString(5, hardwareHash);
+                stmt->setString(6, machineHash);
+                stmt->setUInt32(7, accountId);
 
-                    LoginDatabasePreparedStatement* stmtHardware = LoginDatabase.GetPreparedStatement(LOGIN_REP_BNET_HARDWARE_HISTORY);
-                    stmtHardware->setUInt32(0, accountId);
-                    stmtHardware->setString(1, overallHashString);
-                    stmtHardware->setString(2, macHash);
-                    stmtHardware->setString(3, gatewayMacHash);
-                    stmtHardware->setString(4, hardwareHash);
-                    stmtHardware->setString(5, machineHash);
-                    LoginDatabase.AsyncQuery(stmtHardware);
+                LoginDatabasePreparedStatement* stmtHardware = LoginDatabase.GetPreparedStatement(LOGIN_REP_BNET_HARDWARE_HISTORY);
+                stmtHardware->setUInt32(0, accountId);
+                stmtHardware->setString(1, overallHashString);
+                stmtHardware->setString(2, macHash);
+                stmtHardware->setString(3, gatewayMacHash);
+                stmtHardware->setString(4, hardwareHash);
+                stmtHardware->setString(5, machineHash);
+                LoginDatabase.AsyncQuery(stmtHardware);
 
-                    callback.WithPreparedCallback([request, loginTicket](PreparedQueryResult)
-                    {
-                        Battlenet::JSON::Login::LoginResult loginResult;
-                        loginResult.set_authentication_state(Battlenet::JSON::Login::DONE);
-                        loginResult.set_login_ticket(loginTicket);
-                        sLoginService.SendResponse(request->GetClient(), loginResult);
-                    }).SetNextQuery(LoginDatabase.AsyncQuery(stmt));
-                }).SetNextQuery(LoginDatabase.AsyncQuery(GetCheckDoubleAccountPreparedStatement(accountId, macHash, gatewayMacHash, hardwareHash, machineHash)));
+                callback.WithPreparedCallback([request, loginTicket](PreparedQueryResult)
+                {
+                    Battlenet::JSON::Login::LoginResult loginResult;
+                    loginResult.set_authentication_state(Battlenet::JSON::Login::DONE);
+                    loginResult.set_login_ticket(loginTicket);
+                    sLoginService.SendResponse(request->GetClient(), loginResult);
+                }).SetNextQuery(LoginDatabase.AsyncQuery(stmt));
 
                 return;
             }
