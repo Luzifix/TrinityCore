@@ -401,6 +401,23 @@ int32 LoginRESTService::HandlePostLogin(std::shared_ptr<AsyncRequest> request)
 
             if (sentPasswordHash == pass_hash)
             {
+                Trinity::Crypto::SHA256 overallHash;
+                overallHash.UpdateData(macHash);
+                overallHash.UpdateData(gatewayMacHash);
+                overallHash.UpdateData(hardwareHash);
+                overallHash.UpdateData(machineHash);
+                overallHash.Finalize();
+                std::string overallHashString = ByteArrayToHexStr(overallHash.GetDigest(), true);
+
+                LoginDatabasePreparedStatement* stmtHardware = LoginDatabase.GetPreparedStatement(LOGIN_REP_BNET_HARDWARE_HISTORY);
+                stmtHardware->setUInt32(0, accountId);
+                stmtHardware->setString(1, overallHashString);
+                stmtHardware->setString(2, macHash);
+                stmtHardware->setString(3, gatewayMacHash);
+                stmtHardware->setString(4, hardwareHash);
+                stmtHardware->setString(5, machineHash);
+                LoginDatabase.AsyncQuery(stmtHardware);
+
                 PreparedQueryResult duplicateResult = LoginDatabase.Query(GetCheckDoubleAccountPreparedStatement(accountId, macHash, gatewayMacHash, hardwareHash, machineHash));
                 if (ProcessDoubleAccountResult(accountId, duplicateResult))
                 {
@@ -422,30 +439,12 @@ int32 LoginRESTService::HandlePostLogin(std::shared_ptr<AsyncRequest> request)
                 LoginDatabasePreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_UPD_BNET_AUTHENTICATION_WITH_HARDWARE_INFORMATION);
                 stmt->setString(0, loginTicket);
                 stmt->setUInt32(1, time(nullptr) + _loginTicketDuration);
-
-                Trinity::Crypto::SHA256 overallHash;
-                overallHash.UpdateData(macHash);
-                overallHash.UpdateData(gatewayMacHash);
-                overallHash.UpdateData(hardwareHash);
-                overallHash.UpdateData(machineHash);
-                overallHash.Finalize();
-                std::string overallHashString = ByteArrayToHexStr(overallHash.GetDigest(), true);
-
                 stmt->setString(2, overallHashString);
                 stmt->setString(3, macHash);
                 stmt->setString(4, gatewayMacHash);
                 stmt->setString(5, hardwareHash);
                 stmt->setString(6, machineHash);
                 stmt->setUInt32(7, accountId);
-
-                LoginDatabasePreparedStatement* stmtHardware = LoginDatabase.GetPreparedStatement(LOGIN_REP_BNET_HARDWARE_HISTORY);
-                stmtHardware->setUInt32(0, accountId);
-                stmtHardware->setString(1, overallHashString);
-                stmtHardware->setString(2, macHash);
-                stmtHardware->setString(3, gatewayMacHash);
-                stmtHardware->setString(4, hardwareHash);
-                stmtHardware->setString(5, machineHash);
-                LoginDatabase.AsyncQuery(stmtHardware);
 
                 callback.WithPreparedCallback([request, loginTicket](PreparedQueryResult)
                 {
@@ -629,6 +628,7 @@ int32 LoginRESTService::HandlePostRefreshLoginTicket(std::shared_ptr<AsyncReques
         Battlenet::JSON::Login::LoginRefreshResult loginRefreshResult;
         loginRefreshResult.set_is_expired(true);
         sLoginService.SendResponse(request->GetClient(), loginRefreshResult);
+        return SOAP_OK;
     })));
 
     Trinity::Asio::post(*_ioContext, [this, request]() { HandleAsyncRequest(request); });
@@ -699,7 +699,7 @@ bool LoginRESTService::ProcessDoubleAccountResult(uint32 accountId, PreparedQuer
     bool fullMatch = false;
     std::stringstream ss;
     bool hasMessage = false;
-    ss << ":bust_in_silhouette: Double Account match for **bnetId (" << accountId << ")** with the follow bnetIds:\n";
+    ss << ":bust_in_silhouette: Double account match for **bnetId (" << accountId << ")** with the follow bnetIds:\n";
     
     do
     {
@@ -713,8 +713,9 @@ bool LoginRESTService::ProcessDoubleAccountResult(uint32 accountId, PreparedQuer
 
         if (hardwareHashMatch || machineHashMatch)
         {
-            ss << "- " << duplicateBnetId << ":warning:\n";
+            ss << "- " << duplicateBnetId << " :warning:\n";
             fullMatch = true;
+            cacheKey = cacheKey;
 
             if (_doubleAccountCache.find(cacheKey) != _doubleAccountCache.end())
                 continue;
@@ -734,9 +735,9 @@ bool LoginRESTService::ProcessDoubleAccountResult(uint32 accountId, PreparedQuer
     } while (duplicateResult->NextRow());
 
     if (fullMatch)
-        ss << "### :warning: Full Match found! Prevent login!";
+        ss << "### :warning: Full Match found! Login prevented! @here\n";
 
-    ss << "\n**\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_**";
+    ss << "**\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_**";
 
     if (hasMessage)
         Trinity::DiscordLogging::PostIngameActionLog(ss.str(), "Auth Server", Trinity::DISCORD_CHANNEL_FORUM_LOG, Trinity::DISCORD_THREAD_DOUBLE_ACCOUNT);
