@@ -443,6 +443,19 @@ void WorldSession::HandleCharEnum(CharacterDatabaseQueryHolder const& holder)
             if (!sCharacterCache->HasCharacterCacheEntry(charInfo.Guid)) // This can happen if characters are inserted into the database manually. Core hasn't loaded name data yet.
                 sCharacterCache->AddCharacterCacheEntry(charInfo.Guid, GetAccountId(), charInfo.Name, charInfo.SexID, charInfo.RaceID, charInfo.ClassID, charInfo.ExperienceLevel, false);
 
+            CharacterDatabasePreparedStatement* mailSenderStmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_MAIL_SENDER_LIST_UNREADED);
+            mailSenderStmt->setUInt64(0, charInfo.Guid.GetCounter());
+            PreparedQueryResult mailSenderResult = CharacterDatabase.Query(mailSenderStmt);
+            if (mailSenderResult)
+            {
+                do
+                {
+                    Field* fields = mailSenderResult->Fetch();
+                    charInfo.MailSenders.push_back(fields[0].GetString());
+                    charInfo.MailSenderTypes.push_back(0);
+                } while (mailSenderResult->NextRow());
+            }
+
             charEnum.MaxCharacterLevel = std::max<int32>(charEnum.MaxCharacterLevel, charInfo.ExperienceLevel);
         }
         while (result->NextRow() && charEnum.Characters.size() < MAX_CHARACTERS_PER_REALM);
