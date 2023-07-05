@@ -2584,6 +2584,11 @@ ItemModifiedAppearanceEntry const* DB2Manager::GetItemModifiedAppearance(uint32 
             return itr->second;
     }
 
+    // Fall back to first available modified appearance
+    for (ItemModifiedAppearanceEntry const* itemModifiedAppearance : sItemModifiedAppearanceStore)
+        if (itemModifiedAppearance->ItemID == itemId)
+            return itemModifiedAppearance;
+
     return nullptr;
 }
 
