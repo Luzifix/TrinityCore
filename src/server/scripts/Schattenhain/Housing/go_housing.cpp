@@ -135,11 +135,11 @@ public:
 
     enum HOUSING_LADDER : uint32
     {
-        HOUSING_LADDER_PA_LADDER_01            = 1002019,
-        HOUSING_LADDER_HU_HUMANLADDER          = 1002020,
-        HOUSING_LADDER_6IH_IRONHORDE_LADDER01  = 1002021,
-        HOUSING_LADDER_ALTERACLEDDER           = 1002022,
-        HOUSING_LADDER_WORGEN_BEDLADDER        = 1002023,
+        HOUSING_LADDER_PA_LADDER_01 = 1002019,
+        HOUSING_LADDER_HU_HUMANLADDER = 1002020,
+        HOUSING_LADDER_6IH_IRONHORDE_LADDER01 = 1002021,
+        HOUSING_LADDER_ALTERACLEDDER = 1002022,
+        HOUSING_LADDER_WORGEN_BEDLADDER = 1002023,
     };
 
     struct go_housing_ladderAI : public GameObjectAI
@@ -188,9 +188,32 @@ public:
     }
 };
 
+class go_housing_bank : public GameObjectScript
+{
+public:
+    go_housing_bank() : GameObjectScript("go_housing_bank") { }
+
+    struct go_housing_bankAI : public GameObjectAI
+    {
+        go_housing_bankAI(GameObject* go) : GameObjectAI(go) { }
+
+        bool OnGossipHello(Player* player)
+        {
+            player->GetSession()->SendShowBank(player->GetGUID());
+            return true;
+        }
+    };
+
+    GameObjectAI* GetAI(GameObject* go) const override
+    {
+        return new go_housing_bankAI(go);
+    }
+};
+
 void AddSC_Housing_GameObjectScript()
 {
     new go_housing_door();
     new go_housing_basement_door();
     new go_housing_ladder();
+    new go_housing_bank();
 }
