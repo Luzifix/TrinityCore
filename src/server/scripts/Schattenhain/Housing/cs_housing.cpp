@@ -458,6 +458,7 @@ public:
         sHousingMgr->TempHousingModifyStore[playerGuid]->AddHousingArea(sHousingMgr->TempHousingAreaModifyStore[playerGuid]);
         sHousingMgr->TempHousingAreaModifyStore.erase(playerGuid);
         handler->PSendSysMessage(LANG_HOUSING_AREA_SAVED, housingAreaId);
+        return true;
     }
 
     static bool HandleModifyCreateHousingAreaCommand(ChatHandler* handler, char const* args)
@@ -514,7 +515,7 @@ public:
 
     static bool HandleAddTriggerHousingAreaCommand(ChatHandler* handler, char const* args)
     {
-        if (CheckTempHousingModifyStore(handler) == false)
+        if (CheckTempHousingAreaModifyStore(handler) == false)
             return false;
 
         Player* player = handler->GetSession()->GetPlayer();
@@ -533,7 +534,7 @@ public:
 
     static bool HandleDeleteTriggerHousingAreaCommand(ChatHandler* handler, char const* args)
     {
-        if (CheckTempHousingModifyStore(handler) == false)
+        if (CheckTempHousingAreaModifyStore(handler) == false)
             return false;
 
         ObjectGuid playerGuid = handler->GetSession()->GetPlayer()->GetGUID();
@@ -554,7 +555,7 @@ public:
 
     static bool HandleClearTriggerHousingAreaCommand(ChatHandler* handler, char const* args)
     {
-        if (CheckTempHousingModifyStore(handler) == false)
+        if (CheckTempHousingAreaModifyStore(handler) == false)
             return false;
 
         ObjectGuid playerGuid = handler->GetSession()->GetPlayer()->GetGUID();
