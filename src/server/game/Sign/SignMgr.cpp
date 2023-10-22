@@ -84,6 +84,9 @@ void SignMgr::Save(Sign* sign)
 {
     WorldDatabaseTransaction trans = WorldDatabase.BeginTransaction();
 
+    // Store
+    _signStore[sign->GetCreatureGuid()] = sign;
+
     // Save Sign
     WorldDatabasePreparedStatement* stmt = WorldDatabase.GetPreparedStatement(WORLD_INS_SIGN);
     stmt->setUInt64(0, sign->GetCreatureGuid());
@@ -125,7 +128,7 @@ Sign* SignMgr::GetByCreatureOrCreate(Creature* creature)
     if (sign != nullptr)
         return sign;
 
-    sign = new Sign(creature->GetSpawnId(), _signDisplayStore[SIGN_DEFAULT_DISPLAY_ID], creature->GetName());
+    sign = new Sign(creature->GetSpawnId(), _signDisplayStore[SIGN_DEFAULT_DISPLAY_ID], creature->GetNameForLocaleIdx(sWorld->GetDefaultDbcLocale()));
     Save(sign);
     
     return sign;

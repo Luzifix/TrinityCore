@@ -35,7 +35,7 @@ void SlopsHandler::HandleSignSubmit(SlopsPackage package)
 {
     JSON data = JSON::Load(package.message);
 
-    if (!data.hasKey("spawnId") || !data.hasKey("name") || !data.hasKey("content"))
+    if (!data.hasKey("spawnId") || !data.hasKey("name") || !data.hasKey("content") || !data.hasKey("displayId"))
         return;
 
     uint64 spawnId = data["spawnId"].ToInt();
@@ -60,17 +60,30 @@ void SlopsHandler::HandleSignSubmit(SlopsPackage package)
 
     std::string name = trim(data["name"].ToString());
     std::string content = trim(data["content"].ToString());
+    uint32 displayId = data["displayId"].ToInt();
 
-    if (name == "" || content.size() > 6500)
+    SignDisplayStore availableDisplays = sSignMgr->GetDisplayStore();
+    auto signDisplay = availableDisplays.find(displayId);
+
+    if (name == "" || content.size() > 6500 || signDisplay == availableDisplays.end())
         return;
 
+    // Save
+    sign->SetName(name);
+    sign->SetContent(content);
+    sign->SetSignDisplay(signDisplay->second);
+    sign->AddHistory(new SignHistory(sign->GetCreatureGuid(), player->GetName(), time(nullptr)));
+    sSignMgr->Save(sign);
+
+    // Set name
     signCreature->SetName(name);
     signCreature->SetPetNameTimestamp(uint32(time(nullptr)));
 
-    sign->SetName(name);
-    sign->SetContent(content);
-    sign->AddHistory(new SignHistory(sign->GetCreatureGuid(), player->GetName(), time(nullptr)));
-    sSignMgr->Save(sign);
+    // Set display
+    SignDisplay* signDisplayEntry = signDisplay->second;
+    signCreature->SetDisplayId(signDisplayEntry->GetDisplayId());
+    signCreature->SetNativeDisplayId(signDisplayEntry->GetDisplayId());
+    signCreature->SetObjectScale(signDisplayEntry->GetScale());
 }
 
 void SlopsHandler::HandleSignHistoryRequest(SlopsPackage package)

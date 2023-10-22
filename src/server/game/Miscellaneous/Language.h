@@ -1375,5 +1375,6 @@ enum TrinityStrings
 
     LANG_SIGN_SUCCESS_GUILD_SET                   = 50800,
     LANG_SIGN_ERROR_GUILD_NOT_FOUND               = 50801,
+    LANG_SIGN_SUCCESS_GUILD_RESET                 = 50802,
 };
 #endif

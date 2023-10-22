@@ -31,6 +31,7 @@ public:
     Sign* GetBySpawnId(ObjectGuid::LowType spawnId);
     Sign* GetByCreature(Creature* creature);
     Sign* GetByCreatureOrCreate(Creature* creature);
+    SignDisplayStore GetDisplayStore() { return _signDisplayStore; };
 };
 
 #define sSignMgr SignMgr::instance()

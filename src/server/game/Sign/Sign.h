@@ -33,7 +33,7 @@ public:
     uint32 GetDisplayId() { return _displayId; }
 
     void SetScale(float scale) { _scale = scale; }
-    uint32 GetScale() { return _scale; }
+    float GetScale() { return _scale; }
 #pragma endregion
 
 private:
