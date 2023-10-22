@@ -65,12 +65,6 @@ public:
             me->SetObjectScale(signDisplayEntry->GetScale());
         }
 
-        bool StartInteract(Player* player) override
-        {
-            if (!_sign)
-                return false;
-        }
-
         bool OnGossipHello(Player* player) override
         {
             if (!_sign)
