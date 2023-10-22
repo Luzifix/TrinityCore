@@ -73,6 +73,12 @@ Slops::Slops()
     // Animations
     AddMessageHandler(SLOPS_CMSG_ANIMATIONS_LIST_REQUEST, SlopsHandler::HandleAnimationsListRequest);
     AddMessageHandler(SLOPS_CMSG_ANIMATIONS_DO, SlopsHandler::HandleAnimationsDo);
+
+    // Sign
+    AddMessageHandler(SLOPS_CMSG_SIGN_CONTENT_REQUEST, SlopsHandler::HandleSignContentRequest);
+    AddMessageHandler(SLOPS_CMSG_SIGN_SUBMIT, SlopsHandler::HandleSignSubmit);
+    AddMessageHandler(SLOPS_CMSG_SIGN_HISTORY_REQUEST, SlopsHandler::HandleSignHistoryRequest);
+    
 }
 Slops::~Slops() { }
 

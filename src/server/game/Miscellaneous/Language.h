@@ -1238,7 +1238,7 @@ enum TrinityStrings
     LANG_YOU_CHANGE_POWER                         = 11019,
     LANG_YOUR_POWER_CHANGED                       = 11020,
     LANG_INVALID_POWER_NAME                       = 11021,
-    
+
     LANG_GET_COPPER_COINS                         = 40000,
 
     LANG_HOUSING_CREATE_ERR_ARGS                  = 50000,
@@ -1372,5 +1372,9 @@ enum TrinityStrings
     LANG_ITEM_SELLER_NOT_ENOUGH_MONEY             = 50703,
     LANG_ITEM_SELLER_BUY_FOR_CHARACTER_NOT_FOUND  = 50704,
     LANG_ITEM_SELLER_DISCORD_LOG                  = 50705,
+
+    LANG_SIGN_SUCCESS_GUILD_SET                   = 50800,
+    LANG_SIGN_ERROR_GUILD_NOT_FOUND               = 50801,
+    LANG_SIGN_SUCCESS_GUILD_RESET                 = 50802,
 };
 #endif

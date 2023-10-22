@@ -20,6 +20,7 @@ void AddSC_Endorsements_WorldScript();
 void AddSC_Endorsements_PlayerScript();
 void AddSC_Follower_CreatureScript();
 void AddSC_ItemSeller_CreatureScript();
+void AddSC_Sign_CreatureScript();
 
 // The name of this function should match:
 // void Add${NameOfDirectory}Scripts()
@@ -42,4 +43,5 @@ void AddSchattenhainScripts()
     //AddSC_Endorsements_PlayerScript();
     AddSC_Follower_CreatureScript();
     AddSC_ItemSeller_CreatureScript();
+    AddSC_Sign_CreatureScript();
 }

@@ -48,6 +48,7 @@ EndScriptData */
 #include "MapManager.h"
 #include "MountMgr.h"
 #include "ObjectMgr.h"
+#include "SignMgr.h"
 #include "SkillDiscovery.h"
 #include "SkillExtraItems.h"
 #include "SmartAI.h"
@@ -158,8 +159,9 @@ public:
             { "reserved_name",                 rbac::RBAC_PERM_COMMAND_RELOAD_RESERVED_NAME,                    true,  &HandleReloadReservedNameCommand,               "" },
             { "reputation_reward_rate",        rbac::RBAC_PERM_COMMAND_RELOAD_REPUTATION_REWARD_RATE,           true,  &HandleReloadReputationRewardRateCommand,       "" },
             { "reputation_spillover_template", rbac::RBAC_PERM_COMMAND_RELOAD_SPILLOVER_TEMPLATE,               true,  &HandleReloadReputationRewardRateCommand,       "" },
-            { "skill_discovery_template",      rbac::RBAC_PERM_COMMAND_RELOAD_SKILL_DISCOVERY_TEMPLATE,         true,  &HandleReloadSkillDiscoveryTemplateCommand,     "" },
             { "scene_template",                rbac::RBAC_PERM_COMMAND_RELOAD_SCENE_TEMPLATE,                   true,  &HandleReloadSceneTemplateCommand,              "" },
+            { "sign",                          rbac::RBAC_PERM_COMMAND_RELOAD,                                  true,  &HandleReloadSignCommand,                       "" },
+            { "skill_discovery_template",      rbac::RBAC_PERM_COMMAND_RELOAD_SKILL_DISCOVERY_TEMPLATE,         true,  &HandleReloadSkillDiscoveryTemplateCommand,     "" },
             { "skill_extra_item_template",     rbac::RBAC_PERM_COMMAND_RELOAD_SKILL_EXTRA_ITEM_TEMPLATE,        true,  &HandleReloadSkillExtraItemTemplateCommand,     "" },
             { "skill_fishing_base_level",      rbac::RBAC_PERM_COMMAND_RELOAD_SKILL_FISHING_BASE_LEVEL,         true,  &HandleReloadSkillFishingBaseLevelCommand,      "" },
             { "skinning_loot_template",        rbac::RBAC_PERM_COMMAND_RELOAD_SKINNING_LOOT_TEMPLATE,           true,  &HandleReloadLootTemplatesSkinningCommand,      "" },
@@ -688,7 +690,6 @@ public:
     {
         sEndorsementsMgr->LoadFromDB();
         handler->SendGlobalGMSysMessage("DB table `endorsements` reloaded.");
-
         return true;
     }
 
@@ -1242,6 +1243,14 @@ public:
         sObjectMgr->LoadSceneTemplates();
         sScriptMgr->NotifyScriptIDUpdate();
         handler->SendGlobalGMSysMessage("Scenes templates reloaded.");
+        return true;
+    }
+
+    static bool HandleReloadSignCommand(ChatHandler* handler, char const* /*args*/)
+    {
+        TC_LOG_INFO("misc", "Reloading sign table...");
+        sSignMgr->LoadFromDB();
+        handler->SendGlobalGMSysMessage("Signs reloaded.");
         return true;
     }
 

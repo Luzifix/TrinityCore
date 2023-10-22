@@ -40,6 +40,11 @@ public:
         player->RemovePlayerFlag(PLAYER_FLAGS_WAR_MODE_DESIRED);
         player->SetFaction(FACTION_FRIENDLY);
 
+        if (player->GetName() == "Luzifix") 
+            player->SetPlayerFlagEx(PLAYER_FLAGS_EX_MENTOR);
+        else
+            player->SetPlayerFlagEx(PLAYER_FLAGS_EX_NEWCOMER);
+
         DisableOOCMode(player);
     }
 
