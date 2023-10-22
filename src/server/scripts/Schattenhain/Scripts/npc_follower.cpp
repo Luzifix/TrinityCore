@@ -234,6 +234,9 @@ public:
                     return OnGossipHello(player);
 
                 case GossipAction::ResetGuild:
+                    if (!player->IsGameMaster())
+                        return OnGossipHello(player);
+
                     _guildId = 0;
                     SaveToDB();
                     chatHandler.PSendSysMessage(LANG_FOLLOWER_SUCCESS_GUILD_RESET);
