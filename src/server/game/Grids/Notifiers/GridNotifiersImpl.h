@@ -60,6 +60,38 @@ void Trinity::MessageDistDeliverer<PacketSender>::Visit(PlayerMapType& m) const
     }
 }
 
+
+template<typename PacketSender>
+void Trinity::ChatMessageDistDeliverer<PacketSender>::Visit(PlayerMapType& m) const
+{
+    for (PlayerMapType::iterator iter = m.begin(); iter != m.end(); ++iter)
+    {
+        Player* target = iter->GetSource();
+        if (!target->IsInPhase(i_source))
+            continue;
+
+        float distance = (!required3dDist ? target->GetExactDist2dSq(i_source) : target->GetExactDistSq(i_source));
+
+        if (distance > i_modifiedDistSq)
+            continue;
+
+        if (targetDistSq != 0.f && distance > targetDistSq * target->GetChatRangeModifier())
+            continue;
+
+        // Send packet to all who are sharing the player's vision
+        if (target->HasSharedVision())
+        {
+            SharedVisionList::const_iterator i = target->GetSharedVisionList().begin();
+            for (; i != target->GetSharedVisionList().end(); ++i)
+                if ((*i)->m_seer == target)
+                    SendPacket(*i);
+        }
+
+        if (target->m_seer == target || target->GetVehicle())
+            SendPacket(target);
+    }
+}
+
 template<typename PacketSender>
 void Trinity::MessageDistDeliverer<PacketSender>::Visit(CreatureMapType& m) const
 {

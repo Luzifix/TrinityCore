@@ -162,10 +162,48 @@ namespace Trinity
                     team = player->GetEffectiveTeam();
         }
 
-        void Visit(PlayerMapType &m) const;
-        void Visit(CreatureMapType &m) const;
-        void Visit(DynamicObjectMapType &m) const;
-        template<class SKIP> void Visit(GridRefManager<SKIP> &) const { }
+        void Visit(PlayerMapType& m) const;
+        void Visit(CreatureMapType& m) const;
+        void Visit(DynamicObjectMapType& m) const;
+        template<class SKIP> void Visit(GridRefManager<SKIP>&) const { }
+
+        void SendPacket(Player const* player) const
+        {
+            // never send packet to self
+            if (player == i_source || (team && player->GetEffectiveTeam() != team) || skipped_receiver == player)
+                return;
+
+            if (!player->HaveAtClient(i_source))
+                return;
+
+            i_packetSender(player);
+        }
+    };
+
+    template<typename PacketSender>
+    struct ChatMessageDistDeliverer
+    {
+        WorldObject const* i_source;
+        PacketSender& i_packetSender;
+        float i_modifiedDistSq;
+        Team team;
+        Player const* skipped_receiver;
+        bool required3dDist;
+        float targetDistSq;
+        ChatMessageDistDeliverer(WorldObject const* src, PacketSender& packetSender, float modifiedDist, bool own_team_only = false, Player const* skipped = nullptr, bool req3dDist = false, float targetDist = 0.f)
+            : i_source(src), i_packetSender(packetSender), i_modifiedDistSq(modifiedDist * modifiedDist)
+            , team(TEAM_OTHER)
+            , skipped_receiver(skipped)
+            , required3dDist(req3dDist)
+            , targetDistSq(targetDist * targetDist)
+        {
+            if (own_team_only)
+                if (Player const* player = src->ToPlayer())
+                    team = player->GetEffectiveTeam();
+        }
+
+        void Visit(PlayerMapType& m) const;
+        template<class SKIP> void Visit(GridRefManager<SKIP>&) const { }
 
         void SendPacket(Player const* player) const
         {

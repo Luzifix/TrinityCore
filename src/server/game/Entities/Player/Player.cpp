@@ -20971,12 +20971,15 @@ void Player::SendChatMessageToSetInRange(ChatMsg chatMsg, Language language, std
     Trinity::CustomChatTextBuilder builder(this, chatMsg, std::move(text), language, this);
     Trinity::LocalizedDo<Trinity::CustomChatTextBuilder> localizer(builder);
 
+    // Calc modified chat range
+    float modifiedChatRange = range * GetChatRangeModifier();
+
     // Send to self
     localizer(this);
 
     // Send to players
-    Trinity::MessageDistDeliverer<Trinity::LocalizedDo<Trinity::CustomChatTextBuilder>> notifier(this, localizer, range, false, nullptr, true);
-    Cell::VisitWorldObjects(this, notifier, range);
+    Trinity::ChatMessageDistDeliverer<Trinity::LocalizedDo<Trinity::CustomChatTextBuilder>> notifier(this, localizer, modifiedChatRange, false, nullptr, true, range);
+    Cell::VisitWorldObjects(this, notifier, modifiedChatRange);
 }
 
 void Player::Say(uint32 textId, WorldObject const* target /*= nullptr*/)

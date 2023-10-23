@@ -686,7 +686,7 @@ public:
         return true;
     }
 
-    static bool HandleReloadEndorsementsCommand(ChatHandler* handler, char const* args)
+    static bool HandleReloadEndorsementsCommand(ChatHandler* handler, char const* /*args*/)
     {
         sEndorsementsMgr->LoadFromDB();
         handler->SendGlobalGMSysMessage("DB table `endorsements` reloaded.");
@@ -1272,7 +1272,7 @@ public:
         return true;
     }
 
-    static bool HandleReloadHousing(ChatHandler* handler, const char* args)
+    static bool HandleReloadHousing(ChatHandler* handler, const char* /*args*/)
     {
         TC_LOG_INFO("misc", "Reloading Housing tables...");
         sHousingMgr->LoadFromDB();
@@ -1280,7 +1280,7 @@ public:
         return true;
     }
 
-    static bool HandleReloadMountSystem(ChatHandler* handler, const char* args)
+    static bool HandleReloadMountSystem(ChatHandler* handler, const char* /*args*/)
     {
         TC_LOG_INFO("misc", "Reloading Mount tables...");
         sMountMgr->LoadFromDB(true);
