@@ -55,7 +55,9 @@ using boost::asio::ip::tcp;
 using namespace boost::program_options;
 namespace fs = boost::filesystem;
 
-#define _TRINITY_BNET_CONFIG_DIST "bnetserver.conf.dist"
+#ifndef _TRINITY_BNET_CONFIG_DIST
+    #define _TRINITY_BNET_CONFIG_DIST "bnetserver.conf.dist"
+#endif
 
 #ifndef _TRINITY_BNET_CONFIG
     #define _TRINITY_BNET_CONFIG "bnetserver.conf"
@@ -120,6 +122,7 @@ int main(int argc, char** argv)
 
     std::string configError;
     if (!sConfigMgr->LoadInitial(configFile.generic_string(),
+                                 configDir.generic_string(),
                                  std::vector<std::string>(argv, argv + argc),
                                  configError))
     {
@@ -153,7 +156,8 @@ int main(int argc, char** argv)
         },
         []()
         {
-            TC_LOG_INFO("server.bnetserver", "Using configuration file %s.", sConfigMgr->GetFilename().c_str());
+            TC_LOG_INFO("server.bnetserver", "Using configuration file %s", sConfigMgr->GetFilename().c_str());
+            TC_LOG_INFO("server.bnetserver", "Using configuration folder %s", sConfigMgr->GetFoldername().c_str());
             TC_LOG_INFO("server.bnetserver", "Using SSL version: %s (library: %s)", OPENSSL_VERSION_TEXT, OpenSSL_version(OPENSSL_VERSION));
             TC_LOG_INFO("server.bnetserver", "Using Boost version: %i.%i.%i", BOOST_VERSION / 100000, BOOST_VERSION / 100 % 1000, BOOST_VERSION % 100);
         }

@@ -31,6 +31,7 @@ namespace fs = boost::filesystem;
 namespace
 {
     std::string _filename;
+    std::string _folder;
     std::vector<std::string> _additonalFiles;
     std::vector<std::string> _args;
     bpt::ptree _config;
@@ -136,12 +137,13 @@ namespace
     }
 }
 
-bool ConfigMgr::LoadInitial(std::string file, std::vector<std::string> args,
+bool ConfigMgr::LoadInitial(std::string file, std::string folder, std::vector<std::string> args,
     std::string& error)
 {
     std::lock_guard<std::mutex> lock(_configLock);
 
     _filename = std::move(file);
+    _folder = std::move(folder);
     _args = std::move(args);
 
     bpt::ptree fullTree;
@@ -229,7 +231,7 @@ ConfigMgr* ConfigMgr::instance()
 bool ConfigMgr::Reload(std::vector<std::string>& errors)
 {
     std::string error;
-    if (!LoadInitial(_filename, std::move(_args), error))
+    if (!LoadInitial(_filename, _folder, std::move(_args), error))
         errors.push_back(std::move(error));
 
     for (std::string const& additionalFile : _additonalFiles)
@@ -353,6 +355,11 @@ std::string const& ConfigMgr::GetFilename()
 {
     std::lock_guard<std::mutex> lock(_configLock);
     return _filename;
+}
+
+std::string const& ConfigMgr::GetFoldername()
+{
+    return _folder;
 }
 
 std::vector<std::string> const& ConfigMgr::GetArguments() const

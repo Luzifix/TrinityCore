@@ -34,6 +34,14 @@ add_executable(bnetserver
   ${PRIVATE_SOURCES}
 )
 
+if (NOT WIN32)
+  target_compile_definitions(bnetserver PRIVATE
+    _TRINITY_BNET_CONFIG="${CONF_DIR}/bnetserver.conf"
+    _TRINITY_BNET_CONFIG_DIST="${CONF_DIR}/bnetserver.conf.dist"
+    _TRINITY_BNET_CONFIG_DIR="${CONF_DIR}/bnetserver.unix.conf.d"
+  )
+endif()
+
 target_link_libraries(bnetserver
   PRIVATE
     trinity-core-interface
@@ -63,14 +71,12 @@ if (COPY_CONF AND WIN32)
       POST_BUILD
       COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_CURRENT_SOURCE_DIR}/bnetserver.conf.dist ${CMAKE_BINARY_DIR}/bin/$(ConfigurationName)/
       COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_CURRENT_SOURCE_DIR}/bnetserver.win.conf.d/ ${CMAKE_BINARY_DIR}/bin/$(ConfigurationName)/bnetserver.win.conf.d/
-      COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_CURRENT_SOURCE_DIR}/bnetserver.unix.conf.d/ ${CMAKE_BINARY_DIR}/bin/$(ConfigurationName)/bnetserver.unix.conf.d/
     )
   elseif (MINGW)
     add_custom_command(TARGET bnetserver
       POST_BUILD
       COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_CURRENT_SOURCE_DIR}/bnetserver.conf.dist ${CMAKE_BINARY_DIR}/bin/
       COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_CURRENT_SOURCE_DIR}/bnetserver.win.conf.d/ ${CMAKE_BINARY_DIR}/bin/bnetserver.win.conf.d/
-      COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_CURRENT_SOURCE_DIR}/bnetserver.unix.conf.d/ ${CMAKE_BINARY_DIR}/bin/bnetserver.unix.conf.d/
     )
   endif()
 endif()
@@ -95,14 +101,14 @@ if (UNIX)
   install(TARGETS bnetserver DESTINATION bin)
   if (COPY_CONF)
     install(FILES bnetserver.conf.dist DESTINATION ${CONF_DIR})
-    install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/bnetserver.unix.conf.d/ DESTINATION ${CONF_DIR}/bnetserver.unix.conf.d/)
+    install(DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/bnetserver.unix.conf.d" DESTINATION "${CONF_DIR}")
   endif()
   install(FILES bnetserver.cert.pem bnetserver.key.pem DESTINATION bin)
 elseif (WIN32)
   install(TARGETS bnetserver DESTINATION "${CMAKE_INSTALL_PREFIX}")
   if (COPY_CONF)
     install(FILES bnetserver.conf.dist DESTINATION "${CMAKE_INSTALL_PREFIX}")
-    install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/bnetserver.win.conf.d/ DESTINATION ${CONF_DIR}/bnetserver.win.conf.d/)
+    install(DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/bnetserver.win.conf.d" DESTINATION "${CONF_DIR}")
   endif()
   install(FILES bnetserver.cert.pem bnetserver.key.pem DESTINATION "${CMAKE_INSTALL_PREFIX}")
 endif()

@@ -32,6 +32,14 @@ add_executable(worldserver
   ${PRIVATE_SOURCES}
 )
 
+if (NOT WIN32)
+  target_compile_definitions(worldserver PRIVATE
+    _TRINITY_CORE_CONFIG="${CONF_DIR}/worldserver.conf"
+    _TRINITY_CORE_CONFIG_DIST="${CONF_DIR}/worldserver.conf.dist"
+    _TRINITY_CORE_CONFIG_DIR="${CONF_DIR}/worldserver.unix.conf.d"
+  )
+endif()
+
 if(UNIX AND NOT NOJEM AND NOT APPLE)
   set(worldserver_LINK_FLAGS "-pthread -lncurses ${worldserver_LINK_FLAGS}")
 endif()
@@ -74,14 +82,12 @@ if(COPY_CONF AND WIN32)
       POST_BUILD
       COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_CURRENT_SOURCE_DIR}/worldserver.conf.dist ${CMAKE_BINARY_DIR}/bin/$(ConfigurationName)/
       COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_CURRENT_SOURCE_DIR}/worldserver.win.conf.d/ ${CMAKE_BINARY_DIR}/bin/$(ConfigurationName)/worldserver.win.conf.d/
-      COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_CURRENT_SOURCE_DIR}/worldserver.unix.conf.d/ ${CMAKE_BINARY_DIR}/bin/$(ConfigurationName)/worldserver.unix.conf.d/
     )
   elseif(MINGW)
     add_custom_command(TARGET worldserver
       POST_BUILD
       COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_CURRENT_SOURCE_DIR}/worldserver.conf.dist ${CMAKE_BINARY_DIR}/bin/
       COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_CURRENT_SOURCE_DIR}/worldserver.win.conf.d/ ${CMAKE_BINARY_DIR}/bin/worldserver.win.conf.d/
-      COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_CURRENT_SOURCE_DIR}/worldserver.unix.conf.d/ ${CMAKE_BINARY_DIR}/bin/worldserver.unix.conf.d/
     )
   endif()
 endif()
@@ -90,13 +96,13 @@ if(UNIX)
   install(TARGETS worldserver DESTINATION bin)
   if(COPY_CONF)
     install(FILES worldserver.conf.dist DESTINATION ${CONF_DIR})
-    install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/worldserver.unix.conf.d/ DESTINATION ${CONF_DIR}/worldserver.unix.conf.d/)
+    install(DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/worldserver.unix.conf.d" DESTINATION "${CONF_DIR}")
   endif()
 elseif(WIN32)
   install(TARGETS worldserver DESTINATION "${CMAKE_INSTALL_PREFIX}")
   if(COPY_CONF)
     install(FILES worldserver.conf.dist DESTINATION "${CMAKE_INSTALL_PREFIX}")
-    install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/worldserver.unix.conf.d/ DESTINATION ${CONF_DIR}/worldserver.win.conf.d/)
+    install(DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/worldserver.win.conf.d" DESTINATION "${CONF_DIR}")
   endif()
 endif()
 

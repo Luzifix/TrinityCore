@@ -32,7 +32,7 @@ class TC_COMMON_API ConfigMgr
 
 public:
     /// Method used only for loading main configuration files (bnetserver.conf and worldserver.conf)
-    bool LoadInitial(std::string file, std::vector<std::string> args, std::string& error);
+    bool LoadInitial(std::string file, std::string folder, std::vector<std::string> args, std::string& error);
     bool LoadAdditionalFile(std::string file, bool keepOnReload, std::string& error);
     bool LoadAdditionalDir(std::string const& dir, bool keepOnReload, std::vector<std::string>& loadedFiles, std::vector<std::string>& errors);
 
@@ -50,6 +50,7 @@ public:
     float GetFloatDefault(std::string const& name, float def, bool quiet = false) const;
 
     std::string const& GetFilename();
+    std::string const& GetFoldername();
     std::vector<std::string> const& GetArguments() const;
     std::vector<std::string> GetKeysByString(std::string const& name);
 
