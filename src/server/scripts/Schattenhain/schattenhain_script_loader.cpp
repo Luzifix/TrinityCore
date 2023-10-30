@@ -16,6 +16,7 @@ void AddSC_Price_CommandScript();
 void AddSC_MountSystem_CreatureScript();
 void AddSC_MountSystem_GameObjectScript();
 void AddSC_MountSystem_CommandScript();
+void AddSC_MountSystem_WorldScript();
 void AddSC_Endorsements_WorldScript();
 void AddSC_Endorsements_PlayerScript();
 void AddSC_Follower_CreatureScript();
@@ -39,6 +40,7 @@ void AddSchattenhainScripts()
     AddSC_MountSystem_CreatureScript();
     AddSC_MountSystem_GameObjectScript();
     AddSC_MountSystem_CommandScript();
+    AddSC_MountSystem_WorldScript();
     //AddSC_Endorsements_WorldScript();
     //AddSC_Endorsements_PlayerScript();
     AddSC_Follower_CreatureScript();

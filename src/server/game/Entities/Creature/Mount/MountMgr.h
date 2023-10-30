@@ -49,6 +49,8 @@ public:
     CharacterMount* GetCharacterMountById(uint32 id);
     std::list<CharacterMount*> GetCharacterMountsByGuid(ObjectGuid guid);
     CharacterMount* GetCharacterMountByCreatureGuid(ObjectGuid creatureGuid);
+    std::list<CharacterMount*> GetCharacterMountStore() { return _characterMountStore; };
+
     void RespawnCharacterMount(CharacterMount* characterMount);
     void CreateCharacterMount(ObjectGuid guid, MountTemplate* mountTemplate, WorldLocation position);
 

@@ -213,7 +213,7 @@ public:
                 me->SetName(codeStr);
                 me->SetPetNameTimestamp(uint32(time(nullptr)));
                 characterMount->SetName(codeStr);
-                Save();
+                Save(true);
                 break;
             }
 
@@ -242,7 +242,7 @@ public:
                     characterMount->SetParkingTicket(true);
                     characterMount->SetPosition(MOUNTSYSTEM_LOCATION_DEFAULT);
                     sMountMgr->RespawnCharacterMount(characterMount);
-                    Save();
+                    Save(true);
 
                     break;
                 }
@@ -261,7 +261,7 @@ public:
                     }
 
                     characterMount->SetParkingTicket(false);
-                    Save();
+                    Save(true);
 
                     break;
                 }
@@ -279,7 +279,7 @@ public:
                 characterMount->SetCondition(std::min(100.f, characterMount->GetCondition() + 5.f));
                 characterMount->SetLastCleanupTimestamp((uint64)std::time(0));
                 characterMount->SetLastMoveTimestamp((uint64)std::time(0));
-                Save();
+                Save(true);
 
                 return OnGossipHello(player);
 
@@ -324,7 +324,7 @@ public:
 
                 characterMount->SetPosition(characterMount->GetHomePosition());
                 sMountMgr->RespawnCharacterMount(characterMount);
-                Save();
+                Save(true);
 
                 return true;
             case MountSystemGossipAction::SetHome:
@@ -335,7 +335,7 @@ public:
                 }
 
                 characterMount->SetHomePosition(me->GetWorldLocation());
-                Save();
+                Save(true);
                 break;
             }
 
@@ -744,7 +744,9 @@ public:
                 return;
 
             characterMount->SetPosition(me->GetWorldLocation());
-            characterMount->SaveToDB();
+
+            if (forceSave)
+                characterMount->SaveToDB();
         }
 
         void EjectPlayer(CharacterMount* characterMount)
