@@ -34,12 +34,6 @@ add_executable(bnetserver
   ${PRIVATE_SOURCES}
 )
 
-if (NOT WIN32)
-  set_target_properties(bnetserver PROPERTIES
-    COMPILE_DEFINITIONS _TRINITY_BNET_CONFIG="${CONF_DIR}/bnetserver.conf"
-  )
-endif()
-
 target_link_libraries(bnetserver
   PRIVATE
     trinity-core-interface
@@ -68,11 +62,15 @@ if (COPY_CONF AND WIN32)
     add_custom_command(TARGET bnetserver
       POST_BUILD
       COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_CURRENT_SOURCE_DIR}/bnetserver.conf.dist ${CMAKE_BINARY_DIR}/bin/$(ConfigurationName)/
+      COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_CURRENT_SOURCE_DIR}/bnetserver.win.conf.d/ ${CMAKE_BINARY_DIR}/bin/$(ConfigurationName)/bnetserver.win.conf.d/
+      COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_CURRENT_SOURCE_DIR}/bnetserver.unix.conf.d/ ${CMAKE_BINARY_DIR}/bin/$(ConfigurationName)/bnetserver.unix.conf.d/
     )
   elseif (MINGW)
     add_custom_command(TARGET bnetserver
       POST_BUILD
       COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_CURRENT_SOURCE_DIR}/bnetserver.conf.dist ${CMAKE_BINARY_DIR}/bin/
+      COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_CURRENT_SOURCE_DIR}/bnetserver.win.conf.d/ ${CMAKE_BINARY_DIR}/bin/bnetserver.win.conf.d/
+      COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_CURRENT_SOURCE_DIR}/bnetserver.unix.conf.d/ ${CMAKE_BINARY_DIR}/bin/bnetserver.unix.conf.d/
     )
   endif()
 endif()

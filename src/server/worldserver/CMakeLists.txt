@@ -32,12 +32,6 @@ add_executable(worldserver
   ${PRIVATE_SOURCES}
 )
 
-if(NOT WIN32)
-  set_target_properties(worldserver PROPERTIES
-    COMPILE_DEFINITIONS _TRINITY_CORE_CONFIG="${CONF_DIR}/worldserver.conf"
-  )
-endif()
-
 if(UNIX AND NOT NOJEM AND NOT APPLE)
   set(worldserver_LINK_FLAGS "-pthread -lncurses ${worldserver_LINK_FLAGS}")
 endif()
@@ -79,11 +73,15 @@ if(COPY_CONF AND WIN32)
     add_custom_command(TARGET worldserver
       POST_BUILD
       COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_CURRENT_SOURCE_DIR}/worldserver.conf.dist ${CMAKE_BINARY_DIR}/bin/$(ConfigurationName)/
+      COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_CURRENT_SOURCE_DIR}/worldserver.win.conf.d/ ${CMAKE_BINARY_DIR}/bin/$(ConfigurationName)/worldserver.win.conf.d/
+      COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_CURRENT_SOURCE_DIR}/worldserver.unix.conf.d/ ${CMAKE_BINARY_DIR}/bin/$(ConfigurationName)/worldserver.unix.conf.d/
     )
   elseif(MINGW)
     add_custom_command(TARGET worldserver
       POST_BUILD
       COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_CURRENT_SOURCE_DIR}/worldserver.conf.dist ${CMAKE_BINARY_DIR}/bin/
+      COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_CURRENT_SOURCE_DIR}/worldserver.win.conf.d/ ${CMAKE_BINARY_DIR}/bin/worldserver.win.conf.d/
+      COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_CURRENT_SOURCE_DIR}/worldserver.unix.conf.d/ ${CMAKE_BINARY_DIR}/bin/worldserver.unix.conf.d/
     )
   endif()
 endif()
