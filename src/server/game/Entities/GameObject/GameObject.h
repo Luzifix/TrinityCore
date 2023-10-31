@@ -153,9 +153,9 @@ class TC_GAME_API GameObject : public WorldObject, public GridObject<GameObject>
         void CleanupsBeforeDelete(bool finalCleanup = true) override;
 
     private:
-        bool Create(uint32 entry, Map* map, Position const& pos, QuaternionData const& rotation, uint32 animProgress, GOState goState, uint32 artKit, bool dynamic, ObjectGuid::LowType spawnid, float size = -1.0f, int32 houseAreaId = -1);
+        bool Create(uint32 entry, Map* map, Position const& pos, QuaternionData const& rotation, uint32 animProgress, GOState goState, uint32 artKit, bool dynamic, ObjectGuid::LowType spawnid, float size = -1.0f, int32 houseAreaId = -1, uint32 spellVisualId = 0);
     public:
-        static GameObject* CreateGameObject(uint32 entry, Map* map, Position const& pos, QuaternionData const& rotation, uint32 animProgress, GOState goState, uint32 artKit = 0, float size = -1.0f, int32 houseAreaId = -1);
+        static GameObject* CreateGameObject(uint32 entry, Map* map, Position const& pos, QuaternionData const& rotation, uint32 animProgress, GOState goState, uint32 artKit = 0, float size = -1.0f, int32 houseAreaId = -1, uint32 spellVisualId = 0);
         static GameObject* CreateGameObjectFromDB(ObjectGuid::LowType spawnId, Map* map, bool addToMap = true);
 
         void Update(uint32 p_time) override;
@@ -164,6 +164,7 @@ class TC_GAME_API GameObject : public WorldObject, public GridObject<GameObject>
         GameObjectOverride const* GetGameObjectOverride() const;
         GameObjectData const* GetGameObjectData() const { return m_goData; }
         GameObjectValue const* GetGOValue() const { return &m_goValue; }
+        uint32 GetSpellVisualId() const { return m_gameObjectData->SpellVisualID; }
 
         bool IsTransport() const;
         bool IsDynTransport() const;
@@ -386,7 +387,9 @@ class TC_GAME_API GameObject : public WorldObject, public GridObject<GameObject>
         uint32 GetWorldEffectID() const { return _worldEffectID; }
         void SetWorldEffectID(uint32 worldEffectID) { _worldEffectID = worldEffectID; }
 
-        void SetSpellVisualId(int32 spellVisualId, ObjectGuid activatorGuid = ObjectGuid::Empty);
+        void SetSpellVisualId(uint32 spellVisualId) { SetUpdateFieldValue(m_values.ModifyValue(&GameObject::m_gameObjectData).ModifyValue(&UF::GameObjectData::SpellVisualID), spellVisualId); };
+        void SendSpellVisualId(uint32 spellVisualId, ObjectGuid activatorGuid = ObjectGuid::Empty);
+
         void AssaultCapturePoint(Player* player);
         void UpdateCapturePoint();
         bool CanInteractWithCapturePoint(Player const* target) const;

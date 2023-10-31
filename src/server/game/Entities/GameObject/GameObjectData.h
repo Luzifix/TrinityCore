@@ -1274,6 +1274,7 @@ struct GameObjectData : public SpawnData
     uint32 artKit = 0;
     float size = 0.0f;
     uint32 houseAreaId = 0;
+    uint32 spellVisualId = 0;
 };
 
 enum class GameObjectActions : uint32

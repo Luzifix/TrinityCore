@@ -633,7 +633,7 @@ void GameObject::RemoveFromWorld()
     }
 }
 
-bool GameObject::Create(uint32 entry, Map* map, Position const& pos, QuaternionData const& rotation, uint32 animProgress, GOState goState, uint32 artKit, bool dynamic, ObjectGuid::LowType spawnid, float size /*= -1*/, int32 houseAreaId /*= -1*/)
+bool GameObject::Create(uint32 entry, Map* map, Position const& pos, QuaternionData const& rotation, uint32 animProgress, GOState goState, uint32 artKit, bool dynamic, ObjectGuid::LowType spawnid, float size /*= -1*/, int32 houseAreaId /*= -1*/, uint32 spellVisualId /*= 0*/)
 {
     ASSERT(map);
     SetMap(map);
@@ -707,6 +707,8 @@ bool GameObject::Create(uint32 entry, Map* map, Position const& pos, QuaternionD
         SetObjectScale(size);
     else
         SetObjectScale(goInfo->size);
+
+    SetSpellVisualId(spellVisualId);
 
     if (GameObjectOverride const* goOverride = GetGameObjectOverride())
     {
@@ -870,14 +872,14 @@ bool GameObject::Create(uint32 entry, Map* map, Position const& pos, QuaternionD
     return true;
 }
 
-GameObject* GameObject::CreateGameObject(uint32 entry, Map* map, Position const& pos, QuaternionData const& rotation, uint32 animProgress, GOState goState, uint32 artKit /*= 0*/, float scale /*=-1.0f*/, int32 houseAreaId /*= -1*/)
+GameObject* GameObject::CreateGameObject(uint32 entry, Map* map, Position const& pos, QuaternionData const& rotation, uint32 animProgress, GOState goState, uint32 artKit /*= 0*/, float scale /*=-1.0f*/, int32 houseAreaId /*= -1*/, uint32 spellVisualId /*= 0*/)
 {
     GameObjectTemplate const* goInfo = sObjectMgr->GetGameObjectTemplate(entry);
     if (!goInfo)
         return nullptr;
 
     GameObject* go = new GameObject();
-    if (!go->Create(entry, map, pos, rotation, animProgress, goState, artKit, false, 0, scale, houseAreaId))
+    if (!go->Create(entry, map, pos, rotation, animProgress, goState, artKit, false, 0, scale, houseAreaId, spellVisualId))
     {
         delete go;
         return nullptr;
@@ -1571,6 +1573,7 @@ void GameObject::SaveToDB(uint32 mapid, std::vector<Difficulty> const& spawnDiff
     data.spawnDifficulties = spawnDifficulties;
     data.artKit = GetGoArtKit();
     data.houseAreaId = GetHouseAreaId();
+    data.spellVisualId = GetSpellVisualId();
     if (!data.spawnGroupData)
         data.spawnGroupData = sObjectMgr->GetDefaultSpawnGroup();
 
@@ -1638,6 +1641,7 @@ void GameObject::SaveToDB(uint32 mapid, std::vector<Difficulty> const& spawnDiff
     stmt->setUInt8(index++, uint8(GetGoState()));
     stmt->setFloat(index++, data.size);
     stmt->setUInt32(index++, data.houseAreaId);
+    stmt->setUInt32(index++, data.spellVisualId);
     trans->Append(stmt);
 
     WorldDatabase.CommitTransaction(trans);
@@ -1660,12 +1664,14 @@ bool GameObject::LoadFromDB(ObjectGuid::LowType spawnId, Map* map, bool addToMap
     uint32 artKit = data->artKit;
     float size = data->size;
     uint32 houseAreaId = data->houseAreaId;
+    uint32 spellVisualId = data->spellVisualId;
+
     int32 phaseId = data->phaseId;
     bool alwaysVisible = false;
 
     m_spawnId = spawnId;
     m_respawnCompatibilityMode = ((data->spawnGroupData->flags & SPAWNGROUP_FLAG_COMPATIBILITY_MODE) != 0);
-    if (!Create(entry, map, data->spawnPoint, data->rotation, animprogress, go_state, artKit, !m_respawnCompatibilityMode, spawnId, size, houseAreaId))
+    if (!Create(entry, map, data->spawnPoint, data->rotation, animprogress, go_state, artKit, !m_respawnCompatibilityMode, spawnId, size, houseAreaId, spellVisualId))
         return false;
 
     SetDBPhase(phaseId);
@@ -2197,10 +2203,10 @@ void GameObject::ActivateObject(GameObjectActions action, int32 param, WorldObje
             SetAnimKitId(0, false);
             break;
         case GameObjectActions::PlaySpellVisual:
-            SetSpellVisualId(param, Object::GetGUID(spellCaster));
+            SendSpellVisualId(param, Object::GetGUID(spellCaster));
             break;
         case GameObjectActions::StopSpellVisual:
-            SetSpellVisualId(0);
+            SendSpellVisualId(0);
             break;
         default:
             TC_LOG_ERROR("spell", "Spell %d has unhandled action %d in effect %d", spellId, int32(action), effectIndex);
@@ -3800,9 +3806,9 @@ void GameObject::SetAnimKitId(uint16 animKitId, bool oneshot)
     SendMessageToSet(activateAnimKit.Write(), true);
 }
 
-void GameObject::SetSpellVisualId(int32 spellVisualId, ObjectGuid activatorGuid)
+void GameObject::SendSpellVisualId(uint32 spellVisualId, ObjectGuid activatorGuid)
 {
-    SetUpdateFieldValue(m_values.ModifyValue(&GameObject::m_gameObjectData).ModifyValue(&UF::GameObjectData::SpellVisualID), spellVisualId);
+    SetSpellVisualId(spellVisualId);
 
     WorldPackets::GameObject::GameObjectPlaySpellVisual packet;
     packet.ObjectGUID = GetGUID();
@@ -3932,7 +3938,7 @@ void GameObject::UpdateCapturePoint()
     if (customAnim != 0)
         SendCustomAnim(customAnim);
 
-    SetSpellVisualId(spellVisualId);
+    SendSpellVisualId(spellVisualId);
     UpdateDynamicFlagsForNearbyPlayers();
 
     if (BattlegroundMap* map = GetMap()->ToBattlegroundMap())

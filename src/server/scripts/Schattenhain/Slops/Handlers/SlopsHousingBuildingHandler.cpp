@@ -40,10 +40,10 @@ static void ResponseSelected(Player* player, std::list<GameObject*> objects)
     sSlops->Send(SLOPS_SMSG_HOUSING_BUILDING_SELECTED, data.dump(), player);
 }
 
-static GameObject* SpawnGameObject(Player* player, uint32 entry, Position position, G3D::Quat rotation, float scale = -1.0f, uint32 houseAreaId = 0)
+static GameObject* SpawnGameObject(Player* player, uint32 entry, Position position, G3D::Quat rotation, float scale = -1.0f, uint32 houseAreaId = 0, uint32 spellVisualId = 0)
 {
     Map* map = player->GetMap();
-    GameObject* object = GameObject::CreateGameObject(entry, map, position, QuaternionData(rotation.x, rotation.y, rotation.z, rotation.w), 255, GO_STATE_READY, 0, scale, houseAreaId);
+    GameObject* object = GameObject::CreateGameObject(entry, map, position, QuaternionData(rotation.x, rotation.y, rotation.z, rotation.w), 255, GO_STATE_READY, 0, scale, houseAreaId, spellVisualId);
 
     if (!object)
         return nullptr;
@@ -52,6 +52,7 @@ static GameObject* SpawnGameObject(Player* player, uint32 entry, Position positi
     float oz, oy, ox;
     object->GetLocalRotationAngles(oz, oy, ox);
     object->SetObjectScale(scale);
+    object->SetSpellVisualId(spellVisualId);
     object->Relocate(position.GetPositionX(), position.GetPositionY(), position.GetPositionZ(), oz);
     object->SaveToDB(player->GetMap()->GetId(), { player->GetMap()->GetDifficultyID() });
     ObjectGuid::LowType spawnId = object->GetSpawnId();
@@ -409,6 +410,7 @@ static bool CommandActionPlayer(Player* player, std::string command, float facto
         float scale = std::min(10.f, std::max(0.001f, factor));
         const_cast<GameObjectData*>(gameObject->GetGameObjectData())->size = scale;
         gameObject->SetObjectScale(scale);
+
         gameObjectSelectionInfo->error = MoveGameObject(player, gameObject, x, y, z, rotationQuaternion);
     }
     else if (command == "ActionPlayerClone") {
@@ -434,7 +436,7 @@ static bool CommandActionPlayer(Player* player, std::string command, float facto
             sFurnitureMgr->RemoveItem(player, furnitrue->GetId());
         }
 
-        GameObject* clonedGameObject = SpawnGameObject(player, gameObject->GetEntry(), gameObject->GetPosition(), rotationQuaternion, gameObject->GetObjectScale(), gameObject->GetHouseAreaId());
+        GameObject* clonedGameObject = SpawnGameObject(player, gameObject->GetEntry(), gameObject->GetPosition(), rotationQuaternion, gameObject->GetObjectScale(), gameObject->GetHouseAreaId(), gameObject->GetSpellVisualId());
 
         if (clonedGameObject) {
             std::list<GameObject*> objects;
@@ -471,6 +473,18 @@ static bool CommandActionPlayer(Player* player, std::string command, float facto
             gameObject->DeleteFromDB(gameObject->GetSpawnId());
             gameObjectSelectionInfo->deleted = true;
         }
+    }
+    else if (command == "ActionPlayerTint") {
+        uint32 tintId = 5000000 + (uint32)factor;
+
+        if (tintId < 5000000 || tintId > 5001080)
+            tintId = 0;
+
+        GameObject* gameObject = gameObjectSelectionInfo->gameObject;
+        const_cast<GameObjectData*>(gameObject->GetGameObjectData())->spellVisualId = tintId;
+        gameObject->SetSpellVisualId(tintId);
+
+        gameObjectSelectionInfo->error = MoveGameObject(player, gameObject, x, y, z, rotationQuaternion);
     }
 
     return true;
