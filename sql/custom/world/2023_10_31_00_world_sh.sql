@@ -1,0 +1,1 @@
+ALTER TABLE `gameobject` ADD COLUMN `spellVisualId` INT NULL AFTER `house_area_id`;
