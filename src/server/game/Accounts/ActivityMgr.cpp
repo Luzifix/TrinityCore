@@ -22,7 +22,7 @@ void ActivityMgr::LoadFromDB()
 {
 }
 
-void ActivityMgr::LoadConfig(bool reload)
+void ActivityMgr::LoadConfig(bool /*reload*/)
 {
     _enabled = sConfigMgr->GetBoolDefault("Schattenhain.Activity.Enable", true);
     _updateInterval = sConfigMgr->GetIntDefault("Schattenhain.Activity.Interval", 10);

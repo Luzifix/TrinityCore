@@ -86,7 +86,7 @@ void BattlepayManager::ProcessDelivery(Purchase * purchase)
         return;
 
     auto const& product = sBattlePayDataStore->GetProduct(purchase->ProductID);
-    auto const& productDisplay = sBattlePayDataStore->GetDisplayInfo(product.ProductID);
+    //auto const& productDisplay = sBattlePayDataStore->GetDisplayInfo(product.ProductID);
     auto const& collectionMgr = player->GetSession()->GetCollectionMgr();
 
     switch (product.WebsiteType)
@@ -449,8 +449,8 @@ std::tuple<bool, WorldPackets::BattlePay::ProductDisplayInfo> BattlepayManager::
 
 void BattlepayManager::SendAccountCredits()
 {
-    auto sessionId = _session->GetAccountId();
-    /*
+    /*auto sessionId = _session->GetAccountId();
+    
     LoginDatabasePreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_SEL_BATTLE_PAY_ACCOUNT_CREDITS);
     stmt->setUInt32(0, _session->GetAccountId());
     PreparedQueryResult result = LoginDatabase.Query(stmt);
@@ -540,7 +540,7 @@ void BattlepayManager::SendBattlePayDistribution(uint32 productId, uint8 status,
     _session->SendPacket(distributionBattlePay.Write());
 }
 
-void BattlepayManager::AssignDistributionToCharacter(ObjectGuid const& targetCharGuid, uint64 distributionId, uint32 productId, uint16 specId, uint16 choiceId)
+void BattlepayManager::AssignDistributionToCharacter(ObjectGuid const& targetCharGuid, uint64 distributionId, uint32 productId, uint16 /*specId*/, uint16 /*choiceId*/)
 {
     WorldPackets::BattlePay::UpgradeStarted upgrade;
     upgrade.CharacterGUID = targetCharGuid;
@@ -558,7 +558,7 @@ void BattlepayManager::AssignDistributionToCharacter(ObjectGuid const& targetCha
     SendBattlePayDistribution(productId, purchase->Status, distributionId, targetCharGuid);
 }
 
-void BattlepayManager::Update(uint32 diff)
+void BattlepayManager::Update(uint32 /*diff*/)
 {
     auto& data = _actualTransaction;
     auto& product = sBattlePayDataStore->GetProduct(data.ProductID);
