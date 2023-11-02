@@ -25,6 +25,7 @@ Slops::Slops()
     AddMessageHandler(SLOPS_CMSG_HOUSING_PERMISSION_REMOVE, SlopsHandler::HandleHousingPermissionRemove);
     AddMessageHandler(SLOPS_CMSG_HOUSING_SET_MOTD, SlopsHandler::HandleHousingSetMotd);
     AddMessageHandler(SLOPS_CMSG_HOUSING_TRANSFER_OWNERSHIP, SlopsHandler::HandleHousingTransferOwnership);
+    AddMessageHandler(SLOPS_CMSG_HOUSING_SET_HEARTHSTONE, SlopsHandler::HandleHousingSetHearthstone);
 
     // Character Modify
     AddMessageHandler(SLOPS_CMSG_CHARACTER_MODIFY_REQUEST, SlopsHandler::HandleCharacterModifyRequest);

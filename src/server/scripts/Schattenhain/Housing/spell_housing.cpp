@@ -16,6 +16,7 @@
 #include "ScriptMgr.h"
 #include "SpellAuraEffects.h"
 #include "Spell.h"
+#include "SpellHistory.h"
 #include "SpellMgr.h"
 #include "SpellScript.h"
 #include "PoolMgr.h"
@@ -305,8 +306,66 @@ public:
     }
 };
 
+class spell_housing_hearthstone : public SpellScriptLoader
+{
+public:
+    spell_housing_hearthstone() : SpellScriptLoader("spell_housing_hearthstone") { }
+
+    class spell_housing_hearthstone_SpellScript : public SpellScript
+    {
+        PrepareSpellScript(spell_housing_hearthstone_SpellScript);
+
+        bool Load() override
+        {
+            if (GetCaster()->GetTypeId() != TYPEID_PLAYER)
+                return false;
+
+            return true;
+        }
+
+        SpellCastResult CheckSpellCast()
+        {
+            return SPELL_CAST_OK;
+        }
+
+        void AfterSpellCast()
+        {
+            Player* player = GetCaster()->ToPlayer();
+            ChatHandler handler = ChatHandler(player->GetSession());
+
+            CharacterDatabasePreparedStatement* selectStmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_HOUSING_HEARTHSTONE);
+            selectStmt->setUInt64(0, player->GetGUID().GetCounter());
+            PreparedQueryResult result = CharacterDatabase.Query(selectStmt);
+
+            if (!result)
+            {
+                handler.SendSysMessage(LANG_HOUSING_HEARTHSTONE_ERR_NOT_SET);
+                player->GetSpellHistory()->ResetCooldown(GetSpellInfo()->Id, true);
+                return;
+            }
+
+            Field* field = result->Fetch();
+            WorldLocation portLocation = WorldLocation(field[1].GetUInt16(), field[2].GetFloat(), field[3].GetFloat(), field[4].GetFloat());
+
+            player->TeleportTo(portLocation);
+        }
+
+        void Register() override
+        {
+            OnCheckCast += SpellCheckCastFn(spell_housing_hearthstone_SpellScript::CheckSpellCast);
+            AfterCast += SpellCastFn(spell_housing_hearthstone_SpellScript::AfterSpellCast);
+        }
+    };
+
+    SpellScript* GetSpellScript() const override
+    {
+        return new spell_housing_hearthstone_SpellScript();
+    }
+};
+
 void AddSC_Housing_SpellScript()
 {
     new spell_housing_furniture_spawn();
     new spell_housing_furniture_select();
+    new spell_housing_hearthstone();
 }

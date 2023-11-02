@@ -52,6 +52,7 @@ enum SchattenhainLuaOpcodeClient : uint32
     SLOPS_CMSG_SIGN_SUBMIT                                     = 0x0027,
     SLOPS_CMSG_SIGN_HISTORY_REQUEST                            = 0x0028,
     SLOPS_CMSG_HOUSING_TRANSFER_OWNERSHIP                      = 0x0029,
+    SLOPS_CMSG_HOUSING_SET_HEARTHSTONE                         = 0x002A,
 
     SLOPS_CMSG_MAX
 };

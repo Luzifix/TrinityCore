@@ -786,6 +786,9 @@ void CharacterDatabaseConnection::DoPrepareStatements()
     PrepareStatement(CHAR_INS_HOUSING_AREA_ADDON_COORDINATES, "INSERT INTO `housing_area_addon_coordinates` (`housing_area_id`, `type`, `position_x`, `position_y`, `position_z`) VALUES (?, ?, ?, ?, ?)", CONNECTION_ASYNC);
     PrepareStatement(CHAR_SEL_HOUSING_NEXT_ID, "SELECT MAX(id) + 1 FROM housing", CONNECTION_SYNCH);
     PrepareStatement(CHAR_SEL_HOUSING_AREA_NEXT_ID, "SELECT MAX(id) + 1 FROM housing_area", CONNECTION_SYNCH);
+    PrepareStatement(CHAR_SEL_HOUSING_HEARTHSTONE, "SELECT houseAreaId, mapId, posX, posY, posZ FROM housing_hearthstone WHERE guid = ?;", CONNECTION_SYNCH);
+    PrepareStatement(CHAR_REP_HOUSING_HEARTHSTONE, "REPLACE INTO housing_hearthstone (guid, houseAreaId, mapId, posX, posY, posZ) VALUES (?, ?, ?, ?, ?, ?) ", CONNECTION_ASYNC);
+    PrepareStatement(CHAR_DEL_HOUSING_HEARTHSTONE, "DELETE FROM housing_hearthstone WHERE guid = ?", CONNECTION_ASYNC);
 
     // Character Modify
     PrepareStatement(CHAR_SEL_CHARACTER_MODIFY, "SELECT scale, speed, morph FROM character_modify WHERE guid = ?", CONNECTION_SYNCH);

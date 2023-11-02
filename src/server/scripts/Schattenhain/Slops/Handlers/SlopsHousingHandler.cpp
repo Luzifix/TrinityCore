@@ -8,6 +8,7 @@
 #include "WorldSession.h"
 #include "Guild.h"
 #include "HousingMgr.h"
+#include "DiscordLogging.h"
 
 inline HousingArea* HousingAreaValidateOwner(uint32 housingId, uint32 housingAreaId, Player* player)
 {
@@ -190,8 +191,6 @@ void SlopsHandler::HandleHousingSetMotd(SlopsPackage package)
     }
 }
 
-#include "DiscordLogging.h"
-
 void SlopsHandler::HandleHousingTransferOwnership(SlopsPackage package)
 {
     JSON data = JSON::Load(package.message);
@@ -217,4 +216,41 @@ void SlopsHandler::HandleHousingTransferOwnership(SlopsPackage package)
         if (Player* newOwnerPlayer = ObjectAccessor::FindPlayerByName(newOwner->Name))
             SendHousingList(newOwnerPlayer);
     }
+}
+
+void SlopsHandler::HandleHousingSetHearthstone(SlopsPackage package)
+{
+    int ITEM_HOUSING_HEARTHSTONE_ID = 500017;
+
+    Player* player = package.sender;
+
+    if (!player->HasItemCount(ITEM_HOUSING_HEARTHSTONE_ID, 1))
+        return;
+
+    HousingArea* housingArea = sHousingMgr->GetHousingAreaByWorldObject(player);
+    ChatHandler handler = ChatHandler(player->GetSession());
+
+    if (housingArea == nullptr)
+    {
+        handler.SendSysMessage(LANG_HOUSING_HEARTHSTONE_ERR_NO_HOUSING_AREA);
+        return;
+    }
+
+    if (!housingArea->HasAccessPermission(player))
+    {
+        handler.SendSysMessage(LANG_HOUSING_HEARTHSTONE_ERR_NO_ACCESS_PERMISSION);
+        return;
+    }
+
+    CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_REP_HOUSING_HEARTHSTONE);
+    stmt->setUInt64(0, player->GetGUID().GetCounter());
+    stmt->setUInt32(1, housingArea->GetId());
+    stmt->setUInt16(2, player->GetMapId());
+    stmt->setFloat(3, player->GetPositionX());
+    stmt->setFloat(4, player->GetPositionY());
+    stmt->setFloat(5, player->GetPositionZ());
+    CharacterDatabase.Execute(stmt);
+
+    handler.SendSysMessage(LANG_HOUSING_HEARTHSTONE_SET_SUCCESS);
+    player->SendPlaySpellVisualKit(1504, 0, 0);
 }
