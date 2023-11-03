@@ -19,6 +19,7 @@
 #include "RBAC.h"
 #include "Chat.h"
 #include "HousingMgr.h"
+#include "DiscordLogging.h"
 
 enum WorldScriptActivity
 {
@@ -227,6 +228,14 @@ public:
         LoginDatabase.DirectExecute(stmt);
 
         stmt = LoginDatabase.GetPreparedStatement(LOGIN_SEL_BNET_ACTIVITY_ALL);
+
+        int totalPlayedHour = 0;
+        int totalRewardInCopper = 0;
+        int totalAddedInactivity = 0;
+        int totalRemovedInactivity = 0;
+        int totalPausedWeeks = 0;
+        int totalRemovedHouse = 0;
+
         if (PreparedQueryResult result = LoginDatabase.Query(stmt))
         {
             do
@@ -259,6 +268,7 @@ public:
                 if (inactivityPausedCurrentWeek)
                 {
                     inactivityPausedWeeks++;
+                    totalPausedWeeks++;
 
                     // If player reachd inactivty paused weeks limit, disable pause
                     if (inactivityPausedWeeks >= sActivityMgr->getMaxPauseWeeks())
@@ -276,25 +286,37 @@ public:
                 int32 rewardInCopper = sActivityMgr->calcPlayerReward(played, minCoin);
                 bool reachedMinimumActivity = (playedHour >= sActivityMgr->getAvgPlayed()) || disableInactivityPoints;
 
+                totalPlayedHour += playedHour;
+                totalRewardInCopper += rewardInCopper;
+
                 if (!reachedMinimumActivity)
                 {
                     // Add Inactivty point if player not reached the avg played time
                     if (inactivity < sActivityMgr->getMaxInactivityPoints())
+                    {
                         inactivity++;
+                        totalAddedInactivity++;
+                    }
                 }
                 else
                 {
                     // Remove Inactivty point if player reached the avg played time
                     if (inactivity > 0)
+                    {
                         inactivity--;
+                        totalRemovedInactivity++;
+                    }
                 }
 
                 if (inactivity >= sActivityMgr->getMaxInactivityPoints() && !disableInactivityPoints)
                 {
-                    RemoveHousingOwnership(bnetId);
-                    SendMailToPlayer(LANG_ACTIVITY_MAIL_SUBJECT, LANG_ACTIVITY_MAIL_TEXT_REMOVE_HOUSE, rewardInCopper, playedLastCharacter, bnetId);
+                    int removedHouseCount = RemoveHousingOwnership(bnetId);
+                    totalRemovedHouse += removedHouseCount;
+
+                    SendMailToPlayer(LANG_ACTIVITY_MAIL_SUBJECT, (removedHouseCount == 0 ? LANG_ACTIVITY_MAIL_TEXT_INACTIVITY_LIMIT_REACHED : LANG_ACTIVITY_MAIL_TEXT_INACTIVITY_LIMIT_REACHED_AND_REMOVE_HOUSE), rewardInCopper, playedLastCharacter, bnetId);
+
                     UpdatePlayerActivtyData(bnetId, playedLastCharacter, inactivity, inactivityPausedWeeks, inactivityPausedCurrentWeek);
-                    return;
+                    continue;
                 }
 #pragma endregion
 
@@ -302,6 +324,18 @@ public:
                 UpdatePlayerActivtyData(bnetId, playedLastCharacter, inactivity, inactivityPausedWeeks, inactivityPausedCurrentWeek);
             } while (result->NextRow());
         }
+
+
+        uint32 totalCalcRewardInGold = totalRewardInCopper / GOLD;
+        uint32 totalCalcRewardInSilver = (totalRewardInCopper % GOLD) / SILVER;
+        uint32 totalCalcRewardInCopper = (totalRewardInCopper % GOLD) % SILVER;
+
+        Trinity::DiscordLogging::PostIngameActionLog(
+            Trinity::StringFormat(sObjectMgr->GetTrinityStringForDBCLocale(LANG_ACTIVITY_LOG_SUMMARY), totalPlayedHour, totalCalcRewardInGold, totalCalcRewardInSilver, totalCalcRewardInCopper, totalAddedInactivity, totalRemovedInactivity, totalPausedWeeks, totalRemovedHouse),
+            "Reward Summery",
+            Trinity::DISCORD_CHANNEL_FORUM_LOG,
+            Trinity::DISCORD_THREAD_REWARDCOINS
+        );
     }
 
     void CalcRewardForGuild()
@@ -433,8 +467,9 @@ public:
         CharacterDatabase.CommitTransaction(trans);
     }
 
-    void RemoveHousingOwnership(uint32 bnetId)
+    int RemoveHousingOwnership(uint32 bnetId)
     {
+        int removedHouseCount = 0;
         for (Housing* housing : sHousingMgr->GetOwnerHousingByBnetId(bnetId))
         {
             for (auto& housingArea : housing->GetHousingAreas())
@@ -447,7 +482,17 @@ public:
             housing->SetOwner(_returnHouseBnetGuid);
 
             sHousingMgr->Save(housing);
+            removedHouseCount++;
+
+            Trinity::DiscordLogging::PostIngameActionLog(
+                Trinity::StringFormat(sObjectMgr->GetTrinityStringForDBCLocale(LANG_HOUSING_LOG_TRANSFER_OWNERSHIP_AUTOMATIC), housing->GetName(), housing->GetId(), bnetId, _returnHouseBnetGuid.GetCounter()),
+                "Housing Inactiviy Transfer",
+                Trinity::DISCORD_CHANNEL_FORUM_LOG,
+                Trinity::DISCORD_THREAD_HOUSING_TRANSFER
+            );
         }
+
+        return removedHouseCount;
     }
 private:
     const CharacterCacheEntry* GetFallbackCharacterCacheEntry(uint32 bnetId)

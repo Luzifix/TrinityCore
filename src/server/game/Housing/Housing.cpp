@@ -67,7 +67,9 @@ bool Housing::TransferOwnership(const CharacterCacheEntry* newOwner, Player* rep
 
         Trinity::DiscordLogging::PostIngameActionLog(
             Trinity::StringFormat(sObjectMgr->GetTrinityStringForDBCLocale(LANG_HOUSING_LOG_TRANSFER_OWNERSHIP), "Unbekannt", GetOwner().GetCounter(), GetName(), GetId(), newOwner->Name, newOwnerBnetGuid.GetCounter()),
-            "Housing Transfer"
+            "Housing Player Transfer",
+            Trinity::DISCORD_CHANNEL_FORUM_LOG,
+            Trinity::DISCORD_THREAD_HOUSING_TRANSFER
         );
 
         return true;
@@ -193,7 +195,9 @@ bool Housing::TransferOwnership(const CharacterCacheEntry* newOwner, Player* rep
 
     Trinity::DiscordLogging::PostIngameActionLog(
         Trinity::StringFormat(sObjectMgr->GetTrinityStringForDBCLocale(LANG_HOUSING_LOG_TRANSFER_OWNERSHIP), ownerPlayerName, ownerBnetId, GetName(), GetId(), newOwnerPlayer->GetName(), newOwnerBnetId),
-        "Housing Transfer"
+        "Housing Player Transfer",
+        Trinity::DISCORD_CHANNEL_FORUM_LOG,
+        Trinity::DISCORD_THREAD_HOUSING_TRANSFER
     );
 
     return true;

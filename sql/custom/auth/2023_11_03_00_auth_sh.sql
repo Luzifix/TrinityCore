@@ -1,0 +1,2 @@
+ALTER TABLE `battlenet_account_activity_history`
+	DROP FOREIGN KEY `FK_battlenet_account_activity_history_battlenet_accounts`;
