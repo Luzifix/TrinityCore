@@ -1427,7 +1427,7 @@ void WorldSession::SendFeatureSystemStatus()
     features.CfgRealmRecID = 0;
     features.TokenPollTimeSeconds = 300;
     features.VoiceEnabled = false;
-    features.BrowserEnabled = false; // Has to be false, otherwise client will crash if "Customer Support" is opened
+    features.BrowserEnabled = true; // Has to be false, otherwise client will crash if "Customer Support" is opened
 
     features.EuropaTicketSystemStatus.emplace();
     features.EuropaTicketSystemStatus->ThrottleState.MaxTries = 10;
