@@ -147,7 +147,7 @@ public:
             for (auto dirtinessSteps : sMountMgr->GetDirtinessSteps())
                 data["stats"]["dirtinessSteps"][dirtinessSteps.first] = dirtinessSteps.second;
 
-            AddGossipItemFor(player, GossipOptionNpc::Auctioneer, data.dump(), GOSSIP_SENDER_MAIN, 0);
+            InitGossipMenuFor(player, menuId); 
             AddGossipItemFor(player, menuId, 0, GOSSIP_SENDER_MAIN, MountSystemGossipAction::Broom);
             AddGossipItemFor(player, menuId, 1, GOSSIP_SENDER_MAIN, MountSystemGossipAction::Follow);
             AddGossipItemFor(player, menuId, 2, GOSSIP_SENDER_MAIN, MountSystemGossipAction::Mount, characterMount->GetFuel() > 0 && characterMount->GetCondition() > 0 ? GossipOptionStatus::Available : GossipOptionStatus::Locked);
@@ -158,8 +158,8 @@ public:
             AddGossipItemFor(player, menuId, 7, GOSSIP_SENDER_MAIN, MountSystemGossipAction::Rename, isOwner ? GossipOptionStatus::Available : GossipOptionStatus::Locked);
             AddGossipItemFor(player, menuId, 8, GOSSIP_SENDER_MAIN, MountSystemGossipAction::CreateTicket, isGamemaster ? GossipOptionStatus::Available : GossipOptionStatus::Locked);
             AddGossipItemFor(player, menuId, 9, GOSSIP_SENDER_MAIN, MountSystemGossipAction::PayTicket, hasParkingTicket ? GossipOptionStatus::Available : GossipOptionStatus::Locked);
+            AddGossipItemFor(player, GossipOptionNpc::Auctioneer, data.dump(), GOSSIP_SENDER_MAIN, 0);
 
-            player->PlayerTalkClass->GetGossipMenu().SetMenuId(menuId);
             player->TalkedToCreature(me->GetEntry(), me->GetGUID());
             SendGossipMenuFor(player, player->GetGossipTextId(me), me->GetGUID());
 
