@@ -119,7 +119,14 @@ void GossipMenu::AddMenuItem(uint32 menuId, uint32 menuItemId, uint32 sender, ui
     if (optionBroadcastText)
         strOptionText = DB2Manager::GetBroadcastTextValue(optionBroadcastText, GetLocale());
     else
+    {
         strOptionText = itr->second.OptionText;
+
+        /// Find localizations from database.
+        if (GetLocale() != LOCALE_enUS)
+            if (GossipMenuItemsLocale const* gossipMenuLocale = sObjectMgr->GetGossipMenuItemsLocale(menuId, menuItemId))
+                ObjectMgr::GetLocaleString(gossipMenuLocale->OptionText, GetLocale(), strOptionText);
+    }
 
     /// BoxText
     if (boxBroadcastText)
@@ -130,8 +137,9 @@ void GossipMenu::AddMenuItem(uint32 menuId, uint32 menuItemId, uint32 sender, ui
     if (!boxBroadcastText)
     {
         /// Find localizations from database.
-        if (GossipMenuItemsLocale const* gossipMenuLocale = sObjectMgr->GetGossipMenuItemsLocale(menuId, menuItemId))
-            ObjectMgr::GetLocaleString(gossipMenuLocale->BoxText, GetLocale(), strBoxText);
+        if (GetLocale() != LOCALE_enUS)
+            if (GossipMenuItemsLocale const* gossipMenuLocale = sObjectMgr->GetGossipMenuItemsLocale(menuId, menuItemId))
+                ObjectMgr::GetLocaleString(gossipMenuLocale->BoxText, GetLocale(), strBoxText);
     }
 
     /// Add menu item with existing method. Menu item id -1 is also used in ADD_GOSSIP_ITEM macro.
