@@ -859,6 +859,7 @@ class TC_GAME_API Unit : public WorldObject
         bool IsHunterPet() const{ return (m_unitTypeMask & UNIT_MASK_HUNTER_PET) != 0; }
         bool IsTotem() const    { return (m_unitTypeMask & UNIT_MASK_TOTEM) != 0; }
         bool IsVehicle() const  { return (m_unitTypeMask & UNIT_MASK_VEHICLE) != 0; }
+        bool IsMinion() const   { return (m_unitTypeMask & UNIT_MASK_MINION) != 0; }
 
         uint8 GetLevel() const { return uint8(m_unitData->Level); }
         uint8 GetLevelForTarget(WorldObject const* /*target*/) const override { return GetLevel(); }
@@ -1314,7 +1315,7 @@ class TC_GAME_API Unit : public WorldObject
         // all of these are for DIRECT CLIENT CONTROL only
         void SetMovedUnit(Unit* target);
         // returns the unit that this player IS CONTROLLING
-        Unit* GetUnitBeingMoved() const { return m_unitMovedByMe; }
+        Unit* GetUnitBeingMoved() const;
         // returns the player that this unit is BEING CONTROLLED BY
         Player* GetPlayerMovingMe() const { return m_playerMovingMe; }
 
