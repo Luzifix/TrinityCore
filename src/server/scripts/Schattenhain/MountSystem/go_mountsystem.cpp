@@ -43,6 +43,12 @@ public:
             _events.ScheduleEvent(FUEL_UPDATE_EVENT, FUEL_UPDATE_INTERVAL);
         }
 
+        void RemoveFromWorld() override
+        {
+            _events.Reset();
+            me->setActive(false);
+        }
+
         void UpdateAI(uint32 diff) override
         {
             _events.Update(diff);
