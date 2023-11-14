@@ -63,9 +63,9 @@ void CharacterMount::SavePositionToDB()
     CharacterDatabase.DirectExecute(stmt);
 }
 
-void CharacterMount::Delete()
+void CharacterMount::DeleteFromDB()
 {
-    CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_REP_CHARACTER_MOUNT);
+    CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_CHARACTER_MOUNT);
     stmt->setUInt32(0, GetId());
     CharacterDatabase.Execute(stmt);
 }

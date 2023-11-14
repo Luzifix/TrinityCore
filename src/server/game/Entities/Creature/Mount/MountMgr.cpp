@@ -390,3 +390,16 @@ void MountMgr::CreateCharacterMount(ObjectGuid guid, MountTemplate* mountTemplat
     characterMount->SaveToDB();
     SpawnCharacterMount(characterMount, true);
 }
+
+void MountMgr::DeleteCharacterMount(CharacterMount* characterMount)
+{
+    if (!characterMount)
+        return;
+
+    TempSummon* mount = characterMount->GetCreature();
+    if (mount)
+        _mountCreatureStore.erase(mount->GetGUID());
+
+    _characterMountStore.remove(characterMount);
+    characterMount->DeleteFromDB();
+}

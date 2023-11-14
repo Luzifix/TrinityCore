@@ -53,6 +53,7 @@ public:
 
     void RespawnCharacterMount(CharacterMount* characterMount);
     void CreateCharacterMount(ObjectGuid guid, MountTemplate* mountTemplate, WorldLocation position);
+    void DeleteCharacterMount(CharacterMount* characterMount);
 
 private:
     void DespawnCharacterMounts(bool reload = false);
