@@ -220,7 +220,7 @@ CharacterMount* MountMgr::GetCharacterMountById(uint32 id)
 {
     for (CharacterMount* characterMount : _characterMountStore)
     {
-        if (characterMount->GetId() != id)
+        if (characterMount->GetId() == id)
             return characterMount;
     }
 
