@@ -11,6 +11,8 @@
 #include "DatabaseEnv.h"
 #include "ObjectMgr.h"
 #include "SharedDefines.h"
+#include "MountMgr.h"
+#include "Chat.h"
 
 enum Spells
 {
@@ -48,12 +50,12 @@ public:
         DisableOOCMode(player);
     }
 
-    void OnPVPKill(Player* killer, Player* killed) override
+    void OnPVPKill(Player* /*killer*/, Player* killed) override
     {
         OnDie(killed);
     }
 
-    void OnPlayerKilledByCreature(Creature* killer, Player* killed) override
+    void OnPlayerKilledByCreature(Creature* /*killer*/, Player* killed) override
     {
         OnDie(killed);
     }
@@ -65,6 +67,14 @@ public:
         player->DurabilityRepairAll(false, 0, false);
         player->SetFullHealth();
         player->TeleportTo(oocSpawn);
+    }
+
+    void OnLogout(Player* player)
+    {
+        for (CharacterMount* characterMount : sMountMgr->GetCharacterMountsByGuid(player->GetGUID()))
+        {
+            characterMount->SaveToDB();
+        }
     }
 
     void CheckCharName(Player* player)

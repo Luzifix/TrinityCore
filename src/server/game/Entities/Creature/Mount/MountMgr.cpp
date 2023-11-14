@@ -220,7 +220,7 @@ CharacterMount* MountMgr::GetCharacterMountById(uint32 id)
 {
     for (CharacterMount* characterMount : _characterMountStore)
     {
-        if (characterMount->GetId() != id)
+        if (characterMount->GetId() == id)
             return characterMount;
     }
 
@@ -388,5 +388,20 @@ void MountMgr::CreateCharacterMount(ObjectGuid guid, MountTemplate* mountTemplat
 
     characterMount->SetMood(MOUNT_MOOD_TYPE_NORMAL);
     characterMount->SaveToDB();
+
+    _characterMountStore.push_back(characterMount);
     SpawnCharacterMount(characterMount, true);
+}
+
+void MountMgr::DeleteCharacterMount(CharacterMount* characterMount)
+{
+    if (!characterMount)
+        return;
+
+    TempSummon* mount = characterMount->GetCreature();
+    if (mount)
+        _mountCreatureStore.erase(mount->GetGUID());
+
+    _characterMountStore.remove(characterMount);
+    characterMount->DeleteFromDB();
 }

@@ -53,8 +53,6 @@ public:
         const uint32 MOUNTSYSTEM_MUD_SPELL_ID = 315786;
         const float MOUNTSYSTEM_MUD_MIN_DIRTINESS = 75.f;
 
-        const uint64 MOUNTSYSTEM_COST_PORTBACK = 50;
-        const uint64 MOUNTSYSTEM_COST_TICKET = 200;
         const WorldLocation MOUNTSYSTEM_LOCATION_DEFAULT = WorldLocation(5000, -9.5843f, -494.1369f, 5.5607f, 4.6343f);
 
         enum ScriptEvents
@@ -147,7 +145,7 @@ public:
             for (auto dirtinessSteps : sMountMgr->GetDirtinessSteps())
                 data["stats"]["dirtinessSteps"][dirtinessSteps.first] = dirtinessSteps.second;
 
-            AddGossipItemFor(player, GossipOptionNpc::Auctioneer, data.dump(), GOSSIP_SENDER_MAIN, 0);
+            InitGossipMenuFor(player, menuId); 
             AddGossipItemFor(player, menuId, 0, GOSSIP_SENDER_MAIN, MountSystemGossipAction::Broom);
             AddGossipItemFor(player, menuId, 1, GOSSIP_SENDER_MAIN, MountSystemGossipAction::Follow);
             AddGossipItemFor(player, menuId, 2, GOSSIP_SENDER_MAIN, MountSystemGossipAction::Mount, characterMount->GetFuel() > 0 && characterMount->GetCondition() > 0 ? GossipOptionStatus::Available : GossipOptionStatus::Locked);
@@ -158,8 +156,8 @@ public:
             AddGossipItemFor(player, menuId, 7, GOSSIP_SENDER_MAIN, MountSystemGossipAction::Rename, isOwner ? GossipOptionStatus::Available : GossipOptionStatus::Locked);
             AddGossipItemFor(player, menuId, 8, GOSSIP_SENDER_MAIN, MountSystemGossipAction::CreateTicket, isGamemaster ? GossipOptionStatus::Available : GossipOptionStatus::Locked);
             AddGossipItemFor(player, menuId, 9, GOSSIP_SENDER_MAIN, MountSystemGossipAction::PayTicket, hasParkingTicket ? GossipOptionStatus::Available : GossipOptionStatus::Locked);
+            AddGossipItemFor(player, GossipOptionNpc::Auctioneer, data.dump(), GOSSIP_SENDER_MAIN, 0);
 
-            player->PlayerTalkClass->GetGossipMenu().SetMenuId(menuId);
             player->TalkedToCreature(me->GetEntry(), me->GetGUID());
             SendGossipMenuFor(player, player->GetGossipTextId(me), me->GetGUID());
 
@@ -213,7 +211,7 @@ public:
                 me->SetName(codeStr);
                 me->SetPetNameTimestamp(uint32(time(nullptr)));
                 characterMount->SetName(codeStr);
-                Save();
+                Save(true);
                 break;
             }
 
@@ -242,7 +240,7 @@ public:
                     characterMount->SetParkingTicket(true);
                     characterMount->SetPosition(MOUNTSYSTEM_LOCATION_DEFAULT);
                     sMountMgr->RespawnCharacterMount(characterMount);
-                    Save();
+                    Save(true);
 
                     break;
                 }
@@ -261,7 +259,7 @@ public:
                     }
 
                     characterMount->SetParkingTicket(false);
-                    Save();
+                    Save(true);
 
                     break;
                 }
@@ -279,7 +277,7 @@ public:
                 characterMount->SetCondition(std::min(100.f, characterMount->GetCondition() + 5.f));
                 characterMount->SetLastCleanupTimestamp((uint64)std::time(0));
                 characterMount->SetLastMoveTimestamp((uint64)std::time(0));
-                Save();
+                Save(true);
 
                 return OnGossipHello(player);
 
@@ -318,13 +316,13 @@ public:
             case MountSystemGossipAction::PortBack:
                 CloseGossipMenuFor(player);
 
-                if (!player->ModifyMoney(-MOUNTSYSTEM_COST_PORTBACK)) {
+                if (!player->ModifyMoney(-MOUNTSYSTEM_COST_PORT_BACK)) {
                     return true;
                 }
 
                 characterMount->SetPosition(characterMount->GetHomePosition());
                 sMountMgr->RespawnCharacterMount(characterMount);
-                Save();
+                Save(true);
 
                 return true;
             case MountSystemGossipAction::SetHome:
@@ -335,7 +333,7 @@ public:
                 }
 
                 characterMount->SetHomePosition(me->GetWorldLocation());
-                Save();
+                Save(true);
                 break;
             }
 
@@ -429,7 +427,11 @@ public:
             }
 
             if (CharacterMount* characterMount = GetCharacterMount())
+            {
                 characterMount->SetLastMoveTimestamp(std::time(0));
+                characterMount->SetPosition(me->GetWorldLocation());
+                characterMount->SavePositionToDB();
+            }
         }
 
     private:
@@ -744,7 +746,9 @@ public:
                 return;
 
             characterMount->SetPosition(me->GetWorldLocation());
-            characterMount->SaveToDB();
+
+            if (forceSave)
+                characterMount->SaveToDB();
         }
 
         void EjectPlayer(CharacterMount* characterMount)

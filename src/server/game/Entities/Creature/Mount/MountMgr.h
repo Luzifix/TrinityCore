@@ -27,6 +27,12 @@ const uint32 MOUNTSYSTEM_REFILL_INDICATOR_AURA_SLOW = 800003;
 const uint32 MOUNTSYSTEM_REFILL_INDICATOR_AURA_NORMAL = 800004;
 const uint32 MOUNTSYSTEM_REFILL_INDICATOR_AURA_FAST = 800005;
 
+const uint64 MOUNTSYSTEM_COST_PORT_BACK = 50;
+const uint64 MOUNTSYSTEM_COST_PORT_TO_ME = 100;
+const uint64 MOUNTSYSTEM_COST_TICKET = 200;
+
+const uint32 MOUNTSYSTEM_ALLOWED_MAPID = 5000;
+
 class TC_GAME_API MountMgr
 {
 public:
@@ -49,8 +55,11 @@ public:
     CharacterMount* GetCharacterMountById(uint32 id);
     std::list<CharacterMount*> GetCharacterMountsByGuid(ObjectGuid guid);
     CharacterMount* GetCharacterMountByCreatureGuid(ObjectGuid creatureGuid);
+    std::list<CharacterMount*> GetCharacterMountStore() { return _characterMountStore; };
+
     void RespawnCharacterMount(CharacterMount* characterMount);
     void CreateCharacterMount(ObjectGuid guid, MountTemplate* mountTemplate, WorldLocation position);
+    void DeleteCharacterMount(CharacterMount* characterMount);
 
 private:
     void DespawnCharacterMounts(bool reload = false);

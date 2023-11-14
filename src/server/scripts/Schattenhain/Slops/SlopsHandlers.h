@@ -76,6 +76,10 @@ public:
     static void HandleSignSubmit(SlopsPackage package);
     static void HandleSignHistoryRequest(SlopsPackage package);
 
+    // Mount System
+    static void HandleMountSystemRequest(SlopsPackage package);
+    static void HandleMountSystemAction(SlopsPackage package);
+
 };
 
 #endif // SlopsHandler_h__

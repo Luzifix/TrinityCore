@@ -48,8 +48,8 @@ public:
         }
     }
 
-    void SaveToDB();
-    void Delete();
+    void SaveToDB(CharacterDatabaseTransaction characterTransaction = nullptr);
+    void DeleteFromDB();
     void SavePositionToDB();
     bool IsOwner(Player* player);
     bool IsOwner(ObjectGuid playerGuid);

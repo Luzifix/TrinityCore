@@ -79,6 +79,10 @@ Slops::Slops()
     AddMessageHandler(SLOPS_CMSG_SIGN_CONTENT_REQUEST, SlopsHandler::HandleSignContentRequest);
     AddMessageHandler(SLOPS_CMSG_SIGN_SUBMIT, SlopsHandler::HandleSignSubmit);
     AddMessageHandler(SLOPS_CMSG_SIGN_HISTORY_REQUEST, SlopsHandler::HandleSignHistoryRequest);
+
+    // Mount System
+    AddMessageHandler(SLOPS_CMSG_MOUNT_SYSTEM_REQUEST, SlopsHandler::HandleMountSystemRequest);
+    AddMessageHandler(SLOPS_CMSG_MOUNT_SYSTEM_ACTION, SlopsHandler::HandleMountSystemAction);
     
 }
 Slops::~Slops() { }

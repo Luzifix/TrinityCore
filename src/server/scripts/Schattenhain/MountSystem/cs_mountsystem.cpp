@@ -208,7 +208,7 @@ public:
             return false;
         }
 
-        characterMount->Delete();
+        sMountMgr->DeleteCharacterMount(characterMount);
 
         // Delete the creature
         creature->CombatStop();

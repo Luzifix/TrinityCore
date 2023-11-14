@@ -5,12 +5,14 @@
 #include "MountMgr.h"
 #include "DatabaseEnv.h"
 
-void CharacterMount::SaveToDB()
+void CharacterMount::SaveToDB(CharacterDatabaseTransaction characterTransaction /* = nullptr*/)
 {
     WorldLocation position = GetPosition();
     WorldLocation homePosition = GetHomePosition();
 
-    CharacterDatabaseTransaction trans = CharacterDatabase.BeginTransaction();
+    bool commitTansaction = (characterTransaction == nullptr);
+    if (characterTransaction == nullptr)
+        characterTransaction = CharacterDatabase.BeginTransaction();
 
     CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_REP_CHARACTER_MOUNT);
     stmt->setUInt32(0, GetId());
@@ -33,17 +35,18 @@ void CharacterMount::SaveToDB()
     stmt->setUInt64(17, GetLastCleanupTimestamp());
     stmt->setUInt64(18, GetLastMoveTimestamp());
     stmt->setBool(19, HasParkingTicket());
-    trans->Append(stmt);
+    characterTransaction->Append(stmt);
 
     for (CharacterMountPermission* permission : _permissionList)
     {
         CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_REP_CHARACTER_MOUNT_PERMISSION);
         stmt->setUInt32(0, GetId());
         stmt->setUInt64(1, permission->characterGuid.GetCounter());
-        trans->Append(stmt);
+        characterTransaction->Append(stmt);
     }
 
-    CharacterDatabase.CommitTransaction(trans);
+    if (commitTansaction)
+        CharacterDatabase.CommitTransaction(characterTransaction);
 }
 void CharacterMount::SavePositionToDB()
 {
@@ -60,9 +63,9 @@ void CharacterMount::SavePositionToDB()
     CharacterDatabase.DirectExecute(stmt);
 }
 
-void CharacterMount::Delete()
+void CharacterMount::DeleteFromDB()
 {
-    CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_REP_CHARACTER_MOUNT);
+    CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_CHARACTER_MOUNT);
     stmt->setUInt32(0, GetId());
     CharacterDatabase.Execute(stmt);
 }
