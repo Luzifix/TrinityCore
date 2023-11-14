@@ -429,7 +429,11 @@ public:
             }
 
             if (CharacterMount* characterMount = GetCharacterMount())
+            {
                 characterMount->SetLastMoveTimestamp(std::time(0));
+                characterMount->SetPosition(me->GetWorldLocation());
+                characterMount->SavePositionToDB();
+            }
         }
 
     private:
