@@ -109,6 +109,9 @@ public:
 
     void SetCreature(TempSummon* creature) { _creature = creature; }
     TempSummon* GetCreature() { return _creature; }
+
+    void SetVisibility(bool visibility) { _visible = visibility; }
+    bool IsVisible() { return _visible; }
 #pragma endregion
 
 private:
@@ -128,6 +131,7 @@ private:
 
     MountMoodType _mood = MOUNT_MOOD_TYPE_NORMAL;
     TempSummon* _creature = nullptr;
+    bool _visible = true;
 };
 
 #endif // CharacterMount_h__

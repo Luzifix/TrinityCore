@@ -63,6 +63,7 @@ public:
             EXCRETION_UPDATE_EVENT = 4,
             CLEANLINESS_UPDATE_EVENT = 5,
             CONDITION_UPDATE_EVENT = 6,
+            VISIBILITY_UPDATE_EVENT = 7,
         };
 
         static inline constexpr Seconds SAVE_INTERVAL = 60s;
@@ -71,6 +72,7 @@ public:
         static inline constexpr Seconds EXCRETION_UPDATE_INTERVAL = 5s;
         static inline constexpr Seconds CLEANLINESS_UPDATE_INTERVAL = 1s;
         static inline constexpr Seconds CONDITION_UPDATE_INTERVAL = 5s;
+        static inline constexpr Seconds VISIBILITY_UPDATE_INTERVAL = 5s;
 
         npc_mountsystem_mountAI(Creature* creature) : VehicleAI(creature) { }
 
@@ -349,6 +351,7 @@ public:
             _events.ScheduleEvent(EXCRETION_UPDATE_EVENT, EXCRETION_UPDATE_INTERVAL);
             _events.ScheduleEvent(CLEANLINESS_UPDATE_EVENT, CLEANLINESS_UPDATE_INTERVAL);
             _events.ScheduleEvent(CONDITION_UPDATE_EVENT, CONDITION_UPDATE_INTERVAL);
+            _events.ScheduleEvent(VISIBILITY_UPDATE_EVENT, VISIBILITY_UPDATE_INTERVAL);
         }
 
         void UpdateAI(uint32 diff) override
@@ -361,13 +364,13 @@ public:
                 {
                 case SAVE_EVENT:
                     Save();
-
                     _events.ScheduleEvent(eventId, SAVE_INTERVAL);
+
                     break;
                 case MOVEMENT_UPDATE_EVENT:
                     HandleMovementEvent();
-
                     _events.ScheduleEvent(eventId, MOVEMENT_UPDATE_INTERVAL);
+
                     break;
                 case FUEL_UPDATE_EVENT:
                     if (HandleFuelEvent())
@@ -387,6 +390,11 @@ public:
                 case CONDITION_UPDATE_EVENT:
                     if (HandleConditionEvent())
                         _events.ScheduleEvent(eventId, CONDITION_UPDATE_INTERVAL);
+
+                    break;
+                case VISIBILITY_UPDATE_EVENT:
+                    HandleVisibilityEvent();
+                    _events.ScheduleEvent(eventId, VISIBILITY_UPDATE_INTERVAL);
 
                     break;
                 }
@@ -463,6 +471,8 @@ public:
             if (Vehicle* vehicle = me->GetVehicleKit())
             {
                 bool hasOOCModeAura = me->HasAura(SPELL_OOC_MODE);
+                CharacterMount* characterMount = GetCharacterMount();
+
                 if (vehicle->IsVehicleInUse())
                 {
                     Player* mainSeatPlayer = vehicle->GetPassenger(0)->ToPlayer();
@@ -484,7 +494,7 @@ public:
 
                     return;
                 }
-                else if (hasOOCModeAura)
+                else if (hasOOCModeAura && characterMount != nullptr && characterMount->IsVisible())
                 {
                     me->RemoveAurasDueToSpell(SPELL_OOC_MODE);
                     me->m_serverSideVisibility.SetValue(SERVERSIDE_VISIBILITY_GHOST, GHOST_VISIBILITY_ALIVE);
@@ -735,6 +745,35 @@ public:
             }
 
             return true;
+        }
+
+        void HandleVisibilityEvent()
+        {
+            CharacterMount* characterMount = GetCharacterMount();
+            if (!characterMount)
+                return;
+
+            Player* owner = ObjectAccessor::FindPlayer(characterMount->GetGuid());
+            if (!characterMount->IsVisible() && owner)
+                characterMount->SetVisibility(true);
+
+            bool hasOOCModeAura = me->HasAura(SPELL_OOC_MODE);
+
+            if (characterMount->IsVisible() && hasOOCModeAura)
+            {
+                me->RemoveAurasDueToSpell(SPELL_OOC_MODE);
+                me->m_serverSideVisibility.SetValue(SERVERSIDE_VISIBILITY_GHOST, GHOST_VISIBILITY_ALIVE);
+                me->m_serverSideVisibilityDetect.SetValue(SERVERSIDE_VISIBILITY_GHOST, GHOST_VISIBILITY_ALIVE);
+
+                return;
+            }
+
+            if (characterMount->IsVisible() || hasOOCModeAura)
+                return;
+
+            me->AddAura(SPELL_OOC_MODE, me);
+            me->m_serverSideVisibility.SetValue(SERVERSIDE_VISIBILITY_GHOST, GHOST_VISIBILITY_GHOST);
+            me->m_serverSideVisibilityDetect.SetValue(SERVERSIDE_VISIBILITY_GHOST, GHOST_VISIBILITY_GHOST);
         }
 #pragma endregion
 

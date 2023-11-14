@@ -105,8 +105,8 @@ void MountMgr::LoadCharacterMountFromDB()
     _lastCharaterMountId = 0;
     uint32 characterMountCount = 0;
 
-    // Load Character Mounts                                 0     1       2                  3       4       5            6            7            8            9              10     11               12               13               14                 15         16           17                      18                   19
-    if (QueryResult result = CharacterDatabase.Query("SELECT `id`, `guid`, `mountTemplateId`, `name`, `fuel`, `condition`, `positionX`, `positionY`, `positionZ`, `orientation`, `map`, `homePositionX`, `homePositionY`, `homePositionZ`, `homeOrientation`, `homeMap`, `dirtiness`, `lastCleanupTimestamp`, `lastMoveTimestamp`, `parkingTicket` FROM `character_mount`"))
+    // Load Character Mounts                                 0        1          2                     3          4          5               6               7               8               9                 10        11                  12                  13                  14                    15            16              17                         18                      19                  20
+    if (QueryResult result = CharacterDatabase.Query("SELECT cm.`id`, cm.`guid`, cm.`mountTemplateId`, cm.`name`, cm.`fuel`, cm.`condition`, cm.`positionX`, cm.`positionY`, cm.`positionZ`, cm.`orientation`, cm.`map`, cm.`homePositionX`, cm.`homePositionY`, cm.`homePositionZ`, cm.`homeOrientation`, cm.`homeMap`, cm.`dirtiness`, cm.`lastCleanupTimestamp`, cm.`lastMoveTimestamp`, cm.`parkingTicket`, c.`logout_time` FROM `character_mount` cm LEFT JOIN `characters` c ON(cm.`guid` = c.guid)"))
     {
         do
         {
@@ -132,12 +132,13 @@ void MountMgr::LoadCharacterMountFromDB()
             uint64 lastCleanupTimestamp = fields[17].GetUInt64();
             uint64 lastMoveTimestamp = fields[18].GetUInt64();
             bool parkingTicket = fields[19].GetBool();
+            uint64 lastLoginTimestamp = fields[20].GetUInt64();
 
             if (lastMoveTimestamp == 0)
                 lastMoveTimestamp = std::time(0);
 
             _lastCharaterMountId = std::max(mountId, _lastCharaterMountId);
-            _characterMountStore.push_back(new CharacterMount(
+            CharacterMount* characterMount = new CharacterMount(
                 mountId,
                 guid,
                 mountTemplate,
@@ -151,7 +152,13 @@ void MountMgr::LoadCharacterMountFromDB()
                 lastCleanupTimestamp,
                 lastMoveTimestamp,
                 parkingTicket
-            ));
+            );
+
+            // Check if last login is older than 1 week and make the mount invisible
+            if (lastLoginTimestamp > 0 && (std::time(0) - lastLoginTimestamp) > 1 * 7 * 24 * 60 * 60)
+                characterMount->SetVisibility(false);
+
+            _characterMountStore.push_back(characterMount);
             characterMountCount++;
 
         } while (result->NextRow());
