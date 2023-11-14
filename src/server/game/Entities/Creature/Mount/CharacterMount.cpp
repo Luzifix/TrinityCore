@@ -10,6 +10,7 @@ void CharacterMount::SaveToDB(CharacterDatabaseTransaction characterTransaction 
     WorldLocation position = GetPosition();
     WorldLocation homePosition = GetHomePosition();
 
+    bool commitTansaction = (characterTransaction == nullptr);
     if (characterTransaction == nullptr)
         characterTransaction = CharacterDatabase.BeginTransaction();
 
@@ -44,7 +45,7 @@ void CharacterMount::SaveToDB(CharacterDatabaseTransaction characterTransaction 
         characterTransaction->Append(stmt);
     }
 
-    if (characterTransaction == nullptr)
+    if (commitTansaction)
         CharacterDatabase.CommitTransaction(characterTransaction);
 }
 void CharacterMount::SavePositionToDB()
