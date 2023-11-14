@@ -53,8 +53,6 @@ public:
         const uint32 MOUNTSYSTEM_MUD_SPELL_ID = 315786;
         const float MOUNTSYSTEM_MUD_MIN_DIRTINESS = 75.f;
 
-        const uint64 MOUNTSYSTEM_COST_PORTBACK = 50;
-        const uint64 MOUNTSYSTEM_COST_TICKET = 200;
         const WorldLocation MOUNTSYSTEM_LOCATION_DEFAULT = WorldLocation(5000, -9.5843f, -494.1369f, 5.5607f, 4.6343f);
 
         enum ScriptEvents
@@ -318,7 +316,7 @@ public:
             case MountSystemGossipAction::PortBack:
                 CloseGossipMenuFor(player);
 
-                if (!player->ModifyMoney(-MOUNTSYSTEM_COST_PORTBACK)) {
+                if (!player->ModifyMoney(-MOUNTSYSTEM_COST_PORT_BACK)) {
                     return true;
                 }
 
