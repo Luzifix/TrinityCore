@@ -388,6 +388,8 @@ void MountMgr::CreateCharacterMount(ObjectGuid guid, MountTemplate* mountTemplat
 
     characterMount->SetMood(MOUNT_MOOD_TYPE_NORMAL);
     characterMount->SaveToDB();
+
+    _characterMountStore.push_back(characterMount);
     SpawnCharacterMount(characterMount, true);
 }
 
