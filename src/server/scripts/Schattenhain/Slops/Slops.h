@@ -53,6 +53,8 @@ enum SchattenhainLuaOpcodeClient : uint32
     SLOPS_CMSG_SIGN_HISTORY_REQUEST                            = 0x0028,
     SLOPS_CMSG_HOUSING_TRANSFER_OWNERSHIP                      = 0x0029,
     SLOPS_CMSG_HOUSING_SET_HEARTHSTONE                         = 0x002A,
+    SLOPS_CMSG_MOUNT_SYSTEM_REQUEST                            = 0x002B,
+    SLOPS_CMSG_MOUNT_SYSTEM_ACTION                             = 0x002C,
 
     SLOPS_CMSG_MAX
 };
@@ -86,6 +88,7 @@ enum SchattenhainLuaOpcodeServer : uint32
     SLOPS_SMSG_ANIMATIONS_LIST_RESPONSE                        = 0x001E,
     SLOPS_SMSG_SIGN_CONTENT_RESPONSE                           = 0x001F,
     SLOPS_SMSG_SIGN_HISTORY_RESPONSE                           = 0x0020,
+    SLOPS_SMSG_MOUNT_SYSTEM_RESPONSE                           = 0x0021,
 
     SLOPS_SMSG_MAX
 };
