@@ -198,7 +198,7 @@ namespace WorldPackets
             ObjectGuid Vendor;
         };
 
-        class GossipPOI final : public ServerPacket
+        class TC_GAME_API GossipPOI final : public ServerPacket
         {
         public:
             GossipPOI() : ServerPacket(SMSG_GOSSIP_POI, 2 + 4 + 4 + 4 + 4) { }
