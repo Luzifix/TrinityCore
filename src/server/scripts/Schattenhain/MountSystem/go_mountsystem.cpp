@@ -39,14 +39,7 @@ public:
 
         void InitializeAI() override
         {
-            me->setActive(true);
             _events.ScheduleEvent(FUEL_UPDATE_EVENT, FUEL_UPDATE_INTERVAL);
-        }
-
-        void RemoveFromWorld() override
-        {
-            _events.Reset();
-            me->setActive(false);
         }
 
         void UpdateAI(uint32 diff) override
