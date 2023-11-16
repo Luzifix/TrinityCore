@@ -6,7 +6,7 @@
 #include "GameObject.h"
 #include "Player.h"
 
-static float ACTION_MAX_RANGE_PLAYER = 30.f;
+static float ACTION_MAX_RANGE_PLAYER = 80.f;
 static float ACTION_MAX_RANGE_GM = 0.f;
 
 enum GameObjectSelectionInfoError : uint8
