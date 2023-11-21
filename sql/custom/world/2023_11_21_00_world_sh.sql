@@ -1,0 +1,37 @@
+REPLACE INTO `creature_model_info` (`DisplayID`, `BoundingRadius`, `CombatReach`, `DisplayID_Other_Gender`, `VerifiedBuild`) VALUES (1000000, 0, 0, 0, -1);
+REPLACE INTO `creature_model_info` (`DisplayID`, `BoundingRadius`, `CombatReach`, `DisplayID_Other_Gender`, `VerifiedBuild`) VALUES (1000001, 0, 0, 0, -1);
+REPLACE INTO `creature_model_info` (`DisplayID`, `BoundingRadius`, `CombatReach`, `DisplayID_Other_Gender`, `VerifiedBuild`) VALUES (1000002, 0, 0, 0, -1);
+REPLACE INTO `creature_model_info` (`DisplayID`, `BoundingRadius`, `CombatReach`, `DisplayID_Other_Gender`, `VerifiedBuild`) VALUES (1000003, 0, 0, 0, -1);
+REPLACE INTO `creature_model_info` (`DisplayID`, `BoundingRadius`, `CombatReach`, `DisplayID_Other_Gender`, `VerifiedBuild`) VALUES (1000004, 0, 0, 0, -1);
+REPLACE INTO `creature_model_info` (`DisplayID`, `BoundingRadius`, `CombatReach`, `DisplayID_Other_Gender`, `VerifiedBuild`) VALUES (1000005, 0, 0, 0, -1);
+REPLACE INTO `creature_model_info` (`DisplayID`, `BoundingRadius`, `CombatReach`, `DisplayID_Other_Gender`, `VerifiedBuild`) VALUES (1000006, 0, 0, 0, -1);
+REPLACE INTO `creature_model_info` (`DisplayID`, `BoundingRadius`, `CombatReach`, `DisplayID_Other_Gender`, `VerifiedBuild`) VALUES (1000007, 0, 0, 0, -1);
+REPLACE INTO `creature_model_info` (`DisplayID`, `BoundingRadius`, `CombatReach`, `DisplayID_Other_Gender`, `VerifiedBuild`) VALUES (1000008, 0, 0, 0, -1);
+REPLACE INTO `creature_model_info` (`DisplayID`, `BoundingRadius`, `CombatReach`, `DisplayID_Other_Gender`, `VerifiedBuild`) VALUES (1000009, 0, 0, 0, -1);
+REPLACE INTO `creature_model_info` (`DisplayID`, `BoundingRadius`, `CombatReach`, `DisplayID_Other_Gender`, `VerifiedBuild`) VALUES (1000010, 0, 0, 0, -1);
+REPLACE INTO `creature_model_info` (`DisplayID`, `BoundingRadius`, `CombatReach`, `DisplayID_Other_Gender`, `VerifiedBuild`) VALUES (1000011, 0, 0, 0, -1);
+REPLACE INTO `creature_model_info` (`DisplayID`, `BoundingRadius`, `CombatReach`, `DisplayID_Other_Gender`, `VerifiedBuild`) VALUES (1000012, 0, 0, 0, -1);
+REPLACE INTO `creature_model_info` (`DisplayID`, `BoundingRadius`, `CombatReach`, `DisplayID_Other_Gender`, `VerifiedBuild`) VALUES (1000013, 0, 0, 0, -1);
+REPLACE INTO `creature_model_info` (`DisplayID`, `BoundingRadius`, `CombatReach`, `DisplayID_Other_Gender`, `VerifiedBuild`) VALUES (1000014, 0, 0, 0, -1);
+REPLACE INTO `creature_model_info` (`DisplayID`, `BoundingRadius`, `CombatReach`, `DisplayID_Other_Gender`, `VerifiedBuild`) VALUES (1000015, 0, 0, 0, -1);
+REPLACE INTO `creature_model_info` (`DisplayID`, `BoundingRadius`, `CombatReach`, `DisplayID_Other_Gender`, `VerifiedBuild`) VALUES (1000016, 0, 0, 0, -1);
+REPLACE INTO `creature_model_info` (`DisplayID`, `BoundingRadius`, `CombatReach`, `DisplayID_Other_Gender`, `VerifiedBuild`) VALUES (1000017, 0, 0, 0, -1);
+REPLACE INTO `creature_model_info` (`DisplayID`, `BoundingRadius`, `CombatReach`, `DisplayID_Other_Gender`, `VerifiedBuild`) VALUES (1000018, 0, 0, 0, -1);
+
+REPLACE INTO `sign_display` (`id`, `name`, `display_id`, `scale`) VALUES (3, 'Aufgabenschild aus Stein', 1000001, 0.7);
+REPLACE INTO `sign_display` (`id`, `name`, `display_id`, `scale`) VALUES (4, 'Aufgabenschild aus Holz', 1000002, 1);
+REPLACE INTO `sign_display` (`id`, `name`, `display_id`, `scale`) VALUES (5, 'Lichthafen Banner', 1000003, 0.8);
+REPLACE INTO `sign_display` (`id`, `name`, `display_id`, `scale`) VALUES (6, 'Ingenieurs Banner', 1000004, 1);
+REPLACE INTO `sign_display` (`id`, `name`, `display_id`, `scale`) VALUES (7, 'Anker Banner', 1000005, 0.5);
+REPLACE INTO `sign_display` (`id`, `name`, `display_id`, `scale`) VALUES (11, 'Zerkratztes Verbotsschild', 1000008, 1.2);
+REPLACE INTO `sign_display` (`id`, `name`, `display_id`, `scale`) VALUES (12, 'Zerkratztes Schild', 1000009, 0.7);
+REPLACE INTO `sign_display` (`id`, `name`, `display_id`, `scale`) VALUES (13, 'Elfisches Gesucht Schild', 1000010, 0.9);
+REPLACE INTO `sign_display` (`id`, `name`, `display_id`, `scale`) VALUES (14, 'Braufest Banner', 1000011, 0.55);
+REPLACE INTO `sign_display` (`id`, `name`, `display_id`, `scale`) VALUES (15, 'Quadratisches grünes Segel', 1000012, 0.15);
+REPLACE INTO `sign_display` (`id`, `name`, `display_id`, `scale`) VALUES (16, 'Weißes Segel', 1000013, 0.15);
+REPLACE INTO `sign_display` (`id`, `name`, `display_id`, `scale`) VALUES (17, 'Grünes kleines Segel', 1000014, 0.15);
+REPLACE INTO `sign_display` (`id`, `name`, `display_id`, `scale`) VALUES (18, 'Barbier', 1000015, 1);
+REPLACE INTO `sign_display` (`id`, `name`, `display_id`, `scale`) VALUES (19, 'Kleines Gesucht Schild', 1000016, 1);
+REPLACE INTO `sign_display` (`id`, `name`, `display_id`, `scale`) VALUES (20, 'Quadratisches Gesucht Schild', 1000017, 1);
+REPLACE INTO `sign_display` (`id`, `name`, `display_id`, `scale`) VALUES (21, 'Großes Gesucht Schild', 1000018, 1);
+
