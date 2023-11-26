@@ -36,7 +36,7 @@ static void RemoveAurasBeforeAnimation(Player* player)
         if (IsAuraAllowedWhileAnimation(aura))
             ++iter;
         
-        player->_UnapplyAura(iter, AURA_REMOVE_BY_DEFAULT);
+        player->RemoveAurasDueToSpell(aura->GetSpellInfo()->Id);
     }
 
     for (Player::AuraMap::iterator iter = ownedAuras.begin(); iter != ownedAuras.end();)
@@ -46,7 +46,7 @@ static void RemoveAurasBeforeAnimation(Player* player)
         if (IsAuraAllowedWhileAnimation(aura))
             ++iter;
 
-        player->RemoveOwnedAura(iter, AURA_REMOVE_BY_DEFAULT);
+        player->RemoveAurasDueToSpell(aura->GetSpellInfo()->Id);
     }
 }
 
