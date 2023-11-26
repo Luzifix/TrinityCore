@@ -281,6 +281,8 @@ void HousingArea::UpdateVisitorList()
 
 void HousingArea::UpdateChimneySmoke()
 {
+    return; // TODO: Fix chimney smoke
+
     bool chimenySmokeSpawned = (_chimneySmoke.size() > 0);
     if (!IsVisitorInHouse())
     {
