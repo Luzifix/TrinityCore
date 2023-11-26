@@ -12,6 +12,7 @@
 #include "Util.h"
 #include "WorldSession.h"
 #include "NPCPackets.h"
+#include "Vehicle.h"
 
 void SlopsHandler::HandleMountSystemRequest(SlopsPackage package)
 {
@@ -75,6 +76,8 @@ void SlopsHandler::HandleMountSystemAction(SlopsPackage package)
     if (!characterMount || !characterMount->IsOwner(player))
         return;
 
+    bool hasPassenger = characterMount->GetCreature()->HasAuraType(SPELL_AURA_CONTROL_VEHICLE);
+
     if (action == "MARK_ON_MAP") {
         WorldPackets::NPC::GossipPOI packet;
         packet.ID = characterMount->GetGuid().GetCounter();
@@ -87,6 +90,11 @@ void SlopsHandler::HandleMountSystemAction(SlopsPackage package)
 
         player->SendDirectMessage(packet.Write());
     } else if (action == "PORT_BACK") {
+        if (hasPassenger) {
+            handler.SendSysMessage(LANG_MOUNT_SYSTEM_ERR_HAS_PASSANGER);
+            return;
+        }
+
         if (!player->ModifyMoney(-MOUNTSYSTEM_COST_PORT_BACK)) {
             handler.SendSysMessage(LANG_MOUNT_SYSTEM_ERR_NOT_ENOUGH_MONEY);
             return;
@@ -96,6 +104,11 @@ void SlopsHandler::HandleMountSystemAction(SlopsPackage package)
         sMountMgr->RespawnCharacterMount(characterMount);
         characterMount->SaveToDB();
     } else if (action == "PORT_TO_ME") {
+        if (hasPassenger) {
+            handler.SendSysMessage(LANG_MOUNT_SYSTEM_ERR_HAS_PASSANGER);
+            return;
+        }
+
         if (player->GetMapId() != MOUNTSYSTEM_ALLOWED_MAPID) {
             handler.SendSysMessage(LANG_MOUNT_SYSTEM_ERR_PORT_TO_ME_WRONG_MAP);
             return;
