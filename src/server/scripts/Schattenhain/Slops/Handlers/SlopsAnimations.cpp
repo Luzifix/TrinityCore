@@ -29,30 +29,24 @@ static void RemoveAurasBeforeAnimation(Player* player)
     Player::AuraApplicationMap& appliedAuras = player->GetAppliedAuras();
     Player::AuraMap& ownedAuras = player->GetOwnedAuras();
 
-    for (Player::AuraApplicationMap::iterator iter = appliedAuras.begin(); iter != appliedAuras.end();)
-    {
-        Aura const* aura = iter->second->GetBase();
+    std::vector<uint32> allowedAuras = {
+        37800, // OOC MODE
+    };
 
-        if (IsAuraAllowedWhileAnimation(aura))
-        {
-            ++iter;
-            return;
-        }
-        
-        player->RemoveAurasDueToSpell(aura->GetSpellInfo()->Id);
+    for (auto const& [spellId, aura] : appliedAuras)
+    {
+        if (IsAuraAllowedWhileAnimation(aura->GetBase()))
+            continue;
+
+        player->RemoveAurasDueToSpell(spellId);
     }
 
-    for (Player::AuraMap::iterator iter = ownedAuras.begin(); iter != ownedAuras.end();)
+    for (auto const& [spellId, aura] : ownedAuras)
     {
-        Aura* aura = iter->second;
-
         if (IsAuraAllowedWhileAnimation(aura))
-        {
-            ++iter;
-            return;
-        }
+            continue;
 
-        player->RemoveAurasDueToSpell(aura->GetSpellInfo()->Id);
+        player->RemoveAurasDueToSpell(spellId);
     }
 }
 
@@ -109,8 +103,10 @@ void SlopsHandler::HandleAnimationsDo(SlopsPackage package)
     player->SetAIAnimKitId(0);
     player->SetMeleeAnimKitId(0);
     player->SetMovementAnimKitId(0);
-    player->RemoveAllAurasExceptType(AuraType::SPELL_AURA_WORGEN_ALTERED_FORM);
     RemoveAurasBeforeAnimation(player);
+
+    Player::AuraApplicationMap& appliedAuras = player->GetAppliedAuras();
+    Player::AuraMap& ownedAuras = player->GetOwnedAuras();
 
     player->HandleEmoteCommand(Emote(411), nullptr);
 
