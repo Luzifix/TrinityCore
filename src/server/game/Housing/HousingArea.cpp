@@ -288,7 +288,7 @@ void HousingArea::UpdateChimneySmoke()
         {
             for (GameObject* chimneySmoke : _chimneySmoke)
             {
-                if (chimneySmoke->IsInWorld())
+                if (chimneySmoke && chimneySmoke->IsInWorld())
                     chimneySmoke->DespawnOrUnsummon();
             }
 
