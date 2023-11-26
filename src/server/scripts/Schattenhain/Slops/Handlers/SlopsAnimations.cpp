@@ -4,6 +4,51 @@
 
 #include "ScriptPCH.h"
 #include "Player.h"
+#include "SpellAuras.h"
+#include "SpellInfo.h"
+
+static bool IsAuraAllowedWhileAnimation(Aura const* aura)
+{
+    std::vector<uint32> allowedAuras = {
+        37800, // OOC MODE
+    };
+
+    // Check if aura id is in allowedAuras
+    if (std::find(allowedAuras.begin(), allowedAuras.end(), aura->GetSpellInfo()->Id) != allowedAuras.end())
+        return true;
+
+    // Check if aura is a worgen form aura
+    if (aura->GetSpellInfo()->HasAura(AuraType::SPELL_AURA_WORGEN_ALTERED_FORM))
+        return true;
+
+    return false;
+}
+
+static void RemoveAurasBeforeAnimation(Player* player)
+{
+    Player::AuraApplicationMap& appliedAuras = player->GetAppliedAuras();
+    Player::AuraMap& ownedAuras = player->GetOwnedAuras();
+
+    for (Player::AuraApplicationMap::iterator iter = appliedAuras.begin(); iter != appliedAuras.end();)
+    {
+        Aura const* aura = iter->second->GetBase();
+
+        if (IsAuraAllowedWhileAnimation(aura))
+            ++iter;
+        
+        player->_UnapplyAura(iter, AURA_REMOVE_BY_DEFAULT);
+    }
+
+    for (Player::AuraMap::iterator iter = ownedAuras.begin(); iter != ownedAuras.end();)
+    {
+        Aura* aura = iter->second;
+
+        if (IsAuraAllowedWhileAnimation(aura))
+            ++iter;
+
+        player->RemoveOwnedAura(iter, AURA_REMOVE_BY_DEFAULT);
+    }
+}
 
 void SlopsHandler::HandleAnimationsListRequest(SlopsPackage package)
 {
@@ -59,6 +104,8 @@ void SlopsHandler::HandleAnimationsDo(SlopsPackage package)
     player->SetMeleeAnimKitId(0);
     player->SetMovementAnimKitId(0);
     player->RemoveAllAurasExceptType(AuraType::SPELL_AURA_WORGEN_ALTERED_FORM);
+    RemoveAurasBeforeAnimation(player);
+
     player->HandleEmoteCommand(Emote(411), nullptr);
 
     if (animation->emoteId != 0)
