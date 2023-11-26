@@ -34,7 +34,10 @@ static void RemoveAurasBeforeAnimation(Player* player)
         Aura const* aura = iter->second->GetBase();
 
         if (IsAuraAllowedWhileAnimation(aura))
+        {
             ++iter;
+            return;
+        }
         
         player->RemoveAurasDueToSpell(aura->GetSpellInfo()->Id);
     }
@@ -44,7 +47,10 @@ static void RemoveAurasBeforeAnimation(Player* player)
         Aura* aura = iter->second;
 
         if (IsAuraAllowedWhileAnimation(aura))
+        {
             ++iter;
+            return;
+        }
 
         player->RemoveAurasDueToSpell(aura->GetSpellInfo()->Id);
     }
