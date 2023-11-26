@@ -20,6 +20,13 @@
 #include <Language.h>
 #include <DB2Stores.h>
 
+#ifdef RELEASE
+#define MAX_OBJECT_SELECTION 500
+#else
+#define MAX_OBJECT_SELECTION 250
+#endif
+
+
 static void ResponseSelected(Player* player, std::list<GameObject*> objects)
 {
     JSON data = {
@@ -98,21 +105,16 @@ static GameObjectSelectionInfoStore FindNearGameObjectsByGUID(Player* player, JS
 {
     GameObjectSelectionInfoStore gameObjectSelectionInfoStore;
 
-    for (auto& guid : data["objects"].ArrayRange())
+    for (auto& object : data["objects"].ArrayRange())
     {
+        Map* map = player->GetMap();
+        bool isGamemaster = player->IsGameMaster();
+        bool isGamemasterCommand = command.find("ActionGM") == 0;
+
         GameObjectSelectionInfo gameObjectSelectionInfo;
-        gameObjectSelectionInfo.guid = guid.ToInt();
+        gameObjectSelectionInfo.guid = object.ToInt();
 
-        GameObjectData const* gameObjectData = sObjectMgr->GetGameObjectData(gameObjectSelectionInfo.guid);
-
-        if (!gameObjectData)
-        {
-            gameObjectSelectionInfo.error = GAMEOBJECT_SELECTION_INFO_ERROR_OUT_OF_RANGE;
-            gameObjectSelectionInfoStore.push_back(gameObjectSelectionInfo);
-            continue;
-        }
-
-        GameObject* gameObject = player->GetMap()->GetGameObjectBySpawnId(gameObjectData->spawnId);
+        GameObject* gameObject = map->GetGameObjectBySpawnId(gameObjectSelectionInfo.guid);
         if (!gameObject || !gameObject->IsInWorld() || !gameObject->IsInGrid())
         {
             gameObjectSelectionInfo.error = GAMEOBJECT_SELECTION_INFO_ERROR_OUT_OF_RANGE;
@@ -122,7 +124,7 @@ static GameObjectSelectionInfoStore FindNearGameObjectsByGUID(Player* player, JS
 
         gameObjectSelectionInfo.gameObject = gameObject;
 
-        if (!player->IsGameMaster() || command.find("ActionGM") != 0)
+        if (!isGamemaster || !isGamemasterCommand)
         {
             if (player->GetHouseAreaId() != gameObjectSelectionInfo.gameObject->GetHouseAreaId())
             {
@@ -132,7 +134,7 @@ static GameObjectSelectionInfoStore FindNearGameObjectsByGUID(Player* player, JS
             }
         }
 
-        if (!player->CanSeeOrDetect(gameObjectSelectionInfo.gameObject) || (!player->IsGameMaster() && player->GetDistance(gameObjectSelectionInfo.gameObject->GetPosition()) > ACTION_MAX_RANGE_PLAYER))
+        if (!player->CanSeeOrDetect(gameObjectSelectionInfo.gameObject) || (!isGamemaster && player->GetDistance(gameObjectSelectionInfo.gameObject->GetPosition()) > ACTION_MAX_RANGE_PLAYER))
         {
             gameObjectSelectionInfo.error = GAMEOBJECT_SELECTION_INFO_ERROR_OUT_OF_RANGE;
             gameObjectSelectionInfoStore.push_back(gameObjectSelectionInfo);
@@ -167,6 +169,7 @@ static GameObjectSelectionInfoError MoveGameObject(Player* player, GameObject* o
     float oz, oy, ox;
     object->GetLocalRotationAngles(oz, oy, ox);
     object->Relocate(x, y, z, oz);
+    object->RelocateStationaryPosition(x, y, z, oz);
 
     if (!SaveGameobject(object))
         return GAMEOBJECT_SELECTION_INFO_ERROR_OUT_OF_RANGE;
@@ -576,6 +579,12 @@ void SlopsHandler::HandleHousingBuildingAction(SlopsPackage package)
         }
 
         GameObjectSelectionInfoStore gameObjectSelectionInfoList = FindNearGameObjectsByGUID(player, data, command);
+
+        if (gameObjectSelectionInfoList.size() > MAX_OBJECT_SELECTION)
+        {
+            ChatHandler(player->GetSession()).PSendSysMessage(LANG_HOUSING_BUILDING_ERR_TO_MANY_OBJECTS, gameObjectSelectionInfoList.size(), MAX_OBJECT_SELECTION);
+            return;
+        }
 
         for (GameObjectSelectionInfo& gameObjectSelectionInfo : gameObjectSelectionInfoList)
         {
