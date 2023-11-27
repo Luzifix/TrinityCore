@@ -61,6 +61,7 @@ static GameObject* SpawnGameObject(Player* player, uint32 entry, Position positi
     object->SetObjectScale(scale);
     object->SetSpellVisualId(spellVisualId);
     object->Relocate(position.GetPositionX(), position.GetPositionY(), position.GetPositionZ(), oz);
+    object->RelocateStationaryPosition(position.GetPositionX(), position.GetPositionY(), position.GetPositionZ(), oz);
     object->SaveToDB(player->GetMap()->GetId(), { player->GetMap()->GetDifficultyID() });
     ObjectGuid::LowType spawnId = object->GetSpawnId();
 
