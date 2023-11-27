@@ -6353,6 +6353,8 @@ TeamId Player::TeamIdForRace(uint8 race)
 
 uint8 Player::GetFactionGroupForRace(uint8 race)
 {
+    return 1; // Player faction group
+
     if (ChrRacesEntry const* rEntry = sChrRacesStore.LookupEntry(race))
         if (FactionTemplateEntry const* faction = sFactionTemplateStore.LookupEntry(rEntry->FactionID))
             return faction->FactionGroup;
@@ -6362,6 +6364,9 @@ uint8 Player::GetFactionGroupForRace(uint8 race)
 
 void Player::SetFactionForRace(uint8 race)
 {
+    SetFaction(FACTION_FRIENDLY);
+    return;
+
     m_team = TeamForRace(race);
 
     ChrRacesEntry const* rEntry = sChrRacesStore.LookupEntry(race);
