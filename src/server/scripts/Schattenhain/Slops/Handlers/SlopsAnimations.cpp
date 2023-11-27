@@ -35,7 +35,7 @@ static void RemoveAurasBeforeAnimation(Player* player)
 
     for (auto const& [spellId, aura] : appliedAuras)
     {
-        if (IsAuraAllowedWhileAnimation(aura->GetBase()))
+        if (!aura || !aura->GetBase() || IsAuraAllowedWhileAnimation(aura->GetBase()))
             continue;
 
         player->RemoveAurasDueToSpell(spellId);
@@ -43,7 +43,7 @@ static void RemoveAurasBeforeAnimation(Player* player)
 
     for (auto const& [spellId, aura] : ownedAuras)
     {
-        if (IsAuraAllowedWhileAnimation(aura))
+        if (!aura || IsAuraAllowedWhileAnimation(aura))
             continue;
 
         player->RemoveAurasDueToSpell(spellId);
