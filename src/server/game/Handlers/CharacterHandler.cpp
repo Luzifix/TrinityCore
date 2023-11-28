@@ -1909,8 +1909,6 @@ void WorldSession::HandleEquipmentSetSave(WorldPackets::EquipmentSet::SaveEquipm
                     if (item->GetGUID() != itemGuid)
                         return;
                 }
-                else
-                    saveEquipmentSet.Set.IgnoreMask |= 1 << i;
             }
             else
             {
@@ -1925,8 +1923,6 @@ void WorldSession::HandleEquipmentSetSave(WorldPackets::EquipmentSet::SaveEquipm
                     if (!hasAppearance)
                         return;
                 }
-                else
-                    saveEquipmentSet.Set.IgnoreMask |= 1 << i;
             }
         }
         else
