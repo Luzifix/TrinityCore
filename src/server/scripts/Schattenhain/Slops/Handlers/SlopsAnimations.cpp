@@ -53,6 +53,8 @@ static void RemoveAurasBeforeAnimation(Player* player)
 void SlopsHandler::HandleAnimationsListRequest(SlopsPackage package)
 {
     Player* player = package.sender;
+    uint8 race = player->GetRace();
+    Gender gender = player->GetGender();
 
     JSON data = {
         "categorys", JSON::Array(),
@@ -71,6 +73,9 @@ void SlopsHandler::HandleAnimationsListRequest(SlopsPackage package)
 
         for (auto animations : sObjectMgr->GetAnimationsByCategory(category.first))
         {
+            if (animations->disabled.find(race) != animations->disabled.end() && animations->disabled[race] == gender)
+                continue;
+
             JSON animationsElement = {
                 "id", animations->id,
                 "categoryId", animations->categoryId,
@@ -90,6 +95,8 @@ void SlopsHandler::HandleAnimationsListRequest(SlopsPackage package)
 void SlopsHandler::HandleAnimationsDo(SlopsPackage package)
 {
     Player* player = package.sender;
+    uint8 race = player->GetRace();
+    Gender gender = player->GetGender();
 
     uint32 animationId = atoi(package.message.c_str());
 
@@ -109,6 +116,9 @@ void SlopsHandler::HandleAnimationsDo(SlopsPackage package)
     Player::AuraMap& ownedAuras = player->GetOwnedAuras();
 
     player->HandleEmoteCommand(Emote(411), nullptr);
+
+    if (animation->disabled.find(race) != animation->disabled.end() && animation->disabled[race] == gender)
+        return;
 
     if (animation->emoteId != 0)
         player->HandleEmoteCommand(Emote(animation->emoteId), nullptr);

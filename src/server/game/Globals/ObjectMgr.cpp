@@ -11908,6 +11908,21 @@ void ObjectMgr::LoadAnimations()
         ++categoryCount;
     } while (categoryResult->NextRow());
 
+
+    QueryResult disabledResult = WorldDatabase.Query("SELECT `animation_id`, `race`, `gender` FROM `animations_disabled`");
+    std::map<uint32 /* animationId */, std::map<uint8 /* race */, Gender>> disabledStore;
+
+    do
+    {
+        Field* fields = disabledResult->Fetch();
+
+        uint32 animationId = fields[0].GetUInt32();
+        uint8 race = fields[1].GetUInt8();
+        Gender gender = (Gender)fields[2].GetUInt8();
+
+        disabledStore[animationId][race] = gender;
+    } while (disabledResult->NextRow());
+
     QueryResult animationResult = WorldDatabase.Query("SELECT `id`, `category`, `name`, `slash_command`, `emote`, `spell`, `spell_type`, `spell_visual_kit`, `spell_visual_kit_type`, `spell_visual_kit_duration`, `anim_kit`, `anim_kit_type`, `order` FROM `animations` WHERE `active` != 0");
 
     if (!animationResult)
@@ -11951,6 +11966,7 @@ void ObjectMgr::LoadAnimations()
         animations->spellVisualKitDuration = spellVisualKitDuration;
         animations->animKitType = animKitType;
         animations->animKitId = animKitId;
+        animations->disabled = disabledStore[id];
         animations->order = order;
         
         _animationsStore[animations->id] = animations;

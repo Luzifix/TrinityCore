@@ -881,6 +881,7 @@ struct Animations
     uint32 spellVisualKitDuration = 0;
     uint32 animKitId = 0;
     uint8 animKitType = 0;
+    std::map<uint8 /* race */, Gender> disabled;
     uint32 order = 0;
 };
 

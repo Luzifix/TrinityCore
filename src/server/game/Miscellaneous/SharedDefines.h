@@ -124,7 +124,7 @@ constexpr uint32 GetMaxLevelForExpansion(uint32 expansion)
     return 0;
 }
 
-enum Gender
+enum Gender : int8
 {
     GENDER_UNKNOWN                     = -1,
     GENDER_MALE                        =  0,
