@@ -6,6 +6,7 @@
 #include "Player.h"
 #include "SpellAuras.h"
 #include "SpellInfo.h"
+#include "DB2Stores.h"
 
 static bool IsAuraAllowedWhileAnimation(Aura const* aura)
 {
@@ -111,17 +112,22 @@ void SlopsHandler::HandleAnimationsDo(SlopsPackage package)
     player->SetMeleeAnimKitId(0);
     player->SetMovementAnimKitId(0);
     RemoveAurasBeforeAnimation(player);
-
-    Player::AuraApplicationMap& appliedAuras = player->GetAppliedAuras();
-    Player::AuraMap& ownedAuras = player->GetOwnedAuras();
-
-    player->HandleEmoteCommand(Emote(911), nullptr);
+    player->SetEmoteState(EMOTE_ONESHOT_NONE);
 
     if (animation->disabled.find(race) != animation->disabled.end() && animation->disabled[race] == gender)
         return;
 
     if (animation->emoteId != 0)
-        player->HandleEmoteCommand(Emote(animation->emoteId), nullptr);
+    {
+        const EmotesEntry* db2EmoteEntry = sEmotesStore.LookupEntry(animation->emoteId);
+        if (db2EmoteEntry != nullptr)
+        {
+            if (db2EmoteEntry->EmoteSpecProc != (uint8)0)
+                player->SetEmoteState(Emote(animation->emoteId));
+            else
+                player->HandleEmoteCommand(Emote(animation->emoteId), nullptr);
+        }
+    }
 
     if (animation->spellVisualKitId != 0)
         player->SendPlaySpellVisualKit(animation->spellVisualKitId, animation->spellVisualKitType, animation->spellVisualKitDuration);
