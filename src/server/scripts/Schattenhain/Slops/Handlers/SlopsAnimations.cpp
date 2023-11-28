@@ -115,7 +115,7 @@ void SlopsHandler::HandleAnimationsDo(SlopsPackage package)
     Player::AuraApplicationMap& appliedAuras = player->GetAppliedAuras();
     Player::AuraMap& ownedAuras = player->GetOwnedAuras();
 
-    player->HandleEmoteCommand(Emote(411), nullptr);
+    player->HandleEmoteCommand(Emote(911), nullptr);
 
     if (animation->disabled.find(race) != animation->disabled.end() && animation->disabled[race] == gender)
         return;
