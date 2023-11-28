@@ -6,12 +6,20 @@ CREATE TABLE IF NOT EXISTS `animations_disabled` (
 	CONSTRAINT `FK_animations_disabled_animations` FOREIGN KEY (`animation_id`) REFERENCES `animations` (`id`) ON UPDATE NO ACTION ON DELETE NO ACTION
 ) COLLATE='utf8mb4_unicode_ci' ENGINE=InnoDB;
 
+REPLACE INTO `animations_disabled` (`animation_id`, `race`, `gender`) VALUES (75, 1, 1);
+REPLACE INTO `animations_disabled` (`animation_id`, `race`, `gender`) VALUES (75, 10, 0);
+REPLACE INTO `animations_disabled` (`animation_id`, `race`, `gender`) VALUES (75, 22, 1);
+REPLACE INTO `animations_disabled` (`animation_id`, `race`, `gender`) VALUES (75, 29, 0);
+REPLACE INTO `animations_disabled` (`animation_id`, `race`, `gender`) VALUES (134, 22, 1);
+REPLACE INTO `animations_disabled` (`animation_id`, `race`, `gender`) VALUES (136, 22, 1);
+REPLACE INTO `animations_disabled` (`animation_id`, `race`, `gender`) VALUES (138, 22, 1);
 REPLACE INTO `animations_disabled` (`animation_id`, `race`, `gender`) VALUES (144, 10, 0);
 REPLACE INTO `animations_disabled` (`animation_id`, `race`, `gender`) VALUES (144, 10, 1);
 REPLACE INTO `animations_disabled` (`animation_id`, `race`, `gender`) VALUES (148, 10, 0);
+REPLACE INTO `animations_disabled` (`animation_id`, `race`, `gender`) VALUES (150, 22, 0);
+REPLACE INTO `animations_disabled` (`animation_id`, `race`, `gender`) VALUES (150, 22, 1);
 REPLACE INTO `animations_disabled` (`animation_id`, `race`, `gender`) VALUES (151, 10, 0);
 REPLACE INTO `animations_disabled` (`animation_id`, `race`, `gender`) VALUES (165, 10, 0);
 REPLACE INTO `animations_disabled` (`animation_id`, `race`, `gender`) VALUES (165, 10, 1);
 REPLACE INTO `animations_disabled` (`animation_id`, `race`, `gender`) VALUES (168, 10, 0);
-REPLACE INTO `animations_disabled` (`animation_id`, `race`, `gender`) VALUES (75, 10, 0);
-REPLACE INTO `animations_disabled` (`animation_id`, `race`, `gender`) VALUES (75, 29, 0);
+REPLACE INTO `animations_disabled` (`animation_id`, `race`, `gender`) VALUES (168, 22, 1);
