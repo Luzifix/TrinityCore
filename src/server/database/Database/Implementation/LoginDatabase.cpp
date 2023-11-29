@@ -209,6 +209,7 @@ void LoginDatabaseConnection::DoPrepareStatements()
     PrepareStatement(LOGIN_INS_BNET_ACTIVITY, "INSERT INTO battlenet_account_activity (id, inactivity, inactivity_paused_weeks, inactivity_pause_current_week, inactivity_pause_change_allowed) VALUES (?, ?, ?, ?, ?) ON DUPLICATE KEY UPDATE inactivity = VALUES(inactivity), inactivity_paused_weeks = VALUES(inactivity_paused_weeks), inactivity_pause_current_week = VALUES(inactivity_pause_current_week), inactivity_pause_change_allowed = VALUES(inactivity_pause_change_allowed)", CONNECTION_SYNCH);
     PrepareStatement(LOGIN_INS_BNET_ACTIVITY_PLAYTIME, "INSERT INTO battlenet_account_activity (id, played, played_last_character) VALUES (?, ?, ?) ON DUPLICATE KEY UPDATE played = played + VALUES(played), played_last_character = VALUES(played_last_character)", CONNECTION_ASYNC);
     PrepareStatement(LOGIN_UPD_BNET_ACTIVITY_PLAYTIME, "UPDATE battlenet_account_activity SET played = ? WHERE id = ?", CONNECTION_ASYNC);
+    PrepareStatement(LOGIN_SEL_BNET_ACTIVITY_AVG, "SELECT CEIL(AVG(`played`) / 60 / 60) FROM battlenet_account_activity_history WHERE `date` >= CURRENT_TIMESTAMP - INTERVAL 4 WEEK;", CONNECTION_SYNCH);
 
     // Battle Pay
     PrepareStatement(LOGIN_INS_BPAY_PURCHASE, "INSERT INTO battlepay_purchases (battlenetAccountId, realm, characterGuid, productID, productName, CurrentPrice, RemoteAddress) VALUES (?, ?, ?, ?, ?, ?, ?)", CONNECTION_ASYNC);

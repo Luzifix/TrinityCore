@@ -20,6 +20,13 @@ ActivityMgr* ActivityMgr::instance()
 
 void ActivityMgr::LoadFromDB()
 {
+    LoginDatabasePreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_SEL_BNET_ACTIVITY_AVG);
+
+    if (PreparedQueryResult result = LoginDatabase.Query(stmt))
+    {
+        Field* fields = result->Fetch();
+        _avgPlayed = std::max(fields[0].GetUInt32(), ACTIVITY_AVG_MIN);
+    }
 }
 
 void ActivityMgr::LoadConfig(bool /*reload*/)

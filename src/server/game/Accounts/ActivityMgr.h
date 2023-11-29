@@ -8,6 +8,9 @@
 #include "Define.h"
 #include <vector>
 
+
+inline constexpr uint32 ACTIVITY_AVG_MIN = 2;
+
 class TC_GAME_API ActivityMgr
 {
 private:
@@ -46,7 +49,7 @@ private:
     float _coinPerHour = 1.f;
     int _maxInactivityPoints = 4;
     int _maxPauseWeeks = 4;
-    int _avgPlayed = 2; // Implement dynamic avg time
+    int _avgPlayed = ACTIVITY_AVG_MIN;
 
     bool _guildEnabeld = false;
     float _guildCoinPerHour = 0.5f;
