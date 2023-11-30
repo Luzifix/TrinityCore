@@ -48,6 +48,7 @@ public:
             player->SetPlayerFlagEx(PLAYER_FLAGS_EX_NEWCOMER);
 
         DisableOOCMode(player);
+        ResetAnimationsAndSpells(player);
     }
 
     void OnPVPKill(Player* /*killer*/, Player* killed) override
@@ -153,6 +154,23 @@ public:
         player->m_serverSideVisibility.SetValue(SERVERSIDE_VISIBILITY_GHOST, GHOST_VISIBILITY_ALIVE);
         player->m_serverSideVisibilityDetect.SetValue(SERVERSIDE_VISIBILITY_GHOST, GHOST_VISIBILITY_ALIVE);
         player->RemoveAurasDueToSpell(SPELL_OOC_MODE);
+    }
+
+    void ResetAnimationsAndSpells(Player* player)
+    {
+        player->SetAIAnimKitId(0);
+        player->SetMeleeAnimKitId(0);
+        player->SetMovementAnimKitId(0);
+        player->RemoveAllAurasExceptType(AuraType::SPELL_AURA_WORGEN_ALTERED_FORM);
+        player->SetEmoteState(EMOTE_ONESHOT_NONE);
+
+        // Remove worgen running wild
+        if (player->HasAura(87840))
+        {
+            player->Dismount();
+            player->RemoveAurasDueToSpell(87840); // Worgen Running Wild
+            player->RemoveAurasDueToSpell(86458); // Mount Speed Mod: Epic Ground Mount
+        }
     }
 
     void ApplyConditionalAppearanceAchievements(Player* player)
