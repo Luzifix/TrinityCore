@@ -34,6 +34,14 @@ static void RemoveAurasBeforeAnimation(Player* player)
         37800, // OOC MODE
     };
 
+    // Remove worgen running wild
+    if (player->HasAura(87840))
+    {
+        player->Dismount();
+        player->RemoveAurasDueToSpell(87840); // Worgen Running Wild
+        player->RemoveAurasDueToSpell(86458); // Mount Speed Mod: Epic Ground Mount
+    }
+
     for (auto const& [spellId, aura] : appliedAuras)
     {
         if (!aura || !aura->GetBase() || IsAuraAllowedWhileAnimation(aura->GetBase()))
