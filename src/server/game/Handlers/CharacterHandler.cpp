@@ -767,9 +767,9 @@ void WorldSession::HandleCharCreateOpcode(WorldPackets::Character::CreateCharact
             return;
         }
 
-        LoginDatabasePreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_SEL_SUM_REALM_CHARACTERS);
+        CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_SUM_CHARACTERS);
         stmt->setUInt32(0, GetAccountId());
-        queryCallback.SetNextQuery(LoginDatabase.AsyncQuery(stmt));
+        queryCallback.SetNextQuery(CharacterDatabase.AsyncQuery(stmt));
     })
         .WithChainingPreparedCallback([this](QueryCallback& queryCallback, PreparedQueryResult result)
     {

@@ -812,6 +812,8 @@ void CharacterDatabaseConnection::DoPrepareStatements()
     // Item Seller
     PrepareStatement(CHAR_SEL_ITEM_SELLER_PERMISSION, "SELECT `character_guid` FROM `item_seller_permission`", CONNECTION_SYNCH);
     PrepareStatement(CHAR_INS_ITEM_SELLER_HISTORY, "INSERT INTO `item_seller_history` (`character_guid`, `item_id`, `bonus_id`, `buy_for_character_guid`) VALUES (?, ?, ?, ?);", CONNECTION_ASYNC);
+
+    PrepareStatement(CHAR_SEL_SUM_CHARACTERS, "SELECT COUNT(*) FROM characters WHERE account = ?;", CONNECTION_ASYNC);
 }
 
 CharacterDatabaseConnection::CharacterDatabaseConnection(MySQLConnectionInfo& connInfo) : MySQLConnection(connInfo)
