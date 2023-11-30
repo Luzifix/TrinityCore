@@ -86,6 +86,9 @@ namespace FactorySelector
         if (creature->IsPet())
             return ASSERT_NOTNULL(sCreatureAIRegistry->GetRegistryItem("PetAI"))->Create(creature);
 
+        if (creature->IsMinion())
+            return ASSERT_NOTNULL(sCreatureAIRegistry->GetRegistryItem("BattlePetAI"))->Create(creature);
+
         // scriptname in db
         try
         {
@@ -106,6 +109,15 @@ namespace FactorySelector
         if (creature->IsPet())
         {
             auto const* registry = ASSERT_NOTNULL(sCreatureAIRegistry->GetRegistryItem("PetAI"));
+            auto const* factory = dynamic_cast<SelectableAI<Creature, CreatureAI> const*>(registry);
+            ASSERT(factory);
+
+            return factory->GetScriptId();
+        }
+
+        if (creature->IsMinion())
+        {
+            auto const* registry = ASSERT_NOTNULL(sCreatureAIRegistry->GetRegistryItem("BattlePetAI"));
             auto const* factory = dynamic_cast<SelectableAI<Creature, CreatureAI> const*>(registry);
             ASSERT(factory);
 

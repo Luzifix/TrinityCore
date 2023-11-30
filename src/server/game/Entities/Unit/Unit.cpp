@@ -8187,6 +8187,7 @@ void Unit::UpdateSpeed(UnitMoveType mtype)
     switch (mtype)
     {
         case MOVE_RUN:
+        case MOVE_WALK:
         case MOVE_SWIM:
         case MOVE_FLIGHT:
         {

@@ -359,3 +359,64 @@ int32 VehicleAI::Permissible(Creature const* creature)
 
     return PERMIT_BASE_NO;
 }
+
+//////////////
+// BattlePetAI
+//////////////
+
+BattlePetAI::BattlePetAI(Creature* creature, uint32 scriptId) : CreatureAI(creature, scriptId)
+{
+}
+
+void BattlePetAI::InitializeAI()
+{
+    if (Unit* owner = me->GetCharmerOrOwner())
+    {
+        ClearCharmInfoFlags();
+        me->GetMotionMaster()->MoveFollow(owner, PET_FOLLOW_DIST, me->GetFollowAngle(), MOTION_SLOT_ACTIVE);
+    }
+}
+
+void BattlePetAI::UpdateAI(uint32 /*diff*/)
+{
+    if (!me->IsInWorld() || !me->IsAlive())
+        return;
+
+    // Update speed as needed to prevent dropping too far behind and despawning
+    me->UpdateSpeed(MOVE_RUN);
+    me->UpdateSpeed(MOVE_WALK);
+    me->UpdateSpeed(MOVE_FLIGHT);
+}
+
+int BattlePetAI::Permissible(const Creature* /*creature*/)
+{
+    return PERMIT_BASE_NO;
+}
+
+void BattlePetAI::MovementInform(uint32 moveType, uint32 /*data*/)
+{
+    switch (moveType)
+    {
+        case POINT_MOTION_TYPE:
+        {
+            if (Unit* owner = me->GetCharmerOrOwner())
+                me->GetMotionMaster()->MoveFollow(owner, PET_FOLLOW_DIST, me->GetFollowAngle(), MOTION_SLOT_ACTIVE);
+            break;
+        }
+        default:
+            break;
+    }
+}
+
+void BattlePetAI::ClearCharmInfoFlags()
+{
+    CharmInfo* ci = me->GetCharmInfo();
+    if (ci)
+    {
+        ci->SetIsAtStay(false);
+        ci->SetIsCommandAttack(false);
+        ci->SetIsCommandFollow(false);
+        ci->SetIsFollowing(false);
+        ci->SetIsReturning(false);
+    }
+}

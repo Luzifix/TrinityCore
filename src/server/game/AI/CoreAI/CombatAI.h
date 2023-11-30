@@ -117,4 +117,18 @@ struct TC_GAME_API VehicleAI : public CreatureAI
         uint32 _dismissTimer;
 };
 
+struct TC_GAME_API BattlePetAI : public CreatureAI
+{
+public:
+    explicit BattlePetAI(Creature* c, uint32 scriptId = {});
+
+    void InitializeAI() override;
+    void MovementInform(uint32 moveType, uint32 data) override;
+    void UpdateAI(uint32) override;
+
+    void ClearCharmInfoFlags();
+
+    static int Permissible(const Creature*);
+};
+
 #endif
