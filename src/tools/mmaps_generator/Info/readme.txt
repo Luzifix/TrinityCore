@@ -1,5 +1,8 @@
 R"(Generator command line args
 
+--workDir           [path]          Path to directory containing map files
+                                    Default: .
+
 --threads           [#]             Max number of threads used by the generator
                                     Default: 3
 

@@ -157,6 +157,7 @@ namespace MMAP
                 bool bigBaseUnit,
                 int mapid,
                 char const* offMeshFilePath,
+                char const* workDir,
                 unsigned int threads);
 
             ~MapBuilder();
@@ -201,6 +202,7 @@ namespace MMAP
             bool m_debugOutput;
 
             char const* m_offMeshFilePath;
+            char const* m_workDir;
             unsigned int m_threads;
             bool m_skipContinents;
             bool m_skipJunkMaps;

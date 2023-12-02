@@ -27,6 +27,7 @@
 #include <boost/filesystem/operations.hpp>
 #include <unordered_map>
 #include <vector>
+#include <filesystem>
 
 constexpr char Readme[] =
 {
@@ -132,6 +133,7 @@ bool handleArgs(int argc, char** argv,
                bool &silent,
                bool &bigBaseUnit,
                char* &offMeshInputPath,
+               char* &workDir,
                char* &file,
                unsigned int& threads)
 {
@@ -302,6 +304,14 @@ bool handleArgs(int argc, char** argv,
 
             offMeshInputPath = param;
         }
+        else if (strcmp(argv[i], "--workDir") == 0)
+        {
+            param = argv[++i];
+            if (!param)
+                return false;
+
+            workDir = param;
+        }
         else if (strcmp(argv[i], "--allowDebug") == 0)
         {
             allowDebug = true;
@@ -421,15 +431,19 @@ int main(int argc, char** argv)
          silent = false,
          bigBaseUnit = false;
     char* offMeshInputPath = nullptr;
+    char* workDir = nullptr;
     char* file = nullptr;
 
     bool validParam = handleArgs(argc, argv, mapnum,
                                  tileX, tileY, maxAngle, maxAngleNotSteep,
                                  skipLiquid, skipContinents, skipJunkMaps, skipBattlegrounds, onlySchattenhain,
-                                 debugOutput, silent, bigBaseUnit, offMeshInputPath, file, threads);
+                                 debugOutput, silent, bigBaseUnit, offMeshInputPath, workDir, file, threads);
 
     if (!validParam)
         return silent ? -1 : finish("You have specified invalid parameters", -1);
+
+    if (workDir != nullptr)
+        std::filesystem::current_path(workDir);
 
     if (mapnum == -1 && debugOutput)
     {
@@ -452,7 +466,7 @@ int main(int argc, char** argv)
     _mapDataForVmapInitialization = LoadMap(dbcLocales[0], silent, -4);
 
     MapBuilder builder(maxAngle, maxAngleNotSteep, skipLiquid, skipContinents, skipJunkMaps, skipBattlegrounds,
-                       onlySchattenhain, debugOutput, bigBaseUnit, mapnum, offMeshInputPath, threads);
+                       onlySchattenhain, debugOutput, bigBaseUnit, mapnum, offMeshInputPath, workDir, threads);
 
     uint32 start = getMSTime();
     if (file)
