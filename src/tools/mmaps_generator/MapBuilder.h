@@ -152,6 +152,7 @@ namespace MMAP
                 bool skipContinents,
                 bool skipJunkMaps,
                 bool skipBattlegrounds,
+                bool onlySchattenhain,
                 bool debugOutput,
                 bool bigBaseUnit,
                 int mapid,
@@ -187,6 +188,7 @@ namespace MMAP
             bool isDevMap(uint32 mapID) const;
             bool isBattlegroundMap(uint32 mapID) const;
             bool isContinentMap(uint32 mapID) const;
+            bool isSchattenhainMap(uint32 mapID) const;
 
             rcConfig GetMapSpecificConfig(uint32 mapID, float bmin[3], float bmax[3], const TileConfig &tileConfig) const;
 
@@ -203,6 +205,7 @@ namespace MMAP
             bool m_skipContinents;
             bool m_skipJunkMaps;
             bool m_skipBattlegrounds;
+            bool m_onlySchattenhain;
             bool m_skipLiquid;
 
             Optional<float> m_maxWalkableAngle;

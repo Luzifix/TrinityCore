@@ -56,7 +56,7 @@ namespace MMAP
     }
 
     MapBuilder::MapBuilder(Optional<float> maxWalkableAngle, Optional<float> maxWalkableAngleNotSteep, bool skipLiquid,
-        bool skipContinents, bool skipJunkMaps, bool skipBattlegrounds,
+        bool skipContinents, bool skipJunkMaps, bool skipBattlegrounds, bool onlySchattenhain,
         bool debugOutput, bool bigBaseUnit, int mapid, char const* offMeshFilePath, unsigned int threads) :
         m_terrainBuilder     (nullptr),
         m_debugOutput        (debugOutput),
@@ -65,6 +65,7 @@ namespace MMAP
         m_skipContinents     (skipContinents),
         m_skipJunkMaps       (skipJunkMaps),
         m_skipBattlegrounds  (skipBattlegrounds),
+        m_onlySchattenhain   (onlySchattenhain),
         m_skipLiquid         (skipLiquid),
         m_maxWalkableAngle   (maxWalkableAngle),
         m_maxWalkableAngleNotSteep (maxWalkableAngleNotSteep),
@@ -966,6 +967,10 @@ namespace MMAP
         if (m_mapid >= 0)
             return static_cast<uint32>(m_mapid) != mapID;
 
+        if (m_onlySchattenhain)
+            if (!isSchattenhainMap(mapID))
+                return true;
+
         if (m_skipContinents)
             if (isContinentMap(mapID))
                 return true;
@@ -1017,22 +1022,35 @@ namespace MMAP
     {
         switch (mapID)
         {
-            case 0:
-            case 1:
-            case 530:
-            case 571:
-            case 870:
-            case 1116:
-            case 1220:
-            case 1642:
-            case 1643:
-            case 2222:
-            case 5000:
-            case 5001:
-            case 5002:
-                return true;
-            default:
-                return false;
+        case 0:
+        case 1:
+        case 530:
+        case 571:
+        case 870:
+        case 1116:
+        case 1220:
+        case 1642:
+        case 1643:
+        case 2222:
+        case 5000:
+        case 5001:
+        case 5002:
+            return true;
+        default:
+            return false;
+        }
+    }
+
+    bool MapBuilder::isSchattenhainMap(uint32 mapID) const
+    {
+        switch (mapID)
+        {
+        case 5000:
+        case 5001:
+        case 5002:
+            return true;
+        default:
+            return false;
         }
     }
 

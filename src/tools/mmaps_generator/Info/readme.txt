@@ -38,6 +38,10 @@ R"(Generator command line args
 
                                     false: skip battlegrounds (default)
 
+--onlySchattenhain  [true|false]    generate only schattenhain maps
+
+                                    false: build continents (default)
+
 --debugOutput       [true|false]    create debugging files for use with RecastDemo
                                     if you are only creating mmaps for use with MaNGOS,
                                     you don't want debugging files

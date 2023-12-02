@@ -127,6 +127,7 @@ bool handleArgs(int argc, char** argv,
                bool &skipContinents,
                bool &skipJunkMaps,
                bool &skipBattlegrounds,
+               bool &onlySchattenhain,
                bool &debugOutput,
                bool &silent,
                bool &bigBaseUnit,
@@ -249,6 +250,19 @@ bool handleArgs(int argc, char** argv,
                 skipBattlegrounds = false;
             else
                 printf("invalid option for '--skipBattlegrounds', using default\n");
+        }
+        else if (strcmp(argv[i], "--onlySchattenhain") == 0)
+        {
+            param = argv[++i];
+            if (!param)
+                return false;
+
+            if (strcmp(param, "true") == 0)
+                onlySchattenhain = true;
+            else if (strcmp(param, "false") == 0)
+                onlySchattenhain = false;
+            else
+                printf("invalid option for '--onlySchattenhain', using default\n");
         }
         else if (strcmp(argv[i], "--debugOutput") == 0)
         {
@@ -402,6 +416,7 @@ int main(int argc, char** argv)
          skipContinents = false,
          skipJunkMaps = true,
          skipBattlegrounds = false,
+         onlySchattenhain = false,
          debugOutput = false,
          silent = false,
          bigBaseUnit = false;
@@ -410,7 +425,7 @@ int main(int argc, char** argv)
 
     bool validParam = handleArgs(argc, argv, mapnum,
                                  tileX, tileY, maxAngle, maxAngleNotSteep,
-                                 skipLiquid, skipContinents, skipJunkMaps, skipBattlegrounds,
+                                 skipLiquid, skipContinents, skipJunkMaps, skipBattlegrounds, onlySchattenhain,
                                  debugOutput, silent, bigBaseUnit, offMeshInputPath, file, threads);
 
     if (!validParam)
@@ -436,8 +451,8 @@ int main(int argc, char** argv)
 
     _mapDataForVmapInitialization = LoadMap(dbcLocales[0], silent, -4);
 
-    MapBuilder builder(maxAngle, maxAngleNotSteep, skipLiquid, skipContinents, skipJunkMaps,
-                       skipBattlegrounds, debugOutput, bigBaseUnit, mapnum, offMeshInputPath, threads);
+    MapBuilder builder(maxAngle, maxAngleNotSteep, skipLiquid, skipContinents, skipJunkMaps, skipBattlegrounds,
+                       onlySchattenhain, debugOutput, bigBaseUnit, mapnum, offMeshInputPath, threads);
 
     uint32 start = getMSTime();
     if (file)
