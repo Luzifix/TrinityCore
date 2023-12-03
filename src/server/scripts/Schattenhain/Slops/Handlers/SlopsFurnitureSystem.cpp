@@ -55,15 +55,26 @@ void SlopsHandler::HandleFurnitureListRequest(SlopsPackage package)
         lastUpdate = std::max(lastUpdate, furnitureEntry->GetUpdated());
     }
 
-    for (auto furnitureInventory : sFurnitureMgr->GetFurnitureInventory(player->GetSession()->GetBattlenetAccountGUID()))
+    for (auto battlenetAccountFurniture : sFurnitureMgr->GetBattlenetAccountFurnitureStore(player->GetSession()->GetBattlenetAccountGUID()))
     {
         JSON entry = {
-            "i", furnitureInventory.first,
-            "c", furnitureInventory.second->GetCount(),
-            "f", furnitureInventory.second->IsFavorit()
+            "i", battlenetAccountFurniture.first,
+            "f", battlenetAccountFurniture.second->IsFavorite(),
+            "c", battlenetAccountFurniture.second->GetInventoryCount(),
+            "cl", JSON::Array(),
         };
 
-        data["inventory"][std::to_string(furnitureInventory.first)] = entry;
+        for (BattlenetAccountFurnitureInventory* battlenetAccountFurnitureInventory : battlenetAccountFurniture.second->GetInventory())
+        {
+            JSON inventoryEntry = {
+                "sp", battlenetAccountFurnitureInventory->GetSellPrice(),
+                "c", battlenetAccountFurnitureInventory->GetCount(),
+            };
+
+            entry["cl"].append(inventoryEntry);
+        }
+
+        data["inventory"][std::to_string(battlenetAccountFurniture.first)] = entry;
     }
 
     data["lastUpdate"] = lastUpdate;
@@ -77,15 +88,26 @@ void SlopsHandler::HandleFurnitureInvetntoryRequest(SlopsPackage package)
         "inventory", JSON::Object(),
     };
 
-    for (auto furnitureInventory : sFurnitureMgr->GetFurnitureInventory(player->GetSession()->GetBattlenetAccountGUID()))
+    for (auto battlenetAccountFurniture : sFurnitureMgr->GetBattlenetAccountFurnitureStore(player->GetSession()->GetBattlenetAccountGUID()))
     {
         JSON entry = {
-            "i", furnitureInventory.first,
-            "c", furnitureInventory.second->GetCount(),
-            "f", furnitureInventory.second->IsFavorit()
+            "i", battlenetAccountFurniture.first,
+            "f", battlenetAccountFurniture.second->IsFavorite(),
+            "c", battlenetAccountFurniture.second->GetInventoryCount(),
+            "cl", JSON::Array(),
         };
 
-        data["inventory"][std::to_string(furnitureInventory.first)] = entry;
+        for (BattlenetAccountFurnitureInventory* battlenetAccountFurnitureInventory : battlenetAccountFurniture.second->GetInventory())
+        {
+            JSON inventoryEntry = {
+                "sp", battlenetAccountFurnitureInventory->GetSellPrice(),
+                "c", battlenetAccountFurnitureInventory->GetCount(),
+            };
+
+            entry["cl"].append(inventoryEntry);
+        }
+
+        data["inventory"][std::to_string(battlenetAccountFurniture.first)] = entry;
     }
 
     sSlops->Send(SLOPS_SMSG_FURNITURE_INVENTORY, data.dump(), player);
@@ -99,8 +121,8 @@ void SlopsHandler::HandleFurnitureSetFavorite(SlopsPackage package)
     if (!data.hasKey("id") || !data.hasKey("favorite"))
         return;
 
-    if (sFurnitureMgr->SetFavorite(player->GetSession()->GetBattlenetAccountGUID(), data["id"].ToInt(), data["favorite"].ToBool()))
-        SlopsHandler::HandleFurnitureInvetntoryRequest(package);
+    sFurnitureMgr->SetFavorite(player->GetSession()->GetBattlenetAccountGUID(), data["id"].ToInt(), data["favorite"].ToBool());
+    SlopsHandler::HandleFurnitureInvetntoryRequest(package);
 }
 
 void SlopsHandler::HandleFurnitureBuy(SlopsPackage package)

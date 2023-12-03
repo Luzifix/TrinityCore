@@ -103,9 +103,6 @@ void WorldDatabaseConnection::DoPrepareStatements()
     PrepareStatement(WORLD_DEL_FURNITURE_CATALOG_CATEGORY_BY_FURNITURE_ID, "DELETE FROM `furniture_catalog_category` WHERE `furniture_id` = ?;", CONNECTION_ASYNC);
     PrepareStatement(WORLD_INS_FURNITURE_CATALOG_CATEGORY, "INSERT INTO `furniture_catalog_category` (`furniture_id`, `category_id`) VALUES (?, ?);", CONNECTION_ASYNC);
 
-    // Furniture inventory
-    PrepareStatement(WORLD_INS_FURNITURE_INVENTORY, "INSERT INTO `furniture_inventory` (`furniture_id`, `owner`, `count`, `favorit`) VALUES (?, ?, ?, ?) ON DUPLICATE KEY UPDATE `count` = VALUES (`count`), `favorit` = VALUES (`favorit`)", CONNECTION_ASYNC);
-
     // Furniture categorization
     PrepareStatement(WORLD_SEL_FURNITURE_CATALOG_CATEGORIZATION_BY_ID, "SELECT `id`, `furniture_id`, `owner`, `categorized_by`, `price`, `category_ids`, `status` FROM `furniture_catalog_categorization` WHERE `id` = ?;", CONNECTION_SYNCH);
     PrepareStatement(WORLD_SEL_FURNITURE_CATALOG_CATEGORIZATION_BY_STATUS, "SELECT `id`, `furniture_id`, `owner`, `categorized_by`, `price`, `category_ids`, `status` FROM `furniture_catalog_categorization` WHERE `status` = ?;", CONNECTION_SYNCH);

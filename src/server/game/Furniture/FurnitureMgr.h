@@ -11,7 +11,8 @@
 #include <vector>
 #include "GameObject.h"
 #include "Furniture.h"
-#include "FurnitureInventory.h"
+#include "BattlenetAccountFurniture.h"
+#include "BattlenetAccountFurniture.h"
 #include "FurnitureCategory.h"
 
 typedef std::map<uint32 /* id */, Furniture*> FurnitureStore;
@@ -20,8 +21,9 @@ typedef std::vector<Furniture*> FurnitureList;
 
 typedef std::list<FurnitureCategory*> FurnitureCategoryStore;
 
-typedef std::map<uint32 /* furnitureId */, FurnitureInventory*> FurnitureInventoryStore;
-typedef std::map<ObjectGuid, FurnitureInventoryStore> FurnitureOwnerInventoryStore;
+typedef std::map<uint32 /* furnitureId */, BattlenetAccountFurniture*> BattlenetAccountFurnitureStore;
+typedef std::map<ObjectGuid, BattlenetAccountFurnitureStore> BattlenetAccountFurnitureByOwnerStore;
+
 typedef std::map<ObjectGuid, Furniture*> FurnitureNextPlayerSpawnStore;
 
 class TC_GAME_API FurnitureMgr
@@ -29,10 +31,9 @@ class TC_GAME_API FurnitureMgr
 private:
     FurnitureStore _furnitureStore;
     FurnitureCategoryStore _furnitureCategoryStore;
-    FurnitureOwnerInventoryStore _furnitureOwnerInventoryStore;
-    FurnitureNextPlayerSpawnStore _furnitureNextPlayerSpawnStore;
+    BattlenetAccountFurnitureByOwnerStore _battlenetAccountFurnitureByOwnerStore;
 
-    void CleanupDB();
+    FurnitureNextPlayerSpawnStore _furnitureNextPlayerSpawnStore;
 public:
     static FurnitureMgr* instance();
 
@@ -49,10 +50,9 @@ public:
     FurnitureCategoryStore GetCategorys() { return _furnitureCategoryStore; }
 
     // Inventory
-    FurnitureInventoryStore GetFurnitureInventory(ObjectGuid owner);
-    FurnitureInventory* GetFurnitureInventoryItem(ObjectGuid owner, uint32 furnitureId);
-    bool SaveFurnitureInventoryItem(FurnitureInventory* furnitureInventory);
-    bool SetFavorite(ObjectGuid owner, uint32 furnitureId, bool favorite);
+    BattlenetAccountFurnitureStore GetBattlenetAccountFurnitureStore(ObjectGuid battlenetAccount);
+    BattlenetAccountFurniture* GetBattlenetAccountFurniture(ObjectGuid battlenetAccount, uint32 furnitureId);
+    void SetFavorite(ObjectGuid battlenetAccount, uint32 furnitureId, bool favorite);
     bool Buy(Player* player, uint32 furnitureId, uint32 count);
     bool AddItem(Player* player, uint32 furnitureId, uint32 count = 1);
     bool AddItem(Player* player, Furniture* furniture, uint32 count = 1);

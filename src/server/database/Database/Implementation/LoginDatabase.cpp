@@ -235,6 +235,10 @@ void LoginDatabaseConnection::DoPrepareStatements()
     PrepareStatement(LOGIN_DEL_EXPIRED_HARDWARE_BANS, "DELETE FROM hardware_bans WHERE unbandate<>bandate AND unbandate<=UNIX_TIMESTAMP()", CONNECTION_ASYNC);
     PrepareStatement(LOGIN_DEL_HARDWARE_BANS, "DELETE FROM hardware_bans WHERE hardwareHash=? OR machineHash=?", CONNECTION_ASYNC);
 
+    // Furniture
+    PrepareStatement(LOGIN_REP_BATTLENET_ACCOUNT_FURNITURE, "REPLACE INTO `battlenet_account_furniture` (`battlenet_account_id`, `furniture_id`, `favorite`) VALUES (?, ?, ?);", CONNECTION_ASYNC);
+    PrepareStatement(LOGIN_REP_BATTLENET_ACCOUNT_FURNITURE_INVENTORY, "REPLACE INTO `battlenet_account_furniture_inventory` (`battlenet_account_id`, `furniture_id`, `sell_price`, `count`) VALUES (?, ?, ?, ?);", CONNECTION_ASYNC);
+    PrepareStatement(LOGIN_DEL_BATTLENET_ACCOUNT_FURNITURE_INVENTORY, "DELETE FROM `battlenet_account_furniture_inventory` WHERE `battlenet_account_id` = ? AND `furniture_id` =?;", CONNECTION_ASYNC);
 }
 
 LoginDatabaseConnection::LoginDatabaseConnection(MySQLConnectionInfo& connInfo) : MySQLConnection(connInfo)
