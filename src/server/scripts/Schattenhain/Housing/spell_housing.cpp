@@ -22,8 +22,6 @@
 #include "PoolMgr.h"
 #include <ScriptPCH.h>
 
-#include <String.h>
-
 class spell_housing_furniture_spawn : public SpellScriptLoader
 {
 public:
