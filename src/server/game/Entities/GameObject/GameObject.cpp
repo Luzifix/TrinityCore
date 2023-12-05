@@ -635,7 +635,7 @@ void GameObject::RemoveFromWorld()
     }
 }
 
-bool GameObject::Create(uint32 entry, Map* map, Position const& pos, QuaternionData const& rotation, uint32 animProgress, GOState goState, uint32 artKit, bool dynamic, ObjectGuid::LowType spawnid, float size /*= -1*/, int32 houseAreaId /*= -1*/, uint32 spellVisualId /*= 0*/)
+bool GameObject::Create(uint32 entry, Map* map, Position const& pos, QuaternionData const& rotation, uint32 animProgress, GOState goState, uint32 artKit, bool dynamic, ObjectGuid::LowType spawnid, float size /*= -1*/, int32 houseAreaId /*= -1*/, uint32 spellVisualId /*= 0*/, int32 sellPrice /* = 0*/)
 {
     ASSERT(map);
     SetMap(map);
@@ -711,6 +711,7 @@ bool GameObject::Create(uint32 entry, Map* map, Position const& pos, QuaternionD
         SetObjectScale(goInfo->size);
 
     SetSpellVisualId(spellVisualId);
+    SetSellPrice(sellPrice);
 
     if (GameObjectOverride const* goOverride = GetGameObjectOverride())
     {
@@ -874,14 +875,14 @@ bool GameObject::Create(uint32 entry, Map* map, Position const& pos, QuaternionD
     return true;
 }
 
-GameObject* GameObject::CreateGameObject(uint32 entry, Map* map, Position const& pos, QuaternionData const& rotation, uint32 animProgress, GOState goState, uint32 artKit /*= 0*/, float scale /*=-1.0f*/, int32 houseAreaId /*= -1*/, uint32 spellVisualId /*= 0*/)
+GameObject* GameObject::CreateGameObject(uint32 entry, Map* map, Position const& pos, QuaternionData const& rotation, uint32 animProgress, GOState goState, uint32 artKit /*= 0*/, float scale /*=-1.0f*/, int32 houseAreaId /*= -1*/, uint32 spellVisualId /*= 0*/, int32 sellPrice /*= 0*/)
 {
     GameObjectTemplate const* goInfo = sObjectMgr->GetGameObjectTemplate(entry);
     if (!goInfo)
         return nullptr;
 
     GameObject* go = new GameObject();
-    if (!go->Create(entry, map, pos, rotation, animProgress, goState, artKit, false, 0, scale, houseAreaId, spellVisualId))
+    if (!go->Create(entry, map, pos, rotation, animProgress, goState, artKit, false, 0, scale, houseAreaId, spellVisualId, sellPrice))
     {
         delete go;
         return nullptr;
@@ -1576,6 +1577,7 @@ void GameObject::SaveToDB(uint32 mapid, std::vector<Difficulty> const& spawnDiff
     data.artKit = GetGoArtKit();
     data.houseAreaId = GetHouseAreaId();
     data.spellVisualId = GetSpellVisualId();
+    data.sellPrice = GetSellPrice();
     if (!data.spawnGroupData)
         data.spawnGroupData = sObjectMgr->GetDefaultSpawnGroup();
 
@@ -1644,6 +1646,7 @@ void GameObject::SaveToDB(uint32 mapid, std::vector<Difficulty> const& spawnDiff
     stmt->setFloat(index++, data.size);
     stmt->setUInt32(index++, data.houseAreaId);
     stmt->setUInt32(index++, data.spellVisualId);
+    stmt->setInt32(index++, data.sellPrice);
     trans->Append(stmt);
 
     WorldDatabase.CommitTransaction(trans);
@@ -1667,13 +1670,14 @@ bool GameObject::LoadFromDB(ObjectGuid::LowType spawnId, Map* map, bool addToMap
     float size = data->size;
     uint32 houseAreaId = data->houseAreaId;
     uint32 spellVisualId = data->spellVisualId;
+    uint32 sellPrice = data->sellPrice;
 
     int32 phaseId = data->phaseId;
     bool alwaysVisible = false;
 
     m_spawnId = spawnId;
     m_respawnCompatibilityMode = ((data->spawnGroupData->flags & SPAWNGROUP_FLAG_COMPATIBILITY_MODE) != 0);
-    if (!Create(entry, map, data->spawnPoint, data->rotation, animprogress, go_state, artKit, !m_respawnCompatibilityMode, spawnId, size, houseAreaId, spellVisualId))
+    if (!Create(entry, map, data->spawnPoint, data->rotation, animprogress, go_state, artKit, !m_respawnCompatibilityMode, spawnId, size, houseAreaId, spellVisualId, sellPrice))
         return false;
 
     SetDBPhase(phaseId);

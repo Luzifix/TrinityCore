@@ -228,23 +228,26 @@ bool FurnitureMgr::Buy(Player* player, uint32 furnitureId, uint32 count)
     return result;
 }
 
-bool FurnitureMgr::AddItem(Player* player, uint32 furnitureId, uint32 count /* = 1 */)
+bool FurnitureMgr::AddItem(Player* player, uint32 furnitureId, uint32 count /* = 1 */, int32 sellPrice /*= -1*/)
 {
     Furniture* furniture = GetById(furnitureId);
 
     if (furniture == nullptr)
         return false;
 
-    return AddItem(player, furniture, count);
+    return AddItem(player, furniture, count, sellPrice);
 }
 
-bool FurnitureMgr::AddItem(Player* player, Furniture* furniture, uint32 count /* = 1 */)
+bool FurnitureMgr::AddItem(Player* player, Furniture* furniture, uint32 count /* = 1 */, int32 sellPrice /*= -1*/)
 {
     if (furniture == nullptr)
         return false;
 
+    if (sellPrice < 0)
+        sellPrice = furniture->GetPrice() * 0.75f;
+
     BattlenetAccountFurniture* battlenetAccountFurniture = GetBattlenetAccountFurniture(player->GetSession()->GetBattlenetAccountGUID(), furniture->GetId());
-    battlenetAccountFurniture->AddInventory(new BattlenetAccountFurnitureInventory(furniture->GetPrice() * 0.75f, count));
+    battlenetAccountFurniture->AddInventory(new BattlenetAccountFurnitureInventory(sellPrice, count));
     battlenetAccountFurniture->SaveToDB();
 
     return true;
@@ -260,12 +263,25 @@ bool FurnitureMgr::HasItem(Player* player, uint32 furnitureId, uint32 count /* =
 bool FurnitureMgr::RemoveItem(Player* player, uint32 furnitureId, uint32 count /* = 1 */)
 {
     BattlenetAccountFurniture* battlenetAccountFurniture = GetBattlenetAccountFurniture(player->GetSession()->GetBattlenetAccountGUID(), furnitureId);
-    if (!battlenetAccountFurniture->RemoveInventory(count))
+    uint32 totalSellPrice = battlenetAccountFurniture->RemoveInventory(count);
+    if (totalSellPrice == 0)
         return false;
 
     battlenetAccountFurniture->SaveToDB();
 
     return true;
+}
+
+uint32 FurnitureMgr::RemoveItemAndReturnTotalPrice(Player* player, uint32 furnitureId, uint32 count /* = 1 */)
+{
+    BattlenetAccountFurniture* battlenetAccountFurniture = GetBattlenetAccountFurniture(player->GetSession()->GetBattlenetAccountGUID(), furnitureId);
+    uint32 totalSellPrice = battlenetAccountFurniture->RemoveInventory(count);
+    if (totalSellPrice == 0)
+        return 0;
+
+    battlenetAccountFurniture->SaveToDB();
+
+    return totalSellPrice;
 }
 
 bool FurnitureMgr::Sell(Player* player, uint32 furnitureId, uint32 count)

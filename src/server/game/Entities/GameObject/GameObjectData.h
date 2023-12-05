@@ -1275,6 +1275,7 @@ struct GameObjectData : public SpawnData
     float size = 0.0f;
     uint32 houseAreaId = 0;
     uint32 spellVisualId = 0;
+    int32 sellPrice = 0;
 };
 
 enum class GameObjectActions : uint32

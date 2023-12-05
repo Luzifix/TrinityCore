@@ -17,10 +17,12 @@ uint32 BattlenetAccountFurniture::GetInventoryCount()
     return inventoryCount;
 }
 
-bool BattlenetAccountFurniture::RemoveInventory(uint32 count /*= 1*/)
+uint32 BattlenetAccountFurniture::RemoveInventory(uint32 count /*= 1*/)
 {
     if (GetInventoryCount() < count)
-        return false;
+        return 0;
+
+    uint32 totalSellPrice = 0;
 
     while (count > 0)
     {
@@ -28,16 +30,18 @@ bool BattlenetAccountFurniture::RemoveInventory(uint32 count /*= 1*/)
 
         if (inventory->GetCount() > count)
         {
+            totalSellPrice += inventory->GetSellPrice() * count;
             inventory->SetCount(inventory->GetCount() - count);
             count = 0;
             continue;
         }
 
+        totalSellPrice += inventory->GetSellPrice() * inventory->GetCount();
         count -= inventory->GetCount();
         _inventory.pop_back();
     }
 
-    return true;
+    return totalSellPrice;
 }
 
 BattlenetAccountFurnitureInventory* BattlenetAccountFurniture::AddInventory(BattlenetAccountFurnitureInventory* inventory)

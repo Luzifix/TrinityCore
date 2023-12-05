@@ -54,10 +54,11 @@ public:
     BattlenetAccountFurniture* GetBattlenetAccountFurniture(ObjectGuid battlenetAccount, uint32 furnitureId);
     void SetFavorite(ObjectGuid battlenetAccount, uint32 furnitureId, bool favorite);
     bool Buy(Player* player, uint32 furnitureId, uint32 count);
-    bool AddItem(Player* player, uint32 furnitureId, uint32 count = 1);
-    bool AddItem(Player* player, Furniture* furniture, uint32 count = 1);
+    bool AddItem(Player* player, uint32 furnitureId, uint32 count = 1, int32 sellPrice = -1);
+    bool AddItem(Player* player, Furniture* furniture, uint32 count = 1, int32 sellPrice = -1);
     bool HasItem(Player* player, uint32 furnitureId, uint32 count = 1);
     bool RemoveItem(Player* player, uint32 furnitureId, uint32 count = 1);
+    uint32 RemoveItemAndReturnTotalPrice(Player* player, uint32 furnitureId, uint32 count = 1);
     bool Sell(Player* player, uint32 furnitureId, uint32 count);
 
     // Next Spawn

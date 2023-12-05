@@ -153,9 +153,9 @@ class TC_GAME_API GameObject : public WorldObject, public GridObject<GameObject>
         void CleanupsBeforeDelete(bool finalCleanup = true) override;
 
     private:
-        bool Create(uint32 entry, Map* map, Position const& pos, QuaternionData const& rotation, uint32 animProgress, GOState goState, uint32 artKit, bool dynamic, ObjectGuid::LowType spawnid, float size = -1.0f, int32 houseAreaId = -1, uint32 spellVisualId = 0);
+        bool Create(uint32 entry, Map* map, Position const& pos, QuaternionData const& rotation, uint32 animProgress, GOState goState, uint32 artKit, bool dynamic, ObjectGuid::LowType spawnid, float size = -1.0f, int32 houseAreaId = -1, uint32 spellVisualId = 0, int32 sellPrice = -1);
     public:
-        static GameObject* CreateGameObject(uint32 entry, Map* map, Position const& pos, QuaternionData const& rotation, uint32 animProgress, GOState goState, uint32 artKit = 0, float size = -1.0f, int32 houseAreaId = -1, uint32 spellVisualId = 0);
+        static GameObject* CreateGameObject(uint32 entry, Map* map, Position const& pos, QuaternionData const& rotation, uint32 animProgress, GOState goState, uint32 artKit = 0, float size = -1.0f, int32 houseAreaId = -1, uint32 spellVisualId = 0, int32 sellPrice = -1);
         static GameObject* CreateGameObjectFromDB(ObjectGuid::LowType spawnId, Map* map, bool addToMap = true);
 
         void Update(uint32 p_time) override;
@@ -405,6 +405,9 @@ class TC_GAME_API GameObject : public WorldObject, public GridObject<GameObject>
 
         void HandleCustomTypeCommand(GameObjectTypeBase::CustomCommand const& command) const;
 
+        int32 GetSellPrice() const { return _sellPrice; }
+        void SetSellPrice(int32 sellPrice) { _sellPrice = sellPrice; }
+
         UF::UpdateField<UF::GameObjectData, 0, TYPEID_GAMEOBJECT> m_gameObjectData;
 
     protected:
@@ -464,6 +467,7 @@ class TC_GAME_API GameObject : public WorldObject, public GridObject<GameObject>
         bool m_respawnCompatibilityMode;
         uint16 _animKitId;
         uint32 _worldEffectID;
+        int32 _sellPrice = -1;
 
         struct PerPlayerState
         {

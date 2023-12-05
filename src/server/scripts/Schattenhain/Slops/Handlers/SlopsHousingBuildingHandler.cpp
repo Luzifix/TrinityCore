@@ -47,10 +47,10 @@ static void ResponseSelected(Player* player, std::list<GameObject*> objects)
     sSlops->Send(SLOPS_SMSG_HOUSING_BUILDING_SELECTED, data.dump(), player);
 }
 
-static GameObject* SpawnGameObject(Player* player, uint32 entry, Position position, G3D::Quat rotation, float scale = -1.0f, uint32 houseAreaId = 0, uint32 spellVisualId = 0)
+static GameObject* SpawnGameObject(Player* player, uint32 entry, Position position, G3D::Quat rotation, float scale = -1.0f, uint32 houseAreaId = 0, uint32 spellVisualId = 0, int32 totalSellPrice = -1)
 {
     Map* map = player->GetMap();
-    GameObject* object = GameObject::CreateGameObject(entry, map, position, QuaternionData(rotation.x, rotation.y, rotation.z, rotation.w), 255, GO_STATE_READY, 0, scale, houseAreaId, spellVisualId);
+    GameObject* object = GameObject::CreateGameObject(entry, map, position, QuaternionData(rotation.x, rotation.y, rotation.z, rotation.w), 255, GO_STATE_READY, 0, scale, houseAreaId, spellVisualId, totalSellPrice);
 
     if (!object)
         return nullptr;
@@ -430,6 +430,7 @@ static bool CommandActionPlayer(Player* player, std::string command, float facto
             return true;
         }
 
+        int32 totalSellPrice = -1;
         if (!player->IsGameMaster()) {
             Furniture* furnitrue = sFurnitureMgr->GetByGameObject(gameObject);
             if (!furnitrue || !furnitrue->IsCategorized() || !sFurnitureMgr->HasItem(player, furnitrue->GetId())) {
@@ -437,10 +438,10 @@ static bool CommandActionPlayer(Player* player, std::string command, float facto
                 return true;
             }
 
-            sFurnitureMgr->RemoveItem(player, furnitrue->GetId());
+            totalSellPrice = sFurnitureMgr->RemoveItemAndReturnTotalPrice(player, furnitrue->GetId());
         }
 
-        GameObject* clonedGameObject = SpawnGameObject(player, gameObject->GetEntry(), gameObject->GetPosition(), rotationQuaternion, gameObject->GetObjectScale(), gameObject->GetHouseAreaId(), gameObject->GetSpellVisualId());
+        GameObject* clonedGameObject = SpawnGameObject(player, gameObject->GetEntry(), gameObject->GetPosition(), rotationQuaternion, gameObject->GetObjectScale(), gameObject->GetHouseAreaId(), gameObject->GetSpellVisualId(), totalSellPrice);
 
         if (clonedGameObject) {
             std::list<GameObject*> objects;
@@ -462,7 +463,7 @@ static bool CommandActionPlayer(Player* player, std::string command, float facto
         {
             Furniture* furnitrue = sFurnitureMgr->GetByGameObject(gameObject);
             if (furnitrue && furnitrue->IsCategorized()) {
-                sFurnitureMgr->AddItem(player, furnitrue);
+                sFurnitureMgr->AddItem(player, furnitrue, 1U, gameObject->GetSellPrice());
             }
             else {
                 ChatHandler(player->GetSession()).PSendSysMessage(LANG_HOUSING_BUILDING_ERR_OBJECT_NOT_CATEGORIZED, gameObject->GetNameForLocaleIdx(LOCALE_deDE));

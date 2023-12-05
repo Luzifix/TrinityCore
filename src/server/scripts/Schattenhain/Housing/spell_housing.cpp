@@ -22,6 +22,8 @@
 #include "PoolMgr.h"
 #include <ScriptPCH.h>
 
+#include <String.h>
+
 class spell_housing_furniture_spawn : public SpellScriptLoader
 {
 public:
@@ -98,21 +100,27 @@ public:
                 }
             }
 
-            if (!SpawnFurniture(player, furniture, spawnPosition))
-                return;
-
+            uint32 totalSellPrice = -1;
             if (!player->IsGameMaster())
-                sFurnitureMgr->RemoveItem(player, furniture->GetId(), 1);
+                totalSellPrice = sFurnitureMgr->RemoveItemAndReturnTotalPrice(player, furniture->GetId(), 1);
+
+            if (!SpawnFurniture(player, furniture, spawnPosition, totalSellPrice))
+            {
+                if (totalSellPrice > 0)
+                    player->ModifyMoney(totalSellPrice);
+
+                return;
+            }
 
             SlopsPackage slopsPackage;
             slopsPackage.sender = player;
             SlopsHandler::HandleFurnitureInvetntoryRequest(slopsPackage);
         }
 
-        bool SpawnFurniture(Player* player, Furniture* furniture, Position spawnPosition)
+        bool SpawnFurniture(Player* player, Furniture* furniture, Position spawnPosition, int32 totalSellPrice)
         {
             Map* map = player->GetMap();
-            GameObject* object = GameObject::CreateGameObject(furniture->GetId(), map, spawnPosition, QuaternionData::fromEulerAnglesZYX(player->GetOrientation(), 0.0f, 0.0f), 255, GO_STATE_READY, 0, -1.0f, player->GetHouseAreaId());
+            GameObject* object = GameObject::CreateGameObject(furniture->GetId(), map, spawnPosition, QuaternionData::fromEulerAnglesZYX(player->GetOrientation(), 0.0f, 0.0f), 255, GO_STATE_READY, 0, -1.0f, player->GetHouseAreaId(), 0U, totalSellPrice);
 
             if (!object)
                 return false;

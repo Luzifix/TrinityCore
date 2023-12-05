@@ -32,7 +32,7 @@ public:
 
     std::list<BattlenetAccountFurnitureInventory*> GetInventory() { return _inventory; }
     BattlenetAccountFurnitureInventory* AddInventory(BattlenetAccountFurnitureInventory* inventory);
-    bool RemoveInventory(uint32 count = 1);
+    uint32 RemoveInventory(uint32 count = 1);
     bool HasInventory(uint32 count = 1);
     uint32 GetInventoryCount();
 #pragma endregion

@@ -1,0 +1,1 @@
+ALTER TABLE `gameobject` ADD COLUMN `sellPrice` INT(11) NOT NULL DEFAULT '-1' AFTER `spellVisualId`;
