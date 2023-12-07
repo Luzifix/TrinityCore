@@ -198,7 +198,7 @@ BattlenetAccountFurniture* FurnitureMgr::GetBattlenetAccountFurniture(ObjectGuid
     if (_battlenetAccountFurnitureByOwnerStore.find(battlenetAccount) != _battlenetAccountFurnitureByOwnerStore.end() && _battlenetAccountFurnitureByOwnerStore[battlenetAccount].find(furnitureId) != _battlenetAccountFurnitureByOwnerStore[battlenetAccount].end())
         return _battlenetAccountFurnitureByOwnerStore[battlenetAccount][furnitureId];
 
-    return new BattlenetAccountFurniture(battlenetAccount, furnitureId, false);
+    return _battlenetAccountFurnitureByOwnerStore[battlenetAccount][furnitureId] = new BattlenetAccountFurniture(battlenetAccount, furnitureId, false);
 }
 
 void FurnitureMgr::SetFavorite(ObjectGuid battlenetAccount, uint32 furnitureId, bool favorite)
