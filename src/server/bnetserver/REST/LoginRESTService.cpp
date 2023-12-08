@@ -329,7 +329,7 @@ int32 LoginRESTService::HandlePostLogin(std::shared_ptr<AsyncRequest> request)
     std::string password;
     std::string macHash;
     std::string gatewayMacHash;
-    std::string hardwareHash;
+    std::string hardwareHash = "MISSING";
     std::string machineHash;
 
     for (int32 i = 0; i < loginForm.inputs_size(); ++i)
@@ -342,8 +342,8 @@ int32 LoginRESTService::HandlePostLogin(std::shared_ptr<AsyncRequest> request)
             macHash = loginForm.inputs(i).value();
         else if (loginForm.inputs(i).input_id() == "key2")
             gatewayMacHash = loginForm.inputs(i).value();
-        else if (loginForm.inputs(i).input_id() == "key3")
-            hardwareHash = loginForm.inputs(i).value();
+        //else if (loginForm.inputs(i).input_id() == "key3")
+        //    hardwareHash = loginForm.inputs(i).value();
         else if (loginForm.inputs(i).input_id() == "key4")
             machineHash = loginForm.inputs(i).value();
     }
@@ -355,7 +355,7 @@ int32 LoginRESTService::HandlePostLogin(std::shared_ptr<AsyncRequest> request)
     Utf8ToUpperOnlyLatin(hardwareHash);
     Utf8ToUpperOnlyLatin(machineHash);
 
-    if(macHash.size() != 32 || gatewayMacHash.size() != 32 || hardwareHash.size() != 32 || machineHash.size() != 32)
+    if(macHash.size() != 32 || gatewayMacHash.size() != 32 /*|| hardwareHash.size() != 32*/ || machineHash.size() != 32)
     {
         Battlenet::JSON::Login::LoginResult loginResult;
         loginResult.set_authentication_state(Battlenet::JSON::Login::LOGIN);
@@ -528,7 +528,7 @@ int32 LoginRESTService::HandlePostRefreshLoginTicket(std::shared_ptr<AsyncReques
 
     std::string macHash;
     std::string gatewayMacHash;
-    std::string hardwareHash;
+    std::string hardwareHash = "MISSING";
     std::string machineHash;
 
     if (buf && JSON::Deserialize(buf, &loginForm))
@@ -539,8 +539,8 @@ int32 LoginRESTService::HandlePostRefreshLoginTicket(std::shared_ptr<AsyncReques
                 macHash = loginForm.inputs(i).value();
             else if (loginForm.inputs(i).input_id() == "key2")
                 gatewayMacHash = loginForm.inputs(i).value();
-            else if (loginForm.inputs(i).input_id() == "key3")
-                hardwareHash = loginForm.inputs(i).value();
+            //else if (loginForm.inputs(i).input_id() == "key3")
+            //    hardwareHash = loginForm.inputs(i).value();
             else if (loginForm.inputs(i).input_id() == "key4")
                 machineHash = loginForm.inputs(i).value();
         }
@@ -568,7 +568,7 @@ int32 LoginRESTService::HandlePostRefreshLoginTicket(std::shared_ptr<AsyncReques
                 callback.WithPreparedCallback([request, &callback, now, accountId, macHash, gatewayMacHash, hardwareHash, machineHash, this](PreparedQueryResult duplicateResult)
                 {
                     std::string token = request->GetClient()->userid;
-                    bool hasHardwareInformation = (macHash.size() == 32 && gatewayMacHash.size() == 32 && hardwareHash.size() == 32 && machineHash.size() == 32);
+                    bool hasHardwareInformation = (macHash.size() == 32 && gatewayMacHash.size() == 32 /*&& hardwareHash.size() == 32*/ && machineHash.size() == 32);
 
                     LoginDatabasePreparedStatement* stmt = LoginDatabase.GetPreparedStatement(hasHardwareInformation ? LOGIN_UPD_BNET_EXISTING_AUTHENTICATION_WITH_HARDWARE_INFORMATION : LOGIN_UPD_BNET_EXISTING_AUTHENTICATION);
                     stmt->setUInt32(0, uint32(now + _loginTicketDuration));
@@ -676,17 +676,18 @@ std::string LoginRESTService::CalculateShaPassHash(std::string const& name, std:
 LoginDatabasePreparedStatement* LoginRESTService::GetCheckDoubleAccountPreparedStatement(uint32 bnetId, std::string macHash, std::string gatewayMacHash, std::string hardwareHash, std::string machineHash)
 {
     LoginDatabasePreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_SEL_BNET_SIMILAR_HARDWARE_HISTORY_ENTRIES);
-    stmt->setString(0, macHash);
-    stmt->setString(1, gatewayMacHash);
-    stmt->setString(2, hardwareHash);
-    stmt->setString(3, machineHash);
+    int index = 0;
+    stmt->setString(index++, macHash);
+    stmt->setString(index++, gatewayMacHash);
+    //stmt->setString(index++, hardwareHash);
+    stmt->setString(index++, machineHash);
 
-    stmt->setUInt32(4, bnetId);
+    stmt->setUInt32(index++, bnetId);
 
-    stmt->setString(5, macHash);
-    stmt->setString(6, gatewayMacHash);
-    stmt->setString(7, hardwareHash);
-    stmt->setString(8, machineHash);
+    stmt->setString(index++, macHash);
+    stmt->setString(index++, gatewayMacHash);
+    //stmt->setString(index++, hardwareHash);
+    stmt->setString(index++, machineHash);
 
     return stmt;
 }
@@ -707,8 +708,8 @@ bool LoginRESTService::ProcessDoubleAccountResult(uint32 accountId, PreparedQuer
         uint32 duplicateBnetId = fields[0].GetUInt32();
         //bool macHashMatch = fields[1].GetBool();
         //bool gatewayHashMatch = fields[2].GetBool();
-        bool hardwareHashMatch = fields[3].GetBool();
-        bool machineHashMatch = fields[4].GetBool();
+        bool hardwareHashMatch = false; //fields[3].GetBool();
+        bool machineHashMatch = fields[3].GetBool();
         std::string cacheKey = std::to_string(accountId) + "-" + std::to_string(duplicateBnetId);
 
         if (hardwareHashMatch || machineHashMatch)
