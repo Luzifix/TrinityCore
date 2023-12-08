@@ -1707,7 +1707,7 @@ namespace Trinity
             bool operator()(GameObject* go) const
             {
                 if (!entry || (go->GetGOInfo() && go->GetGOInfo()->entry == entry))
-                    return !go->GetPhaseShift().HasPhaseShiftFlag(PhaseShiftFlags::AlwaysVisible) && go->InSameHouseArea(houseAreaId) && go->IsWithinDist3d(x, y, z, range);
+                    return !go->GetPhaseShift().HasPhaseShiftFlag(PhaseShiftFlags::AlwaysVisible) && go->InSameHouseArea(houseAreaId) && go->IsInRange(x, y, z, range);
                 else return false;
             }
 
