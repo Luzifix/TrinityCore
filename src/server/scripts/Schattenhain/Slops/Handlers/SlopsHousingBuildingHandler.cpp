@@ -129,9 +129,12 @@ static GameObjectSelectionInfoStore FindNearGameObjectsByGUID(Player* player, JS
         {
             if (player->GetHouseAreaId() != gameObjectSelectionInfo.gameObject->GetHouseAreaId())
             {
-                gameObjectSelectionInfo.error = GAMEOBJECT_SELECTION_INFO_ERROR_OUT_OF_RANGE;
-                gameObjectSelectionInfoStore.push_back(gameObjectSelectionInfo);
-                continue;
+                if (!isGamemaster || gameObjectSelectionInfo.gameObject->GetDBPhase() != PHASEMASK_ANYWHERE)
+                {
+                    gameObjectSelectionInfo.error = GAMEOBJECT_SELECTION_INFO_ERROR_OUT_OF_HOUSE;
+                    gameObjectSelectionInfoStore.push_back(gameObjectSelectionInfo);
+                    continue;
+                }
             }
         }
 
