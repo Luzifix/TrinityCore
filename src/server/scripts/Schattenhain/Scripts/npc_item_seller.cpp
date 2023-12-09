@@ -305,6 +305,7 @@ public:
 
             player->SendNewItem(item, count, false, true);
 
+            uint32 itemDisplayInfoId = itemPrice->GetDisplayInfoId();
             Trinity::DiscordLogging::PostIngameActionLog(
                 Trinity::StringFormat(
                     sObjectMgr->GetTrinityStringForDBCLocale(LANG_ITEM_SELLER_DISCORD_LOG),
@@ -313,9 +314,13 @@ public:
                     itemId,
                     bonusId,
                     _itemSellerStore[playerGuid]->BuyForCharacterName,
-                    _itemSellerStore[playerGuid]->BuyForCharacterGuid.GetCounter()
+                    _itemSellerStore[playerGuid]->BuyForCharacterGuid.GetCounter(),
+                    itemDisplayInfoId & 255,
+                    itemDisplayInfoId
                 ),
-                "Item Seller"
+                "Item Seller",
+                Trinity::DISCORD_CHANNEL_FORUM_LOG,
+                Trinity::DISCORD_THREAD_ITEM_SELLER
             );
 
             _itemSellerStore.erase(playerGuid);

@@ -11,6 +11,7 @@ namespace Trinity
     inline static const uint64 DISCORD_THREAD_DOUBLE_ACCOUNT = 1117097235369435280;
     inline static const uint64 DISCORD_THREAD_REWARDCOINS = 1169940110981206026;
     inline static const uint64 DISCORD_THREAD_HOUSING_TRANSFER = 1169954884322349157;
+    inline static const uint64 DISCORD_THREAD_ITEM_SELLER = 1182950630717919282;
 
     struct TC_COMMON_API DiscordLogging
     {
