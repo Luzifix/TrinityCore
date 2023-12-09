@@ -7,7 +7,7 @@ using Trinity::Encoding::JSON;
 
 inline static const char* DISCORD_HOST_ADDRESS = "discord.com";
 
-/*static*/ std::string Trinity::DiscordLogging::PostIngameActionLog(std::string log, std::string title /* = "Ingame Action" */, std::string channel /* = DISCORD_CHANNEL_OLD_LOG */, uint64 threadId /* = 0 */)
+/*static*/ std::string Trinity::DiscordLogging::PostIngameActionLog(std::string log, std::string title, std::string channel, uint64 threadId)
 {
     try
     {
