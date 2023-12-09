@@ -86,7 +86,7 @@ public:
             switch (eventId)
             {
             case ACTIVITY_EVENT_TICK:
-                if (!RewardInProgress && (sActivityMgr->isEnabled() || sActivityMgr->isGuildEnabeld()))
+                if ((sActivityMgr->isEnabled() || sActivityMgr->isGuildEnabeld()))
                 {
                     LoopOnlinePlayer();
                     RewardPayment();
@@ -194,7 +194,7 @@ public:
 
     void RewardPayment()
     {
-        if (ActivityNextPaymentTime >= time(NULL))
+        if (ActivityNextPaymentTime >= time(NULL) || RewardInProgress)
             return;
 
         RewardInProgress = true;
