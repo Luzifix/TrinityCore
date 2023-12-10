@@ -8932,8 +8932,11 @@ void Player::SendInitWorldStates(uint32 zoneId, uint32 areaId)
     SendDirectMessage(packet.Write());
 }
 
-void Player::SetBindPoint(ObjectGuid guid) const
+void Player::SetBindPoint(ObjectGuid guid)
 {
+    if (!HasItemCount(HEARTHSTONE_ITEM_ID, 1, true))
+        AddItem(HEARTHSTONE_ITEM_ID, 1);
+
     WorldPackets::Misc::BinderConfirm packet(guid);
     SendDirectMessage(packet.Write());
 }

@@ -342,6 +342,7 @@ enum ReputationSource
 #define ACTION_BUTTON_ACTION(X) (uint64(X) & 0x00FFFFFFFFFFFFFF)
 #define ACTION_BUTTON_TYPE(X)   ((uint64(X) & 0xFF00000000000000) >> 56)
 #define MAX_ACTION_BUTTON_ACTION_VALUE UI64LIT(0xFFFFFFFFFFFFFF)
+static uint32 const HEARTHSTONE_ITEM_ID = 6948;
 
 struct ActionButton
 {
@@ -1682,7 +1683,7 @@ class TC_GAME_API Player : public Unit, public GridObject<Player>
 
         bool m_mailsUpdated;
 
-        void SetBindPoint(ObjectGuid guid) const;
+        void SetBindPoint(ObjectGuid guid);
         void SendRespecWipeConfirm(ObjectGuid const& guid, uint32 cost, SpecResetType respecType) const;
         void RegenerateAll();
         void Regenerate(Powers power);

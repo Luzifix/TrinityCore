@@ -361,6 +361,12 @@ void WorldSession::SendBindPoint(Creature* npc)
     // send spell for homebinding (3286)
     npc->CastSpell(_player, bindspell, true);
 
+    if (Player* player = GetPlayer())
+    {
+        if (!player->HasItemCount(HEARTHSTONE_ITEM_ID, 1, true))
+            player->AddItem(HEARTHSTONE_ITEM_ID, 1);
+    }
+
     _player->PlayerTalkClass->SendCloseGossip();
 }
 
