@@ -1,0 +1,1 @@
+UPDATE `animations_category` SET `name`='Naturmagie' WHERE `id` = 12;
