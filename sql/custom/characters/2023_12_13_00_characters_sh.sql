@@ -1,0 +1,1 @@
+UPDATE channels SET `ownership` = 0, `announce` = 0, `lastUsed` = UNIX_TIMESTAMP() WHERE `name` IN ("OOC", "Info", "Event", "Fragen", "xtensionxtooltip2");
