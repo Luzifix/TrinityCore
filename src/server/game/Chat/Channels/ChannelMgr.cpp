@@ -110,6 +110,9 @@ ChannelMgr::~ChannelMgr()
     static ChannelMgr allianceChannelMgr(ALLIANCE);
     static ChannelMgr hordeChannelMgr(HORDE);
 
+    // Cross-faction channels
+    return &allianceChannelMgr;        // cross-faction
+
     if (sWorld->getBoolConfig(CONFIG_ALLOW_TWO_SIDE_INTERACTION_CHANNEL))
         return &allianceChannelMgr;        // cross-faction
 
@@ -262,7 +265,9 @@ void ChannelMgr::SendNotOnChannelNotify(Player const* player, std::string const&
 
 ObjectGuid ChannelMgr::CreateCustomChannelGuid()
 {
-    return ObjectGuid::Create<HighGuid::ChatChannel>(false, false, 0, _team == ALLIANCE ? 3 : 5, _guidGenerator.Generate());
+    // Return alliance channel guid
+    return ObjectGuid::Create<HighGuid::ChatChannel>(false, false, 0, 3, _guidGenerator.Generate());
+    //return ObjectGuid::Create<HighGuid::ChatChannel>(false, false, 0, _team == ALLIANCE ? 3 : 5, _guidGenerator.Generate());
 }
 
 ObjectGuid ChannelMgr::CreateBuiltinChannelGuid(uint32 channelId, AreaTableEntry const* zoneEntry /*= nullptr*/) const
@@ -272,5 +277,7 @@ ObjectGuid ChannelMgr::CreateBuiltinChannelGuid(uint32 channelId, AreaTableEntry
     if (channelEntry->Flags & (CHANNEL_DBC_FLAG_GLOBAL | CHANNEL_DBC_FLAG_CITY_ONLY))
         zoneId = 0;
 
-    return ObjectGuid::Create<HighGuid::ChatChannel>(true, (channelEntry->Flags & CHANNEL_DBC_FLAG_CITY_ONLY2) != 0, zoneId, _team == ALLIANCE ? 3 : 5, channelId);
+    // Return alliance channel guid
+    return ObjectGuid::Create<HighGuid::ChatChannel>(true, (channelEntry->Flags & CHANNEL_DBC_FLAG_CITY_ONLY2) != 0, zoneId, 3, channelId);
+    //return ObjectGuid::Create<HighGuid::ChatChannel>(true, (channelEntry->Flags & CHANNEL_DBC_FLAG_CITY_ONLY2) != 0, zoneId, _team == ALLIANCE ? 3 : 5, channelId);
 }
