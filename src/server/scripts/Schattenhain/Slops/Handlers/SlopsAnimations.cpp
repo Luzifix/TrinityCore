@@ -120,7 +120,7 @@ void SlopsHandler::HandleAnimationsDo(SlopsPackage package)
     player->SetMeleeAnimKitId(0);
     player->SetMovementAnimKitId(0);
     RemoveAurasBeforeAnimation(player);
-    player->HandleEmoteCommand(EMOTE_STATE_NONE);
+    player->HandleEmoteCommand(EMOTE_ONESHOT_SETTLE);
 
     if (animation->disabled.find(race) != animation->disabled.end() && animation->disabled[race] == gender)
         return;
