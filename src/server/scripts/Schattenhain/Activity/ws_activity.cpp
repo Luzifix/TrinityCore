@@ -484,8 +484,34 @@ public:
             sHousingMgr->Save(housing);
             removedHouseCount++;
 
+            uint32 facilityValue = 0;
+            uint32 facilityValueGold = 0;
+            uint32 facilityValueSilver = 0;
+            uint32 facilityValueCopper = 0;
+
+            for (auto& housingArea : housing->GetHousingAreas())
+            {
+                facilityValue += housingArea.second->GetFacilityValue();
+            }
+
+            if (facilityValue > 0)
+            {
+                facilityValueGold = facilityValue / GOLD;
+                facilityValueSilver = (facilityValue % GOLD) / SILVER;
+                facilityValueCopper = (facilityValue % GOLD) % SILVER;
+            }
+            
             Trinity::DiscordLogging::PostIngameActionLog(
-                Trinity::StringFormat(sObjectMgr->GetTrinityStringForDBCLocale(LANG_HOUSING_LOG_TRANSFER_OWNERSHIP_AUTOMATIC), housing->GetName(), housing->GetId(), bnetId, _returnHouseBnetGuid.GetCounter()),
+                Trinity::StringFormat(
+                    sObjectMgr->GetTrinityStringForDBCLocale(LANG_HOUSING_LOG_TRANSFER_OWNERSHIP_AUTOMATIC),
+                    housing->GetName(),
+                    housing->GetId(),
+                    facilityValueGold,
+                    facilityValueSilver,
+                    facilityValueCopper,
+                    bnetId,
+                    _returnHouseBnetGuid.GetCounter()
+                ),
                 "Housing Inactiviy Transfer",
                 Trinity::DISCORD_CHANNEL_FORUM_LOG,
                 Trinity::DISCORD_THREAD_HOUSING_TRANSFER
