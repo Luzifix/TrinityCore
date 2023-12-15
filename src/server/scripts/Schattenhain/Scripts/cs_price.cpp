@@ -13,6 +13,8 @@
 #include "Util.h"
 #include "WorldSession.h"
 #include <sstream>
+#include "DiscordLogging.h"
+#include <boost/algorithm/string/join.hpp>
 
 class cs_price : public CommandScript
 {
@@ -124,13 +126,31 @@ public:
         if (priceMultiplierStr != NULL)
             priceMultiplier = std::max(atoi(priceMultiplierStr), 1);
 
+        Player* player = handler->GetSession()->GetPlayer();
         sItemPriceMgr->CategorizeItem(
             itemAppearance->ItemDisplayInfoID,
             itemPriceCategory,
             priceMultiplier,
             itemId,
             itemBonusListIds,
-            handler->GetSession()->GetPlayer()->GetName()
+            player->GetName()
+        );
+
+        uint32 itemDisplayInfoId = itemAppearance->ItemDisplayInfoID;
+        Trinity::DiscordLogging::PostIngameActionLog(
+            Trinity::StringFormat(
+                sObjectMgr->GetTrinityStringForDBCLocale(LANG_ITEM_PRICE_SET_DISCORD_LOG),
+                player->GetName(),
+                player->GetGUID().GetCounter(),
+                itemId,
+                itemPriceCategory->GetName().c_str(),
+                priceMultiplier,
+                itemDisplayInfoId & 255,
+                itemDisplayInfoId
+            ),
+            "Item Categorization",
+            Trinity::DISCORD_CHANNEL_FORUM_LOG,
+            Trinity::DISCORD_THREAD_ITEM_CATEGORISATION
         );
 
         handler->SendSysMessage(LANG_ITEM_PRICE_SET_CATEGORY_SUCCESS);
