@@ -1,5 +1,5 @@
 /*
- * Schattenhain 2020
+ * Schattenhain 2023
  */
 
 #include "SlopsHousingBuildingHandler.h"
@@ -20,12 +20,7 @@
 #include <Language.h>
 #include <DB2Stores.h>
 
-#ifdef RELEASE
 #define MAX_OBJECT_SELECTION 500
-#else
-#define MAX_OBJECT_SELECTION 250
-#endif
-
 
 static void ResponseSelected(Player* player, std::list<GameObject*> objects)
 {
