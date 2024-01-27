@@ -23,7 +23,7 @@ void LoginDatabaseConnection::DoPrepareStatements()
     if (!m_reconnecting)
         m_stmts.resize(MAX_LOGINDATABASE_STATEMENTS);
 
-#define HardwareBanInfo "hwHardware.unbandate > UNIX_TIMESTAMP() OR hwHardware.unbandate = hwHardware.bandate OR hwMachine.unbandate > UNIX_TIMESTAMP() OR hwMachine.unbandate = hwMachine.bandate"
+#define HardwareBanInfo "hwMachine.unbandate > UNIX_TIMESTAMP() OR hwMachine.unbandate = hwMachine.bandate" // OR hwHardware.unbandate > UNIX_TIMESTAMP() OR hwHardware.unbandate = hwHardware.bandate"
 #define HardwarePermaBanInfo "hwHardware.unbandate = hwHardware.bandate OR hwMachine.unbandate = hwMachine.bandate"
 
     PrepareStatement(LOGIN_SEL_REALMLIST, "SELECT id, name, address, localAddress, localSubnetMask, port, icon, flag, timezone, allowedSecurityLevel, population, gamebuild, Region, Battlegroup FROM realmlist WHERE flag <> 3 ORDER BY name", CONNECTION_SYNCH);
