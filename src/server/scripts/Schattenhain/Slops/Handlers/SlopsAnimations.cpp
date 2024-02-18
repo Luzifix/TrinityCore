@@ -11,7 +11,16 @@
 static bool IsAuraAllowedWhileAnimation(Aura const* aura)
 {
     std::vector<uint32> allowedAuras = {
-        37800, // OOC MODE
+        37800,  // OOC MODE
+        168026, // Backpack
+        251403, // Backpack
+        148404, // Backpack
+        243686, // Backpack
+        163398, // Backpack
+        344606, // Backpack
+        136007, // Backpack
+        94218,  // Backpack
+        90353,  // Backpack
     };
 
     // Check if aura id is in allowedAuras
@@ -31,7 +40,16 @@ static void RemoveAurasBeforeAnimation(Player* player)
     Player::AuraMap& ownedAuras = player->GetOwnedAuras();
 
     std::vector<uint32> allowedAuras = {
-        37800, // OOC MODE
+        37800,  // OOC MODE
+        168026, // Backpack
+        251403, // Backpack
+        148404, // Backpack
+        243686, // Backpack
+        163398, // Backpack
+        344606, // Backpack
+        136007, // Backpack
+        94218,  // Backpack
+        90353,  // Backpack
     };
 
     // Remove worgen running wild
