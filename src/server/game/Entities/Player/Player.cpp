@@ -9045,7 +9045,7 @@ uint8 Player::FindEquipSlot(Item const* item, uint32 slot, bool swap) const
             break;
         case INVTYPE_RANGEDRIGHT:
             slots[0] = EQUIPMENT_SLOT_MAINHAND;
-            slots[1] = EQUIPMENT_SLOT_MAINHAND;
+            slots[1] = EQUIPMENT_SLOT_OFFHAND;
             break;
         case INVTYPE_BAG:
             slots[0] = INVENTORY_SLOT_BAG_START + 0;
@@ -10671,8 +10671,8 @@ InventoryResult Player::CanEquipItem(uint8 slot, uint16 &dest, Item* pItem, bool
                         return EQUIP_ERR_2HSKILLNOTFOUND;
                 }
 
-                if (IsTwoHandUsed())
-                    return EQUIP_ERR_2HANDED_EQUIPPED;
+                //if (IsTwoHandUsed())
+                //    return EQUIP_ERR_2HANDED_EQUIPPED;
             }
 
             // equip two-hand weapon case (with possible unequip 2 items)
