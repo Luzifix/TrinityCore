@@ -2538,6 +2538,7 @@ void Spell::EffectTameCreature()
     {
         pet->SavePetToDB(PET_SAVE_AS_CURRENT);
         unitCaster->ToPlayer()->PetSpellInitialize();
+        unitCaster->ToPlayer()->GetSession()->SendStablePet(ObjectGuid::Empty);
     }
 }
 

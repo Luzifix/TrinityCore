@@ -20873,6 +20873,17 @@ void Player::RemovePet(Pet* pet, PetSaveMode mode, bool returnreagent)
         if (GetGroup())
             SetGroupUpdateFlag(GROUP_UPDATE_FLAG_PET);
     }
+
+    if (GetClass() == CLASS_HUNTER && mode == PET_SAVE_AS_DELETED)
+    {
+        for (std::size_t activeSlot = 0; activeSlot < GetPetStable()->ActivePets.size(); ++activeSlot) {
+            if (GetPetStable()->ActivePets[activeSlot] && GetPetStable()->ActivePets[activeSlot]->PetNumber == currentPet->PetNumber) {
+                GetPetStable()->ActivePets[activeSlot].reset();
+                GetSession()->SendStablePet(ObjectGuid::Empty);
+                break;
+            }
+        }
+    }
 }
 
 void Player::SendTameFailure(PetTameResult result)
