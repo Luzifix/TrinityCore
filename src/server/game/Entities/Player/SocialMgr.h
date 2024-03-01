@@ -97,8 +97,8 @@ enum FriendsResult : uint8
     FRIEND_UNKNOWN          = 0x1C                          // Unknown friend response from server
 };
 
-#define SOCIALMGR_FRIEND_LIMIT  50u
-#define SOCIALMGR_IGNORE_LIMIT  50u
+#define SOCIALMGR_FRIEND_LIMIT  100u
+#define SOCIALMGR_IGNORE_LIMIT  0u
 
 class TC_GAME_API PlayerSocial
 {
