@@ -1,0 +1,1 @@
+DELETE FROM character_social WHERE flags=2;

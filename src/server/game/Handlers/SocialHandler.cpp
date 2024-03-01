@@ -29,6 +29,8 @@
 #include "SocialMgr.h"
 #include "SocialPackets.h"
 #include "World.h"
+#include "Language.h"
+#include "Chat.h"
 
 void WorldSession::HandleContactListOpcode(WorldPackets::Social::SendContactList& packet)
 {
@@ -148,8 +150,13 @@ void WorldSession::HandleAddIgnoreOpcode(WorldPackets::Social::AddIgnore& packet
             ignoreResult = FRIEND_IGNORE_ALREADY;
         else
         {
-            ignoreResult = FRIEND_IGNORE_ADDED;
+            // No player ignore on schattenhain
+            ChatHandler(GetPlayer()->GetSession()).PSendSysMessage(LANG_SOCIAL_ERROR_YOU_CANT_IGNORE, packet.Name);
 
+            return;
+            
+            ignoreResult = FRIEND_IGNORE_ADDED;
+            
             // ignore list full
             if (!GetPlayer()->GetSocial()->AddToSocialList(ignoreGuid, ignoreAccountGuid, SOCIAL_FLAG_IGNORED))
                 ignoreResult = FRIEND_IGNORE_FULL;
