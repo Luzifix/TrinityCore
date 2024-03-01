@@ -83,6 +83,17 @@ HyperlinkInfo Trinity::Hyperlinks::ParseSingleHyperlink(std::string_view str)
     // skip to final |
     if (size_t end = str.find('|'); end != std::string_view::npos)
     {
+        if (
+            (Trinity::Hyperlinks::LinkTags::worldmap::tag().compare(tag) == 0 && str.substr(end, 39) == "|A:Waypoint-MapPin-ChatIcon:13:13:0:0|a") ||
+            (Trinity::Hyperlinks::LinkTags::outfit::tag().compare(tag) == 0 && str.substr(end, 22) == "|T1598183:13:13:-1:0|t")
+        ) {
+            for (int i = 0; i < 3; ++i) {
+                end = str.find('|', end);
+                ++end;
+            }
+            --end;
+        }
+
         // check end tag
         if (str.substr(end, 4) != "|h|r")
             return {};
@@ -710,7 +721,7 @@ bool Trinity::Hyperlinks::CheckAllLinks(std::string_view str)
             if (pos == str.length())
                 return false;
             char next = str[pos];
-            if (next == 'H' || next == 'h' || next == 'c' || next == 'r' || next == '|')
+            if (next == 'H' || next == 'h' || next == 'c' || next == 'r' || next == 'A' || next == 'a' || next == 'T' || next == 't' || next == '|')
                 ++pos;
             else
                 return false;
