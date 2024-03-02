@@ -89,6 +89,8 @@ ChannelMgr::~ChannelMgr()
         channel->SetAnnounce(dbAnnounce);
         channel->SetOwnership(dbOwnership);
         channel->SetPassword(dbPass);
+
+        wstrToLower(channelName);
         mgr->_customChannels.emplace(channelName, channel);
 
         ++count;
