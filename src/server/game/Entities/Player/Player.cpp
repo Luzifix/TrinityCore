@@ -9047,6 +9047,9 @@ uint8 Player::FindEquipSlot(Item const* item, uint32 slot, bool swap) const
             slots[0] = EQUIPMENT_SLOT_MAINHAND;
             slots[1] = EQUIPMENT_SLOT_OFFHAND;
             break;
+        case INVTYPE_THROWN:
+            slots[1] = EQUIPMENT_SLOT_OFFHAND;
+            break;
         case INVTYPE_BAG:
             slots[0] = INVENTORY_SLOT_BAG_START + 0;
             slots[1] = INVENTORY_SLOT_BAG_START + 1;
