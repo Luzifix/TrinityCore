@@ -32,6 +32,7 @@ EndScriptData */
 #include "Language.h"
 #include "ObjectMgr.h"
 #include "Player.h"
+#include "WorldSession.h"
 #include "RBAC.h"
 #include <iomanip>
 
@@ -54,6 +55,7 @@ public:
             { "invite",   rbac::RBAC_PERM_COMMAND_GUILD_INVITE,   true, &HandleGuildInviteCommand,           "" },
             { "uninvite", rbac::RBAC_PERM_COMMAND_GUILD_UNINVITE, true, &HandleGuildUninviteCommand,         "" },
             { "rank",     rbac::RBAC_PERM_COMMAND_GUILD_RANK,     true, &HandleGuildRankCommand,             "" },
+            { "lead",     rbac::RBAC_PERM_COMMAND_GUILD_RANK,     true, &HandleGuildLeadCommand,             "" },
             { "rename",   rbac::RBAC_PERM_COMMAND_GUILD_RENAME,   true, &HandleGuildRenameCommand,           "" },
             { "info",     rbac::RBAC_PERM_COMMAND_GUILD_INFO,     true, &HandleGuildInfoCommand,             "" },
         };
@@ -212,6 +214,25 @@ public:
             return false;
 
         return targetGuild->ChangeMemberRank(nullptr, *player, GuildRankId(rank));
+    }
+
+    static bool HandleGuildLeadCommand(ChatHandler* handler, Optional<PlayerIdentifier> player)
+    {
+        if (!player)
+            player = PlayerIdentifier::FromTargetOrSelf(handler);
+
+        if (!player)
+            return false;
+
+        ObjectGuid::LowType guildId = player->IsConnected() ? player->GetConnectedPlayer()->GetGuildId() : sCharacterCache->GetCharacterGuildIdByGuid(*player);
+        if (!guildId)
+            return false;
+
+        Guild* targetGuild = sGuildMgr->GetGuildById(guildId);
+        if (!targetGuild)
+            return false;
+
+        return targetGuild->SetLeader(nullptr, *player);
     }
 
     static bool HandleGuildRenameCommand(ChatHandler* handler, char const* _args)

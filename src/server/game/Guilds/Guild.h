@@ -826,6 +826,7 @@ class TC_GAME_API Guild
         bool AddMember(CharacterDatabaseTransaction trans, ObjectGuid guid, Optional<GuildRankId> rankId = {});
         void DeleteMember(CharacterDatabaseTransaction trans, ObjectGuid guid, bool isDisbanding = false, bool isKicked = false, bool canDeleteGuild = false);
         bool ChangeMemberRank(CharacterDatabaseTransaction trans, ObjectGuid guid, GuildRankId newRank);
+        bool SetLeader(CharacterDatabaseTransaction trans, ObjectGuid guid);
         bool IsMember(ObjectGuid guid) const;
         uint32 GetMembersCount() const { return uint32(m_members.size()); }
         uint64 GetMemberAvailableMoneyForRepairItems(ObjectGuid guid) const;

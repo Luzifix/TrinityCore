@@ -590,12 +590,18 @@ void WorldSession::HandleGuildNewsUpdateSticky(WorldPackets::Guild::GuildNewsUpd
 
 void WorldSession::HandleGuildReplaceGuildMaster(WorldPackets::Guild::GuildReplaceGuildMaster& /*replaceGuildMaster*/)
 {
+    if (!GetPlayer()->IsGameMaster())
+        return;
+
     if (Guild* guild = GetPlayer()->GetGuild())
         guild->HandleSetNewGuildMaster(this, "", true);
 }
 
 void WorldSession::HandleGuildSetGuildMaster(WorldPackets::Guild::GuildSetGuildMaster& packet)
 {
+    if (!GetPlayer()->IsGameMaster())
+        return;
+
     if (Guild* guild = GetPlayer()->GetGuild())
         guild->HandleSetNewGuildMaster(this, packet.NewMasterName, false);
 }

@@ -1504,9 +1504,6 @@ void Guild::HandleSetEmblem(WorldSession* session, EmblemInfo const& emblemInfo)
 
 void Guild::HandleSetNewGuildMaster(WorldSession* session, std::string_view name, bool isSelfPromote)
 {
-    SendCommandResult(session, GUILD_COMMAND_CHANGE_LEADER, ERR_GUILD_PERMISSIONS);
-    return;
-
     Player* player = session->GetPlayer();
 
     Member* oldGuildMaster = GetMember(GetLeaderGUID());
@@ -1525,7 +1522,9 @@ void Guild::HandleSetNewGuildMaster(WorldSession* session, std::string_view name
         if (oldRank->GetOrder() != GuildRankOrder(1) // only second highest rank can take over guild
             || uint32(oldGuildMaster->GetInactiveDays()) < GUILD_MASTER_DETHRONE_INACTIVE_DAYS)
         {
-            SendCommandResult(session, GUILD_COMMAND_CHANGE_LEADER, ERR_GUILD_PERMISSIONS);
+            if (session)
+                SendCommandResult(session, GUILD_COMMAND_CHANGE_LEADER, ERR_GUILD_PERMISSIONS);
+
             return;
         }
     }
@@ -1533,7 +1532,9 @@ void Guild::HandleSetNewGuildMaster(WorldSession* session, std::string_view name
     {
         if (!_IsLeader(player))
         {
-            SendCommandResult(session, GUILD_COMMAND_CHANGE_LEADER, ERR_GUILD_PERMISSIONS);
+            if (session)
+                SendCommandResult(session, GUILD_COMMAND_CHANGE_LEADER, ERR_GUILD_PERMISSIONS);
+
             return;
         }
 
@@ -2928,6 +2929,23 @@ bool Guild::ChangeMemberRank(CharacterDatabaseTransaction trans, ObjectGuid guid
             member->ChangeRank(trans, newRank);
             return true;
         }
+    }
+
+    return false;
+}
+
+bool Guild::SetLeader(CharacterDatabaseTransaction trans, ObjectGuid guid)
+{
+    if (Member* newGuildMaster = GetMember(guid))
+    {
+        Member* oldGuildMaster = GetMember(GetLeaderGUID());
+
+        _SetLeader(trans, *newGuildMaster);
+        oldGuildMaster->ChangeRank(trans, _GetLowestRankId());
+
+        SendEventNewLeader(newGuildMaster, oldGuildMaster);
+
+        return true;
     }
 
     return false;
