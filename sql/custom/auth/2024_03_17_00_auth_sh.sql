@@ -1,0 +1,1 @@
+ALTER TABLE `battlenet_accounts_hardware_whitelist`	DROP PRIMARY KEY;
