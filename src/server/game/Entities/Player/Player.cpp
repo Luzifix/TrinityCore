@@ -9616,6 +9616,8 @@ InventoryResult Player::CanTakeMoreSimilarItems(uint32 entry, uint32 count, Item
     if ((pProto->GetMaxCount() <= 0 && pProto->GetItemLimitCategory() == 0) || pProto->GetMaxCount() == 2147483647)
         return EQUIP_ERR_OK;
 
+    return EQUIP_ERR_OK;
+
     if (pProto->GetMaxCount() > 0)
     {
         uint32 curcount = GetItemCount(pProto->GetId(), true, pItem);
