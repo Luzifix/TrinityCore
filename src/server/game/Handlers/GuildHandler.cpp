@@ -26,6 +26,8 @@
 #include "Log.h"
 #include "ObjectMgr.h"
 #include "Player.h"
+#include <Chat.h>
+#include <Language.h>
 
 void WorldSession::HandleGuildQueryOpcode(WorldPackets::Guild::QueryGuildInfo& query)
 {
@@ -591,7 +593,10 @@ void WorldSession::HandleGuildNewsUpdateSticky(WorldPackets::Guild::GuildNewsUpd
 void WorldSession::HandleGuildReplaceGuildMaster(WorldPackets::Guild::GuildReplaceGuildMaster& /*replaceGuildMaster*/)
 {
     if (!GetPlayer()->IsGameMaster())
+    {
+        ChatHandler(this).PSendSysMessage(LANG_GUILD_ERR_MASTER_TRANSFER_BY_PLAYER);
         return;
+    }
 
     if (Guild* guild = GetPlayer()->GetGuild())
         guild->HandleSetNewGuildMaster(this, "", true);
@@ -600,7 +605,10 @@ void WorldSession::HandleGuildReplaceGuildMaster(WorldPackets::Guild::GuildRepla
 void WorldSession::HandleGuildSetGuildMaster(WorldPackets::Guild::GuildSetGuildMaster& packet)
 {
     if (!GetPlayer()->IsGameMaster())
+    {
+        ChatHandler(this).PSendSysMessage(LANG_GUILD_ERR_MASTER_TRANSFER_BY_PLAYER);
         return;
+    }
 
     if (Guild* guild = GetPlayer()->GetGuild())
         guild->HandleSetNewGuildMaster(this, packet.NewMasterName, false);

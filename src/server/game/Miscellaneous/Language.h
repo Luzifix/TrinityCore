@@ -1392,5 +1392,6 @@ enum TrinityStrings
 
     // IDs for Shantalya 70-80k
     LANG_SOCIAL_ERROR_YOU_CANT_IGNORE             = 70000,
+    LANG_GUILD_ERR_MASTER_TRANSFER_BY_PLAYER      = 70001,
 };
 #endif
