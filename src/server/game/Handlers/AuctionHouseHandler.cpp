@@ -19,11 +19,13 @@
 #include "AccountMgr.h"
 #include "AuctionHouseMgr.h"
 #include "AuctionHousePackets.h"
+#include "Chat.h"
 #include "CharacterCache.h"
 #include "Creature.h"
 #include "DatabaseEnv.h"
 #include "GameTime.h"
 #include "Item.h"
+#include "ItemPriceMgr.h"
 #include "Language.h"
 #include "Log.h"
 #include "ObjectAccessor.h"
@@ -620,6 +622,10 @@ void WorldSession::HandleAuctionSellCommodity(WorldPackets::AuctionHouse::Auctio
     if (throttle.Throttled)
         return;
 
+    ChatHandler(this).PSendSysMessage(LANG_AUCTIONHOUSE_ERR_NOT_CATEGORIZED_ITEM);
+    SendAuctionCommandResult(0, AuctionCommand::SellItem, AuctionResult::HasRestriction, throttle.DelayUntilNext);
+    return;
+
     if (!sellCommodity.UnitPrice || sellCommodity.UnitPrice > MAX_MONEY_AMOUNT)
     {
         TC_LOG_DEBUG("network", "WORLD: HandleAuctionSellItem - Player %s %s attempted to sell item with invalid price.", _player->GetName().c_str(), _player->GetGUID().ToString().c_str());
@@ -912,10 +918,28 @@ void WorldSession::HandleAuctionSellItem(WorldPackets::AuctionHouse::AuctionSell
     Seconds auctionTime = Seconds(int64(std::chrono::duration_cast<Seconds>(Minutes(sellItem.RunTime)).count() * double(sWorld->getRate(RATE_AUCTION_TIME))));
     AuctionHouseObject* auctionHouse = sAuctionMgr->GetAuctionsMap(creature->GetFaction());
 
-    uint64 deposit = AuctionHouseMgr::GetItemAuctionDeposit(_player, item, Minutes(sellItem.RunTime));
-    if (!_player->HasEnoughMoney(deposit))
+    uint64 deposit = 0;
+    //uint64 deposit = AuctionHouseMgr::GetItemAuctionDeposit(_player, item, Minutes(sellItem.RunTime));
+    //if (!_player->HasEnoughMoney(deposit))
+    //{
+    //    SendAuctionCommandResult(0, AuctionCommand::SellItem, AuctionResult::NotEnoughMoney, throttle.DelayUntilNext);
+    //    return;
+    //}
+    std::vector<int32> bonusListIds;
+    uint32 itemId = item->GetEntry();
+    ItemContext itemContext = item->GetContext();
+    if (itemContext != ItemContext::NONE && itemContext < ItemContext::Max)
     {
-        SendAuctionCommandResult(0, AuctionCommand::SellItem, AuctionResult::NotEnoughMoney, throttle.DelayUntilNext);
+        std::set<uint32> contextBonuses = sDB2Manager.GetDefaultItemBonusTree(itemId, itemContext);
+        bonusListIds.insert(bonusListIds.begin(), contextBonuses.begin(), contextBonuses.end());
+    }
+
+    bool itemPriceNotFound = true;
+    ItemPrice* itemPrice = sItemPriceMgr->GetByItemId(itemId, bonusListIds, itemPriceNotFound);
+    if (itemPrice == nullptr || itemPriceNotFound || !itemPrice->GetPriceCategory()->IsActionAllowed())
+    {
+        ChatHandler(this).PSendSysMessage(LANG_AUCTIONHOUSE_ERR_NOT_CATEGORIZED_ITEM);
+        SendAuctionCommandResult(0, AuctionCommand::SellItem, AuctionResult::HasRestriction, throttle.DelayUntilNext);
         return;
     }
 
