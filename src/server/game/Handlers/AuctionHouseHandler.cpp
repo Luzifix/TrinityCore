@@ -927,15 +927,9 @@ void WorldSession::HandleAuctionSellItem(WorldPackets::AuctionHouse::AuctionSell
     //}
     std::vector<int32> bonusListIds;
     uint32 itemId = item->GetEntry();
-    ItemContext itemContext = item->GetContext();
-    if (itemContext != ItemContext::NONE && itemContext < ItemContext::Max)
-    {
-        std::set<uint32> contextBonuses = sDB2Manager.GetDefaultItemBonusTree(itemId, itemContext);
-        bonusListIds.insert(bonusListIds.begin(), contextBonuses.begin(), contextBonuses.end());
-    }
 
     bool itemPriceNotFound = true;
-    ItemPrice* itemPrice = sItemPriceMgr->GetByItemId(itemId, bonusListIds, itemPriceNotFound);
+    ItemPrice* itemPrice = sItemPriceMgr->GetByItemId(itemId, item->m_itemData->BonusListIDs, itemPriceNotFound);
     if (itemPrice == nullptr || itemPriceNotFound || !itemPrice->GetPriceCategory()->IsActionAllowed())
     {
         ChatHandler(this).PSendSysMessage(LANG_AUCTIONHOUSE_ERR_NOT_CATEGORIZED_ITEM);
