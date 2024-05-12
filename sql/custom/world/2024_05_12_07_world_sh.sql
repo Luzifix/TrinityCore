@@ -1,0 +1,1 @@
+UPDATE `gossip_menu_option` SET `OptionNpc`=9 WHERE  `MenuID`=300013 AND `OptionID` IN (0, 1, 2);

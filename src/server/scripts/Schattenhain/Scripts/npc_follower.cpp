@@ -1,5 +1,5 @@
 /*
-* Copyright (C) 2013-2022 Schattenhain <http://schattenhain.de/>
+* Copyright (C) 2013-2024 Schattenhain <http://schattenhain.de/>
 */
 
 #include "AbstractFollower.h"
@@ -419,60 +419,23 @@ public:
             StayHere = 3 + GOSSIP_ACTION_INFO_DEF,
             FollowMe = 4 + GOSSIP_ACTION_INFO_DEF,
             GoodBye = 5 + GOSSIP_ACTION_INFO_DEF,
+            DefaultMenu = 6 + GOSSIP_ACTION_INFO_DEF
         };
-
-        bool StartInteract(Player* player) override
-        {
-            TempSummon* tempMe = me->ToTempSummon();
-            if (tempMe == nullptr || tempMe->GetSummonerGUID() != player->GetGUID())
-                return false;
-
-            return true;
-        }
 
         bool OnGossipHello(Player* player) override
         {
-            ClearGossipMenuFor(player);
-
-            MovementGenerator* movement = me->GetMotionMaster()->GetMovementGenerator([player](MovementGenerator const* a) -> bool
-            {
-                if (a->GetMovementGeneratorType() == FOLLOW_MOTION_TYPE)
-                {
-                    FollowMovementGenerator const* followMovement = dynamic_cast<FollowMovementGenerator const*>(a);
-                    return followMovement && followMovement->GetTarget() == player;
-                }
-                return false;
-            });
-
-            AddGossipItemFor(player, GossipMenuId::FOLLOWER, 0, GOSSIP_SENDER_MAIN, GossipAction::GoBack);
-            
-            if (movement)
-                AddGossipItemFor(player, GossipMenuId::FOLLOWER, 1, GOSSIP_SENDER_MAIN, GossipAction::StayHere);
-
-            if (!movement)
-                AddGossipItemFor(player, GossipMenuId::FOLLOWER, 2, GOSSIP_SENDER_MAIN, GossipAction::FollowMe);
-
-            AddGossipItemFor(player, GossipMenuId::FOLLOWER, 3, GOSSIP_SENDER_MAIN, GossipAction::GoodBye);
-            SendGossipMenuFor(player, DEFAULT_GOSSIP_MESSAGE, me->GetGUID());
+            AddGossipMenu(player, GossipMenuId::FOLLOWER);
 
             return true;
         }
 
         bool OnGossipSelect(Player* player, uint32 /*menuId*/, uint32 gossipListId) override
         {
-            uint32 const action = player->PlayerTalkClass->GetGossipOptionAction(gossipListId);
+            PlayerMenu* playerTalkClass = player->PlayerTalkClass;
+            uint32 const action = playerTalkClass->GetGossipOptionAction(gossipListId);
             Optional<SummonSlot> summonSlot = GetSummonSlot(player, me);
             Optional<float> followAngle = GetFollowAngle(player, me);
-
-            MovementGenerator* movement = me->GetMotionMaster()->GetMovementGenerator([player](MovementGenerator const* a) -> bool
-            {
-                if (a->GetMovementGeneratorType() == FOLLOW_MOTION_TYPE)
-                {
-                    FollowMovementGenerator const* followMovement = dynamic_cast<FollowMovementGenerator const*>(a);
-                    return followMovement && followMovement->GetTarget() == player;
-                }
-                return false;
-            });
+            MovementGenerator* movement = GetMovementGenerator(player);
 
             switch (action)
             {
@@ -480,21 +443,33 @@ public:
                     me->DespawnOrUnsummon();
                     if (summonSlot.has_value())
                         player->m_SummonSlot[*summonSlot] = ObjectGuid::Empty;
+                    CloseGossipMenuFor(player);
                     break;
 
                 case GossipAction::StayHere:
                     me->GetMotionMaster()->Remove(movement);
+                    CloseGossipMenuFor(player);
                     break;
 
                 case GossipAction::FollowMe:
-                    if (!followAngle.has_value())
-                        break;
-
                     me->GetMotionMaster()->MoveFollow(player, NPC_FOLLOWER_FOLLOWER_RANGE, *followAngle);
+                    CloseGossipMenuFor(player);
+                    break;
+
+                case GossipAction::GoodBye:
+                    CloseGossipMenuFor(player);
+                    break;
+
+                case GossipAction::DefaultMenu:
+                    GossipMenuItemData const* menuItemData = playerTalkClass->GetGossipMenu().GetItemData(gossipListId);
+                    if (menuItemData && menuItemData->GossipActionPoi)
+                        playerTalkClass->SendPointOfInterest(menuItemData->GossipActionPoi);
+
+                    uint32 const menuId = playerTalkClass->GetGossipOptionSender(gossipListId);
+                    AddGossipMenu(player, menuId);
                     break;
             }
 
-            CloseGossipMenuFor(player);
             return true;
         }
     private:
@@ -537,6 +512,55 @@ public:
             }
 
             return std::nullopt;
+        }
+
+        MovementGenerator* GetMovementGenerator(Player* player) {
+            return me->GetMotionMaster()->GetMovementGenerator([player](MovementGenerator const* generator) -> bool
+                {
+                    if (generator->GetMovementGeneratorType() == FOLLOW_MOTION_TYPE)
+                    {
+                        FollowMovementGenerator const* followMovement = dynamic_cast<FollowMovementGenerator const*>(generator);
+                        return followMovement && followMovement->GetTarget() == player;
+                    }
+                    return false;
+                });
+        }
+
+        void AddGossipMenu(Player* player, uint32 menuId)
+        {
+            ClearGossipMenuFor(player);
+            InitGossipMenuFor(player, menuId);
+
+            if (menuId == GossipMenuId::FOLLOWER)
+            {
+                TempSummon* tempMe = me->ToTempSummon();
+                if (tempMe && tempMe->GetSummonerGUID() == player->GetGUID())
+                {
+                    MovementGenerator* movement = GetMovementGenerator(player);
+
+                    AddGossipItemFor(player, menuId, 0, GOSSIP_SENDER_MAIN, GossipAction::GoBack);
+
+                    if (movement)
+                        AddGossipItemFor(player, menuId, 1, GOSSIP_SENDER_MAIN, GossipAction::StayHere);
+                    else if (!movement)
+                        AddGossipItemFor(player, menuId, 2, GOSSIP_SENDER_MAIN, GossipAction::FollowMe);
+
+                    AddGossipItemFor(player, menuId, 3, GOSSIP_SENDER_MAIN, GossipAction::GoodBye);
+                }
+            }
+
+            Trinity::IteratorPair menuList = sObjectMgr->GetGossipMenuItemsMapBounds(menuId);
+            for (std::pair<uint32 const, GossipMenuItems> const& menuItems : menuList)
+            {
+                GossipMenuItems menuItem = menuItems.second;
+
+                if (menuId != GossipMenuId::FOLLOWER || (menuId == GossipMenuId::FOLLOWER && menuItem.OptionID > 3))
+                {
+                    AddGossipItemFor(player, menuId, menuItem.OptionID, menuItem.ActionMenuID, GossipAction::DefaultMenu);
+                }
+            }
+
+            SendGossipMenuFor(player, player->GetGossipTextId(menuId, me), me->GetGUID());
         }
     };
 
