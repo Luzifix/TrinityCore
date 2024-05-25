@@ -1,0 +1,25 @@
+name: Build Release
+
+on:
+  workflow_dispatch:
+  push:
+    tags:
+      - v2.4-release*
+
+jobs:
+  build:
+    runs-on: sh-trinity
+    steps:
+    - name: Prepare
+      run: |
+        echo "Update source"
+        git --git-dir $TC_SOURCE_DIR/.git --work-tree $TC_SOURCE_DIR fetch
+        git --git-dir $TC_SOURCE_DIR/.git --work-tree $TC_SOURCE_DIR reset --hard origin/schattenhain-2.4
+        echo "Delete old compile files"
+        rm -rf $TC_SOURCE_DIR/build/*
+        echo "Generate build files"
+        $TC_SOURCE_DIR/build/.gen.sh
+    - name: Build
+      run: |
+        echo "Build core"
+        $TC_SOURCE_DIR/build/.make.sh
